@@ -40,5 +40,6 @@
     ./abbr.nix
     ./completions.nix
     ./functions.nix
+    ./init.nix
   ];
 }
