@@ -13,7 +13,9 @@
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
+  boot.kernelPackages = pkgs.linuxPackages_cachyos;
+  services.scx.enable = true; # by default uses scx_rustland scheduler
+  
   networking.hostName = "reason"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -126,7 +128,11 @@
   # accidentally delete configuration.nix.
   # system.copySystemConfiguration = true;
   
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "root" "@wheer" ];
+  };
+  
   nixpkgs.config.allowUnfree = true;
 
   # This option defines the first version of NixOS you have installed on this particular machine,

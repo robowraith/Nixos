@@ -6,7 +6,7 @@
   };
   outputs = inputs@{ self, nixpkgs, chaotic, ... }: {
    nixosConfigurations.reason = nixpkgs.lib.nixosSystem {
-      system = "X86_64-linux";
+      system = "x86_64-linux";
       modules = [
         ./configuration.nix
         chaotic.nixosModules.default
