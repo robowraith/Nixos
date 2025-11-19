@@ -1,12 +1,11 @@
 {
-  description = "Home Manager configuration";
+  description = "My NixOS and Home Manager configuration";
 
   inputs = {
-    # Use nixpkgs-unstable for the latest packages
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
-      # This ensures home-manager uses the same nixpkgs version
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix = {
@@ -15,7 +14,7 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, stylix, ... }:
+  outputs = { self, nixpkgs, chaotic, home-manager, stylix, ... }:
     let
       # Define user configurations for different devices
       userConfigs = {
@@ -37,7 +36,7 @@
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           modules = [
             stylix.homeModules.stylix
-            ./home.nix
+            ../dotfiles/home.nix
             {
               home = {
                 inherit (config) username homeDirectory;
@@ -53,6 +52,16 @@
           ];
         };
     in {
+      # NixOS system configuration
+      nixosConfigurations.reason = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./configuration.nix
+          chaotic.nixosModules.default
+        ];
+      };
+
+      # Home Manager configurations
       homeConfigurations = builtins.mapAttrs mkHomeConfig userConfigs;
     };
 }
