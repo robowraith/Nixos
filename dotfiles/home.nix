@@ -36,8 +36,8 @@ in
 
   # Environment variables
   home.sessionVariables = {
-    EDITOR = "helix";
-    VISUAL = "helix";
+    EDITOR = "hx";
+    VISUAL = "hx";
     BROWSER = "vivaldi";
     PAGER = "less -R";
     LANG = "de_DE.UTF-8";
