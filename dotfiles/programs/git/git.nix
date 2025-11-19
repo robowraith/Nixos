@@ -9,6 +9,7 @@
         email = "robowraith@gmail.com";
       };
       init.defaultBranch = "main";
+      pull.ff = "only";
       alias = {
         st = "status";
         co = "checkout";
