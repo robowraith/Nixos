@@ -3,9 +3,11 @@
     cl = "clear";
     d = "docker";
     dc = "docker compose";
+    hms = "home-manager switch --flake ~/home/joachim/nixos/dotfiles";
     k = "kubectl";
     kc = "kubectl";
     lg = "lazygit";
+    nrs = "sudo nix-rebuid switch --flake ~/home/joachim/nixos/system";
     zj = "zellij";
   };
 }
