@@ -36,7 +36,7 @@
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           modules = [
             stylix.homeModules.stylix
-            ../dotfiles/home.nix
+            ./dotfiles/home.nix
             {
               home = {
                 inherit (config) username homeDirectory;
@@ -56,7 +56,7 @@
       nixosConfigurations.reason = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ./configuration.nix
+          ./system/configuration.nix
           chaotic.nixosModules.default
         ];
       };
