@@ -27,10 +27,8 @@
      
      # Include Plymouth in initrd for LUKS password prompt theming
      initrd.systemd.enable = true;
-
-     # Enable "Silent boot"
-     consoleLogLevel = 3;
-     initrd.verbose = false;
+     
+     # Kernel parameters for NVIDIA
      kernelParams = [
        "quiet"
        "splash"
@@ -39,9 +37,32 @@
        "udev.log_priority=3"
        "rd.systemd.show_status=auto"
        "rd.udev.log_level=3"
+       "nvidia-drm.modeset=1"
+       "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
      ];
+
+     # Enable "Silent boot"
+     consoleLogLevel = 3;
+     initrd.verbose = false;
   };
   services.scx.enable = true; # by default uses scx_rustland scheduler
+  
+  # NVIDIA Configuration
+  services.xserver.videoDrivers = [ "nvidia" ];
+  
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+  };
+  
+  hardware.nvidia = {
+    modesetting.enable = true;
+    powerManagement.enable = true;
+    powerManagement.finegrained = false;
+    open = false; # Use proprietary driver
+    nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+  };
   
   networking.hostName = "reason"; # Define your hostname.
   # Pick only one of the below networking options.
@@ -89,25 +110,27 @@
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
-  # Enable sound.
-  # services.pulseaudio.enable = true;
-  # OR
-  # services.pipewire = {
-  #   enable = true;
-  #   pulse.enable = true;
-  # };
+  # Enable sound with PipeWire
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    jack.enable = true;
+  };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account. Don't forget to set a password with 'passwd'.
   users = {
     users.joachim = {
     uid = 1000;
     isNormalUser = true;
     group = "joachim";
     createHome = true;
-    extraGroups = [ "networkmanager" "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "networkmanager" "wheel" "video" "input" "audio" ]; # Enable 'sudo' for the user.
     shell = pkgs.fish;
     };
     groups.joachim = {
@@ -127,6 +150,14 @@
     fish
     git
     helix
+    # Wayland essentials
+    wayland
+    wayland-utils
+    wl-clipboard
+    # Basic terminal for emergency access
+    kitty
+    # NVIDIA utilities
+    nvtopPackages.nvidia
   ];
 
  programs.fish.enable = true; 
@@ -136,6 +167,25 @@
    withUWSM = true; # recommended for most users
    xwayland.enable = true; # Xwayland can be disabled.
  };
+
+ # Enable XDG portals for Wayland
+ xdg.portal = {
+   enable = true;
+   extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+   config.common.default = "*";
+ };
+ 
+ # Environment variables for NVIDIA + Wayland
+ environment.sessionVariables = {
+   NIXOS_OZONE_WL = "1";
+   GBM_BACKEND = "nvidia-drm";
+   __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+   LIBVA_DRIVER_NAME = "nvidia";
+   WLR_NO_HARDWARE_CURSORS = "1";
+ };
+
+ # Enable polkit for privilege escalation
+ security.polkit.enable = true;
 
  services.displayManager.ly = {
    enable = true;
