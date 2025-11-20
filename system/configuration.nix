@@ -164,8 +164,8 @@
 
  programs.hyprland = {
    enable = true;
-   withUWSM = true; # recommended for most users
-   xwayland.enable = true; # Xwayland can be disabled.
+   withUWSM = false; # Disable UWSM for now, start Hyprland directly
+   xwayland.enable = true;
  };
 
  # Enable XDG portals for Wayland
