@@ -11,9 +11,29 @@
     ];
 
   # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_cachyos-lto;
+  boot = {
+   loader = {
+     systemd-boot.enable = true;
+     efi.canTouchEfiVariables = true;
+     };
+     kernelPackages = pkgs.linuxPackages_cachyos-lto;
+     plymouth = {
+       enable = true;
+       theme = "catppuccin-mocha";
+       themePackages = [ (pkgs.catppuccin-plymouth.override { variant = "mocha"; }) ];
+     };
+
+     # Enable "Silent boot"
+     consoleLogLevel = 3;
+     initrd.verbose = false;
+     kernelParams = [
+       "quiet"
+       "splash"
+       "boot.shell_on_fail"
+       "udev.log_priority=3"
+       "rd.systemd.show_status=auto"
+     ];
+  };
   services.scx.enable = true; # by default uses scx_rustland scheduler
   
   networking.hostName = "reason"; # Define your hostname.
