@@ -17,11 +17,16 @@
      efi.canTouchEfiVariables = true;
      };
      kernelPackages = pkgs.linuxPackages_cachyos-lto;
+     
+     # Plymouth boot splash (includes LUKS password prompt theming)
      plymouth = {
        enable = true;
        theme = "catppuccin-mocha";
        themePackages = [ (pkgs.catppuccin-plymouth.override { variant = "mocha"; }) ];
      };
+     
+     # Include Plymouth in initrd for LUKS password prompt theming
+     initrd.systemd.enable = true;
 
      # Enable "Silent boot"
      consoleLogLevel = 3;
@@ -30,8 +35,10 @@
        "quiet"
        "splash"
        "boot.shell_on_fail"
+       "loglevel=3"
        "udev.log_priority=3"
        "rd.systemd.show_status=auto"
+       "rd.udev.log_level=3"
      ];
   };
   services.scx.enable = true; # by default uses scx_rustland scheduler
