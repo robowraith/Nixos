@@ -60,17 +60,17 @@
       
       cmd on-select &{{
         lf -remote "send $id set statfmt \"$(eza -ld --color=always \"$f\" | sed 's/\\/\\\\/g;s/\"/\\\"/g')\""
-      }}
+      }}'';
       
-      cmd fzf_search ${{
-        cmd="rg --column --line-number --no-heading --color=always --smart-case"
-        fzf --ansi --disabled --layout=reverse --header="Search in files" --delimiter=: \\
-          --bind="start:reload([ -n {q} ] && $cmd -- {q} || true)" \\
-          --bind="change:reload([ -n {q} ] && $cmd -- {q} || true)" \\
-          --bind='enter:become(lf -remote "send $id select \"$(printf "%s" {1} | sed '\''s/\\/\\\\/g;s/\"/\\\"/g'\'')\"")'  \\
-          --preview='cat -- {1}'
-      }}
-    '';
+      # cmd fzf_search ${{
+      #   cmd="rg --column --line-number --no-heading --color=always --smart-case"
+      #   fzf --ansi --disabled --layout=reverse --header="Search in files" --delimiter=: \\
+      #     --bind="start:reload([ -n {q} ] && $cmd -- {q} || true)" \\
+      #     --bind="change:reload([ -n {q} ] && $cmd -- {q} || true)" \\
+      #     --bind='enter:become(lf -remote "send $id select \"$(printf "%s" {1} | sed '\''s/\\/\\\\/g;s/\"/\\\"/g'\'')\"")'  \\
+      #     --preview='cat -- {1}'
+      # }}
+   # '';
   };
 
   xdg.configFile = {

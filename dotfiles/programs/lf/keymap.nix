@@ -5,7 +5,7 @@
     
     # File selection and navigation
     "<c-f>" = "$lf -remote \"send $id select \\\"$(fzf)\\\"\"";
-    J = "$lf -remote \"send $id cd $(sed -e 's/\\s*#.*//' -e '/^$/d' -e 's/^\\S*\\s*//' ''${XDG_CONFIG_HOME:-$HOME/.config}/shell/bm-dirs | fzf)\"";
+    # J = "$lf -remote \"send $id cd $(sed -e 's/\\s*#.*//' -e '/^$/d' -e 's/^\\S*\\s*//' ''${XDG_CONFIG_HOME:-$HOME/.config}/shell/bm-dirs | fzf)\"";
     gh = "";
     g = "top";
     "<c-g>" = ":fzf_search";
