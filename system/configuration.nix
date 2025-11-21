@@ -189,9 +189,18 @@
 
  services.displayManager.ly = {
    enable = true;
+   settings = {
+     animation = "matrix";
+     clock = "%c";
+     tty = 2;  # Run ly on TTY2, leaving TTY1 for emergency getty access
+   };
  };
  
  services.displayManager.sessionPackages = [ pkgs.hyprland ];
+ 
+ # Ensure getty runs on TTY1 for emergency shell access
+ systemd.services."getty@tty1".enable = true;
+ systemd.services."autovt@".enable = true;
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -207,6 +216,7 @@
 
   # Open ports in the firewall.
   networking.firewall.allowedTCPPorts = [ 22 ];
+
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
