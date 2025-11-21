@@ -231,7 +231,7 @@
       settings = {
         animation = "matrix";
         clock = "%c";
-        tty = 2;
+        tty = 1;
       };
     };
     sessionPackages = [ pkgs.hyprland ];
