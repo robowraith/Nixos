@@ -3,7 +3,7 @@
     cl = "clear";
     d = "docker";
     dc = "docker compose";
-    hms = "home-manager switch --flake ~/nixos#joachim";
+    hms = "home-manager switch --flake ~/nixos#joachim -b backup";
     k = "kubectl";
     kc = "kubectl";
     lg = "lazygit";
