@@ -1,0 +1,8 @@
+# This file is used by sops to configure encryption.
+# You need to replace <YOUR_AGE_PUBLIC_KEY> with your actual age public key.
+# You can get your public key by running `age-keygen -y`.
+creation_rules:
+  - path_regex: secrets.yaml$
+    key_groups:
+      - age:
+          - age1kudsrsdhvgxm93akgldvm7dzhnkkwfjrggpfda3d9g2tdj3e55xqfvf2ky

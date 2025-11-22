@@ -12,9 +12,13 @@
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, chaotic, home-manager, stylix, ... }:
+  outputs = { self, nixpkgs, chaotic, home-manager, stylix, sops-nix, ... }:
     let
       # Define user configurations for different devices
       userConfigs = {
@@ -36,6 +40,7 @@
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           modules = [
             stylix.homeModules.stylix
+            sops-nix.homeManagerModules.sops
             ./dotfiles/home.nix
             {
               home = {
@@ -50,6 +55,7 @@
       nixosConfigurations.reason = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+          sops-nix.nixosModules.sops
           ./system/configuration.nix
           chaotic.nixosModules.default
         ];

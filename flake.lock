@@ -325,6 +325,7 @@
         "chaotic": "chaotic",
         "home-manager": "home-manager_2",
         "nixpkgs": "nixpkgs_2",
+        "sops-nix": "sops-nix",
         "stylix": "stylix"
       }
     },
@@ -346,6 +347,26 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "sops-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1763607916,
+        "narHash": "sha256-VefBA1JWRXM929mBAFohFUtQJLUnEwZ2vmYUNkFnSjE=",
+        "owner": "Mic92",
+        "repo": "sops-nix",
+        "rev": "877bb495a6f8faf0d89fc10bd142c4b7ed2bcc0b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Mic92",
+        "repo": "sops-nix",
         "type": "github"
       }
     },
