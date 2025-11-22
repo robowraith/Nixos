@@ -8,10 +8,14 @@
     defaultSopsFormat = "yaml";
     age.keyFile = "/var/lib/sops/age/keys.txt";
     secrets = {
-      # Example secret, this will be available as a file at /run/secrets/my-secret
-      "my-secret" = {
+      # CIFS credentials for network shares
+      "cifs_username" = {
         sopsFile = ../../secrets.yaml;
-        key = "system-secret";
+        key = "system-secrets/cifs_credentials/username";
+      };
+      "cifs_password" = {
+        sopsFile = ../../secrets.yaml;
+        key = "system-secrets/cifs_credentials/password";
       };
     };
   };

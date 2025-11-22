@@ -4,15 +4,16 @@
 {
   # sops-nix configuration for home-manager
   sops = {
-    enable = true;
     defaultSopsFile = ../../../secrets.yaml;
     defaultSopsFormat = "yaml";
     secrets = {
-      # Example secret for home-manager
-      "hm-secret" = {
-        sopsFile = ../../../secrets.yaml;
-        key = "hm-secret";
-      };
+      # No secrets defined yet for home-manager
+      # The hm-secrets key in secrets.yaml is null
+      # Uncomment and configure when you have actual secrets
+      # "example-secret" = {
+      #   sopsFile = ../../../secrets.yaml;
+      #   key = "hm-secrets/example";
+      # };
     };
   };
 }
