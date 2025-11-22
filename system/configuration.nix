@@ -115,6 +115,46 @@
   };
 
   # ============================================================================
+  # Filesystems - CIFS Network Shares
+  # ============================================================================
+
+  fileSystems."/home/joachim/Backup" = {
+    device = "//192.168.1.3/Backup";
+    fsType = "cifs";
+    options = [ "auto" "nofail" "_netdev" "vers=3.0" "uid=1000" "gid=1000" "credentials=/etc/cifs-credentials" ];
+  };
+
+  fileSystems."/home/joachim/Bilder" = {
+    device = "//192.168.1.3/Bilder";
+    fsType = "cifs";
+    options = [ "auto" "nofail" "_netdev" "vers=3.0" "uid=1000" "gid=1000" "credentials=/etc/cifs-credentials" ];
+  };
+
+  fileSystems."/home/joachim/Dokumente" = {
+    device = "//192.168.1.3/Dokumente";
+    fsType = "cifs";
+    options = [ "auto" "nofail" "_netdev" "vers=3.0" "uid=1000" "gid=1000" "credentials=/etc/cifs-credentials" ];
+  };
+
+  fileSystems."/home/joachim/Install" = {
+    device = "//192.168.1.3/Install";
+    fsType = "cifs";
+    options = [ "auto" "nofail" "_netdev" "vers=3.0" "uid=1000" "gid=1000" "credentials=/etc/cifs-credentials" ];
+  };
+
+  fileSystems."/home/joachim/Musik" = {
+    device = "//192.168.1.3/Musik";
+    fsType = "cifs";
+    options = [ "auto" "nofail" "_netdev" "vers=3.0" "uid=1000" "gid=1000" "credentials=/etc/cifs-credentials" ];
+  };
+
+  fileSystems."/home/joachim/Videos" = {
+    device = "//192.168.1.3/Videos";
+    fsType = "cifs";
+    options = [ "auto" "nofail" "_netdev" "vers=3.0" "uid=1000" "gid=1000" "credentials=/etc/cifs-credentials" ];
+  };
+
+  # ============================================================================
   # Localization
   # ============================================================================
 
@@ -161,6 +201,16 @@
       gid = 1000;
     };
   };
+
+  # Create mount point directories
+  systemd.tmpfiles.rules = [
+    "d /home/joachim/Backup 0755 joachim joachim -"
+    "d /home/joachim/Bilder 0755 joachim joachim -"
+    "d /home/joachim/Dokumente 0755 joachim joachim -"
+    "d /home/joachim/Install 0755 joachim joachim -"
+    "d /home/joachim/Musik 0755 joachim joachim -"
+    "d /home/joachim/Videos 0755 joachim joachim -"
+  ];
 
   # ============================================================================
   # System Packages
