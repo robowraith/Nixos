@@ -223,6 +223,10 @@
     git
     helix
 
+    # Secrets management
+    age
+    sops
+
     # Wayland
     wayland
     wayland-utils
