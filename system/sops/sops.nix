@@ -4,7 +4,6 @@
 {
   # sops-nix configuration
   sops = {
-    enable = true;
     defaultSopsFile = ../../secrets.yaml;
     defaultSopsFormat = "yaml";
     age.keyFile = "/var/lib/sops/age/keys.txt";
