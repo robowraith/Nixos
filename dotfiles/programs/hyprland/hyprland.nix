@@ -3,7 +3,7 @@
 {
   wayland.windowManager.hyprland = {
     enable = true;
-    plugins = [ pkgs.hyprland-plugins.hy3 ];
+    plugins = [ pkgs.hyprlandPlugins.hy3 ];
     # package = pkgs.hyprland; # You can uncomment and set your preferred package
 
     settings = {
@@ -26,8 +26,7 @@
         gaps_in = 5;
         gaps_out = 20;
         border_size = 5;
-        "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
-        "col.inactive_border" = "rgba(595959aa)";
+        # Colors are managed by Stylix
         resize_on_border = false;
         allow_tearing = false;
         layout = "hy3";
@@ -42,7 +41,7 @@
           enabled = true;
           range = 4;
           render_power = 3;
-          color = "rgba(1a1a1aee)";
+          # color is managed by Stylix
         };
         blur = {
           enabled = true;
@@ -109,11 +108,6 @@
         touchpad = {
           natural_scroll = false;
         };
-      };
-
-      gestures = {
-        workspace_swipe = true;
-        workspace_swipe_fingers = 3;
       };
 
       device = [{
