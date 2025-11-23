@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   programs.helix = {
@@ -31,7 +31,7 @@
     languages = {
       language-server = {
         gpt = {
-          command = "/home/joachim/Privat/code/helix-gpt/dist/helix-gpt";
+          command = "${config.home.homeDirectory}/Privat/code/helix-gpt/dist/helix-gpt";
           # IMPORTANT: The API key is read from an environment variable for security.
           # You must set this variable in your shell for it to work, for example:
           # export COPILOT_API_KEY="ghp_..."

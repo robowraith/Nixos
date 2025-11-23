@@ -20,6 +20,9 @@
 
   outputs = { self, nixpkgs, chaotic, home-manager, stylix, sops-nix, ... }:
     let
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
+      
       # Define user configurations for different devices
       userConfigs = {
         # Primary user configuration
@@ -37,7 +40,7 @@
 
       mkHomeConfig = name: config:
         home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          pkgs = nixpkgs.legacyPackages.${system};
           modules = [
             stylix.homeModules.stylix
             sops-nix.homeManagerModules.sops
@@ -45,7 +48,7 @@
             {
               home = {
                 inherit (config) username homeDirectory;
-                stateVersion = "24.11";
+                stateVersion = "25.05";
               };
             }
           ];
@@ -63,5 +66,24 @@
 
       # Home Manager configurations
       homeConfigurations = builtins.mapAttrs mkHomeConfig userConfigs;
+      
+      # Development shell
+      devShells.${system}.default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          nixpkgs-fmt
+          nil # Nix LSP
+          age
+          sops
+          git
+        ];
+        
+        shellHook = ''
+          echo "NixOS configuration development environment"
+          echo "Available tools: nixpkgs-fmt, nil, age, sops"
+        '';
+      };
+      
+      # Formatter for 'nix fmt'
+      formatter.${system} = pkgs.nixpkgs-fmt;
     };
 }
