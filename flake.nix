@@ -103,24 +103,3 @@
       formatter.${system} = pkgs.nixpkgs-fmt;
     };
 }
-      
-      # Development shell
-      devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          nixpkgs-fmt
-          nil # Nix LSP
-          age
-          sops
-          git
-        ];
-        
-        shellHook = ''
-          echo "NixOS configuration development environment"
-          echo "Available tools: nixpkgs-fmt, nil, age, sops"
-        '';
-      };
-      
-      # Formatter for 'nix fmt'
-      formatter.${system} = pkgs.nixpkgs-fmt;
-    };
-}
