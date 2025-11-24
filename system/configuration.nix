@@ -142,7 +142,8 @@
         tty = 1;
       };
     };
-    sessionPackages = [ pkgs.hyprland pkgs.herbstluftwm ];
+    # Hyprland is a standalone compositor, HerbstluftWM is managed via services.xserver.windowManager
+    sessionPackages = [ pkgs.hyprland ];
   };
 
   # Enable X11 for HerbstluftWM

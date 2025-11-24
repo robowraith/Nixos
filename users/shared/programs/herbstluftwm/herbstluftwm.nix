@@ -1,14 +1,9 @@
 { config, pkgs, ... }:
 
 {
-  # Install HerbstluftWM
-  home.packages = [ pkgs.herbstluftwm ];
-
-  # Enable X session for HerbstluftWM
-  xsession = {
-    enable = true;
-    windowManager.command = "${pkgs.herbstluftwm}/bin/herbstluftwm";
-  };
+  # HerbstluftWM is enabled system-wide via services.xserver.windowManager.herbstluftwm
+  # No need to install it here or configure xsession - that's handled by NixOS
+  # We only need to configure the autostart script
 
   # Write the autostart config to XDG config
   xdg.configFile."herbstluftwm/autostart" = {
