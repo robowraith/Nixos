@@ -137,7 +137,13 @@
         tty = 1;
       };
     };
-    sessionPackages = [ pkgs.hyprland ];
+    sessionPackages = [ pkgs.hyprland pkgs.herbstluftwm ];
+  };
+
+  # Enable X11 for HerbstluftWM
+  services.xserver = {
+    enable = true;
+    windowManager.herbstluftwm.enable = true;
   };
 
   # Emergency shell access on TTY1
