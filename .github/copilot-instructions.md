@@ -3,6 +3,8 @@
 This is the NixOS configuration of a machine running NixOS unstable
 and using Home Manager to manage user applications and configuration.
 
+# IMPORTANT: The configuration is deployed on another system. You can reach it via `ssh privat_reason`. The configuration path is `/home/joachim/nixos`.
+
 ## Structure
 
 The system configuration is under `system/`, the Home Manager configuration
