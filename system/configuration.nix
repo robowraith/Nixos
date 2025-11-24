@@ -36,6 +36,11 @@
       "nyx.chaotic.cx-1:HfnXSw4pj95iI/n17rIDy40agHj12WfF+Gqk6SonIT8="
     ];
   };
+
+  # Custom Nix configuration
+  nix.extraOptions = ''
+    eval-cores = 0
+  '';
   
   # Automatic garbage collection
   nix.gc = {
