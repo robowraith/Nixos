@@ -57,4 +57,6 @@ in
   targets.genericLinux.enable = true;
   xdg.enable = true;
   xdg.mime.enable = true;
+  # Enable creation of XDG autostart entries.
+  xdg.autostart.enable = true;
 }
