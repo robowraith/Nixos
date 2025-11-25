@@ -99,12 +99,6 @@
 
   programs.fish.enable = true;
 
-  programs.hyprland = {
-    enable = true;
-    withUWSM = false;
-    xwayland.enable = true;
-  };
-
   # ============================================================================
   # XDG & Portals
   # ============================================================================
@@ -114,7 +108,6 @@
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     config = {
       common.default = [ "gtk" ];
-      hyprland.default = [ "hyprland" "gtk" ];
     };
   };
 
@@ -137,7 +130,6 @@
         tty = 1;
       };
     };
-    sessionPackages = [ pkgs.hyprland ];
   };
 
   # Emergency shell access on TTY1
