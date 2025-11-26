@@ -5,34 +5,97 @@ and using Home Manager to manage user applications and configuration.
 
 ## Structure
 
-The system configuration is under `system/`, the Home Manager configuration
-under `dotfiles/`. All is tied together in a Flake at `./flake.nix`.
+This is a **multi-machine, multi-user** NixOS configuration. System configurations
+are under `hosts/`, user configurations under `users/`, with reusable components
+in `lib/`, `modules/`, and `profiles/`. All is tied together in a Flake at `./flake.nix`.
 
-The base configuration files (`home.nix` and `configuration.nix`) should contain
-only general configuration options. Specific options shall be organized in
-their own subfolders and files.
+### Directory Layout
+```
+.
+├── lib/                    # Builder functions
+│   ├── default.nix        # Main lib export
+│   ├── hosts.nix          # mkHost function
+│   └── users.nix          # mkUser function
+├── hosts/                 # System configurations
+│   ├── <hostname>/       # Machine-specific
+│   │   ├── default.nix
+│   │   └── hardware-configuration.nix
+│   └── shared/           # Common system config
+│       └── default.nix
+├── users/                # User configurations
+│   ├── <username>/      # User-specific
+│   │   ├── default.nix
+│   │   └── <hostname>.nix  # Host-specific overrides (optional)
+│   └── shared/          # Shared programs
+│       ├── home.nix
+│       └── programs/
+├── modules/             # Feature modules (e.g., nvidia.nix)
+├── profiles/            # Setup profiles (e.g., desktop.nix)
+├── secrets/             # Per-host secrets (<hostname>.yaml)
+└── system/              # Legacy (being phased out)
+```
 
-### System Configuration (`system/`)
-- `configuration.nix` - Main system config (imports modules, packages, services)
-- `hardware-configuration.nix` - Auto-generated hardware settings (don't modify directly)
-- `modules/` - Modular system components:
-  - `boot.nix` - Bootloader, kernel, Plymouth boot splash
-  - `networking.nix` - Network settings, static IP, firewall rules
-  - `nvidia.nix` - GPU configuration, Wayland environment variables
-  - `filesystems.nix` - CIFS network mounts, filesystem definitions
-  - `users.nix` - User and group management
-  - `localization.nix` - Timezone, locale, keyboard layout
-- `sops/` - Secrets management configuration
+### Key Directories
 
-### Home Manager Configuration (`dotfiles/`)
-- `home.nix` - Main Home Manager config (auto-imports from programs/)
-- `programs/` - Per-program configurations in subdirectories
-  - Each program has its own folder (e.g., `helix/`, `fish/`, `git/`)
-  - Configuration files typically named `<program>.nix`
-  - Complex programs can have multiple files (e.g., `fish/` contains aliases.nix, functions.nix, etc.)
-  - Auto-installation: If folder name matches nixpkgs package name, it's installed automatically
+**`lib/`** - Helper functions for building configurations
+- `hosts.nix` - `mkHost` function for creating NixOS configurations
+- `users.nix` - `mkUser` function for creating Home Manager configurations
 
-Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
+**`hosts/`** - Per-machine system configurations
+- Each subdirectory represents a physical/virtual machine
+- `default.nix` contains machine-specific settings
+- `hardware-configuration.nix` is auto-generated (don't modify directly)
+- `shared/` contains common configuration for all machines
+
+**`users/`** - Per-user configurations
+- Each subdirectory represents a user
+- `default.nix` contains user-specific settings (git identity, packages, etc.)
+- Optional `<hostname>.nix` for host-specific user overrides
+- `shared/programs/` contains program configurations used by all users
+
+**`modules/`** - Reusable feature modules (e.g., NVIDIA, gaming)
+
+**`profiles/`** - Common setup bundles (e.g., desktop, development, server)
+
+**`secrets/`** - Per-host encrypted secret files using sops-nix
+
+### Program Configuration
+Programs are configured under `users/shared/programs/`:
+- Each program has its own folder (e.g., `helix/`, `fish/`, `git/`)
+- Configuration files typically named `<program>.nix`
+- Complex programs can have multiple files (e.g., `fish/` contains aliases.nix, functions.nix, etc.)
+- Auto-installation: If folder name matches nixpkgs package name, it's installed automatically
+
+Example: The configuration for Helix is in `users/shared/programs/helix/helix.nix`.
+
+## Remote System Access
+
+The NixOS system being configured (hostname "reason") is a **remote machine** accessible via SSH:
+- **SSH Connection**: `ssh privat_reason`
+- **All Commands**: Execute all terminal commands (nixos-rebuild, home-manager, etc.) via SSH
+- **File Editing**: Edit files locally in the workspace, deploy changes remotely
+
+### Running Commands on the Remote System
+
+Always prefix commands with `ssh privat_reason` when they need to execute on the target system:
+
+```bash
+# System rebuild (remote)
+ssh privat_reason "sudo nixos-rebuild switch --flake .#reason"
+ssh privat_reason "sudo nixos-rebuild test --flake .#reason"
+
+# Home Manager (remote)
+ssh privat_reason "home-manager switch --flake .#joachim@reason"
+
+# Checking system state (remote)
+ssh privat_reason "nixos-rebuild list-generations"
+ssh privat_reason "journalctl -xe"
+
+# Local operations (no SSH needed)
+nix flake check
+nix fmt
+git status
+```
 
 ## Best Practices
 
@@ -45,6 +108,7 @@ Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
 4. **State Version**: Keep `system.stateVersion` and `home.stateVersion` in sync (currently 25.05)
 5. **Git Tracking**: All files must be tracked in git for flakes to work properly
 6. **Immutability**: Prefer declarative over imperative configurations
+7. **Remote Execution**: Always run deployment and system commands via `ssh privat_reason`
 
 ### System Configuration
 1. **Hardware Specific**: Keep hardware settings in `hardware-configuration.nix`, regenerate when hardware changes
@@ -80,23 +144,28 @@ Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
 4. **Formatter**: Define formatter for `nix fmt` (e.g., `nixpkgs-fmt`)
 5. **Clear Outputs**: Organize outputs logically:
    - `nixosConfigurations.<hostname>` for systems
-   - `homeConfigurations.<username>` for users
+   - `homeConfigurations.<username>@<hostname>` for users (note the `@hostname` suffix)
    - `devShells.<system>.default` for development
    - `formatter.<system>` for code formatting
 6. **System Variable**: Use a `system` variable to avoid repeating `"x86_64-linux"`
 7. **Descriptions**: Provide clear description in flake metadata
+8. **Multi-Machine**: Define hosts and users centrally in `flake.nix` using `mkHost` and `mkUser`
+9. **Builder Functions**: Use helper functions from `lib/` for consistency across configurations
 
 ### Secrets Management (sops-nix)
 1. **Age Keys**: 
    - Backup age keys securely (encrypted USB, password manager, separate machine)
    - Store at `/var/lib/sops/age/keys.txt` on NixOS
+   - Each machine needs its own age key
    - Document recovery procedures
 2. **Permissions**: Set appropriate permissions on secret files (mode = "0600")
 3. **Templates**: Use `sops.templates` for files requiring multiple secrets
 4. **Key Rotation**: Document and practice key rotation procedures
 5. **Never Commit**: Encrypted secrets are safe to commit, but never plain-text
-6. **Scoping**: System secrets in `system/sops/`, user secrets in home-manager sops config
+6. **Scoping**: Per-host secrets in `secrets/<hostname>.yaml`, configure in host's config
 7. **Placeholders**: Use `config.sops.placeholder.<secret>` in templates
+8. **Per-Host**: Each machine has its own secret file (e.g., `secrets/reason.yaml`)
+9. **`.sops.yaml`**: Define encryption rules per host using path_regex and age public keys
 
 ### Code Quality
 1. **Formatting**: Run `nix fmt` before committing
@@ -146,13 +215,15 @@ Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
 
 ### Common Patterns in This Configuration
 
-1. **Module Structure**: Each system component in its own file under `system/modules/`
-2. **CIFS Mounts**: Helper function `mkCifsMount` with `lib.genAttrs`
-3. **Program Auto-loading**: Directory names under `dotfiles/programs/` auto-discovered
-4. **Secrets**: SOPS with age encryption, templates for multi-secret files
-5. **Development**: `nix develop` provides tools for working with config
-6. **Formatting**: Use `nix fmt` for consistent code style
-7. **Cache**: Chaotic Nyx binary cache for CachyOS kernel packages
+1. **Multi-Machine**: Centralized host/user definitions in `flake.nix` using builder functions
+2. **Module Structure**: Feature modules in `modules/`, system config in `hosts/`, user config in `users/`
+3. **Program Auto-loading**: Directory names under `users/shared/programs/` auto-discovered
+4. **Secrets**: Per-host SOPS files in `secrets/<hostname>.yaml` with age encryption
+5. **Builder Functions**: `lib.mkHost` and `lib.mkUser` for consistent configuration building
+6. **Profiles**: Reusable configuration bundles in `profiles/` (desktop, development, etc.)
+7. **Development**: `nix develop` provides tools for working with config
+8. **Formatting**: Use `nix fmt` for consistent code style
+9. **Deployment**: Use `.#<hostname>` for systems, `.#<username>@<hostname>` for users
 
 ### When Making Changes
 
@@ -164,6 +235,45 @@ Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
 6. **Rollback Plan**: Know how to rollback if something breaks
 7. **Documentation**: Update relevant docs if changing structure
 
+### Multi-Machine Management
+
+**Adding a New Machine:**
+1. Create `hosts/<hostname>/` directory
+2. Generate hardware config: `nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix`
+3. Create `hosts/<hostname>/default.nix` with machine-specific settings
+4. Generate age key: `sudo age-keygen -o /var/lib/sops/age/keys.txt`
+5. Get public key: `sudo age-keygen -y /var/lib/sops/age/keys.txt`
+6. Update `.sops.yaml` with new host's age public key
+7. Create `secrets/<hostname>.yaml` for host-specific secrets
+8. Add to `flake.nix` in the `hosts` attribute set
+9. Deploy: `sudo nixos-rebuild switch --flake .#<hostname>`
+
+**Adding a New User:**
+1. Create `users/<username>/` directory
+2. Create `users/<username>/default.nix` with user settings
+3. Add to `flake.nix` in the `users` attribute set with target hosts
+4. Add system user in appropriate host config(s)
+5. Deploy: `home-manager switch --flake .#<username>@<hostname>`
+
+**Deployment Commands:**
+```bash
+# System configuration (remote execution required)
+ssh privat_reason "sudo nixos-rebuild switch --flake .#<hostname>"
+ssh privat_reason "sudo nixos-rebuild test --flake .#<hostname>"      # Test without activation
+ssh privat_reason "sudo nixos-rebuild build --flake .#<hostname>"     # Build without activation
+
+# User configuration (remote execution required, note the @hostname suffix)
+ssh privat_reason "home-manager switch --flake .#<username>@<hostname>"
+
+# Example for current system
+ssh privat_reason "sudo nixos-rebuild switch --flake .#reason"
+ssh privat_reason "home-manager switch --flake .#joachim@reason"
+
+# Local validation (no SSH needed)
+nix flake check
+nix fmt
+```
+
 ### Troubleshooting
 
 1. **Build Errors**: Check syntax with `nix flake check`
@@ -173,3 +283,5 @@ Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
 5. **Rollback**: Boot menu or `nixos-rebuild switch --rollback`
 6. **Logs**: Use `journalctl` for system service logs
 7. **Evaluation**: Add `--show-trace` for detailed error traces
+8. **Multi-Machine**: Verify host is defined in `flake.nix` and has correct modules
+9. **User Config**: Ensure user is listed for the target host in `flake.nix`

@@ -5,33 +5,38 @@ and using Home Manager to manage user applications and configuration.
 
 ## Structure
 
-The system configuration is under `system/`, the Home Manager configuration
-under `dotfiles/`. All is tied together in a Flake at `./flake.nix`.
+This is a **multi-machine, multi-user** NixOS configuration. System configurations
+are under `hosts/`, user configurations under `users/`, with reusable components
+in `lib/`, `modules/`, and `profiles/`. All is tied together in a Flake at `./flake.nix`.
 
-The base configuration files (`home.nix` and `configuration.nix`) should contain
-only general configuration options. Specific options shall be organized in
-their own subfolders and files.
+### Directory Layout
+- `lib/` - Helper functions for building hosts and users
+  - `hosts.nix` - `mkHost` function for system configurations
+  - `users.nix` - `mkUser` function for home-manager configurations
+- `hosts/` - System configurations (per-machine)
+  - `<hostname>/` - Machine-specific configuration
+    - `default.nix` - Main machine config
+    - `hardware-configuration.nix` - Hardware-specific settings
+  - `shared/` - Common system configuration shared across machines
+- `users/` - User configurations
+  - `<username>/` - User-specific configuration
+    - `default.nix` - User settings (git identity, packages, etc.)
+    - `<hostname>.nix` - Host-specific user overrides (optional)
+  - `shared/` - Shared user configuration and programs
+    - `programs/` - Per-program configurations
+- `modules/` - Reusable feature modules (e.g., `nvidia.nix`)
+- `profiles/` - Common setup profiles (e.g., `desktop.nix`, `development.nix`)
+- `secrets/` - Per-host encrypted secrets (e.g., `reason.yaml`)
+- `system/` - Legacy system configuration (being phased out)
 
-### System Configuration (`system/`)
-- `configuration.nix` - Main system config (imports modules, packages, services)
-- `hardware-configuration.nix` - Auto-generated hardware settings
-- `modules/` - Modular system components:
-  - `boot.nix` - Bootloader, kernel, Plymouth
-  - `networking.nix` - Network settings, firewall
-  - `nvidia.nix` - GPU configuration, Wayland environment
-  - `filesystems.nix` - CIFS mounts, filesystem definitions
-  - `users.nix` - User and group management
-  - `localization.nix` - Timezone, locale, keyboard layout
-- `sops/` - Secrets management configuration
+### Program Configuration
+Programs are configured under `users/shared/programs/`:
+- Each program has its own folder (e.g., `helix/`, `fish/`, `git/`)
+- Configuration files named `<program>.nix`
+- Complex programs can have multiple files (e.g., `fish/` has aliases, functions, etc.)
+- Auto-installation: If folder name matches nixpkgs package name, it's installed automatically
 
-### Home Manager Configuration (`dotfiles/`)
-- `home.nix` - Main Home Manager config (auto-imports from programs/)
-- `programs/` - Per-program configurations in subdirectories
-  - Each program has its own folder (e.g., `helix/`, `fish/`, `git/`)
-  - Configuration files named `<program>.nix`
-  - Complex programs can have multiple files (e.g., `fish/` has aliases, functions, etc.)
-
-Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
+Example: The configuration for Helix is in `users/shared/programs/helix/helix.nix`.
 
 ## Best Practices
 
@@ -64,7 +69,13 @@ Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
 2. **Input Following**: Use `inputs.nixpkgs.follows` for consistency
 3. **Dev Tools**: Provide `devShells` for development environment
 4. **Formatter**: Define formatter for `nix fmt`
-5. **Clear Outputs**: Organize outputs logically (nixosConfigurations, homeConfigurations, etc.)
+5. **Clear Outputs**: Organize outputs logically:
+   - `nixosConfigurations.<hostname>` for systems
+   - `homeConfigurations.<username>@<hostname>` for users (note the `@hostname` suffix)
+   - `devShells.<system>.default` for development
+   - `formatter.<system>` for code formatting
+6. **Multi-Machine**: Define hosts and users centrally in `flake.nix`
+7. **Builder Functions**: Use `lib.mkHost` and `lib.mkUser` for consistency
 
 ### Secrets (sops-nix)
 1. **Age Keys**: Backup age keys securely (encrypted USB, password manager)
@@ -86,4 +97,46 @@ Example: The configuration for Helix is in `dotfiles/programs/helix/helix.nix`.
 3. **Generations**: Keep recent generations for easy rollback
 4. **Documentation**: Update README when adding major features
 5. **Backups**: Backup configuration and age keys regularly
+
+## Deployment
+
+### System Configuration
+```bash
+# Deploy to current machine
+sudo nixos-rebuild switch --flake .#<hostname>
+
+# Test before switching
+sudo nixos-rebuild test --flake .#<hostname>
+
+# Build without activating
+sudo nixos-rebuild build --flake .#<hostname>
+```
+
+### User Configuration
+```bash
+# Deploy home-manager (note the @hostname suffix)
+home-manager switch --flake .#<username>@<hostname>
+
+# Example for user joachim on machine reason
+home-manager switch --flake .#joachim@reason
+```
+
+## Adding New Machines
+
+1. **Create host directory**: `mkdir -p hosts/<hostname>`
+2. **Generate hardware config**: `nixos-generate-config --show-hardware-config > hosts/<hostname>/hardware-configuration.nix`
+3. **Create `hosts/<hostname>/default.nix`** with machine-specific settings
+4. **Generate age key**: `sudo age-keygen -o /var/lib/sops/age/keys.txt`
+5. **Update `.sops.yaml`** with new host's age public key
+6. **Create `secrets/<hostname>.yaml`** for host-specific secrets
+7. **Add to `flake.nix`** in the `hosts` attribute set
+8. **Deploy**: `sudo nixos-rebuild switch --flake .#<hostname>`
+
+## Adding New Users
+
+1. **Create user directory**: `mkdir -p users/<username>`
+2. **Create `users/<username>/default.nix`** with user settings
+3. **Add to `flake.nix`** in the `users` attribute set with target hosts
+4. **Add system user** in appropriate host config
+5. **Deploy**: `home-manager switch --flake .#<username>@<hostname>`
 
