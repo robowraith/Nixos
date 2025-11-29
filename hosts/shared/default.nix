@@ -111,7 +111,7 @@
         tty = 1;
       };
     };
-    sessionPackages = [ pkgs.hyprland ];
+    sessionPackages = [ pkgs.herbstluftwm ];
   };
 
   # Emergency shell access on TTY1
