@@ -111,7 +111,11 @@
         tty = 1;
       };
     };
-    sessionPackages = [ pkgs.herbstluftwm ];
+  };
+
+  services.xserver = {
+    enable = true;
+    windowManager.herbstluftwm.enable = true;
   };
 
   # Emergency shell access on TTY1
