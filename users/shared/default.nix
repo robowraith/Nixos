@@ -54,7 +54,6 @@ in
   programs.home-manager.enable = true;
 
   # Enable XDG desktop integration
-  targets.genericLinux.enable = true;
   xdg.enable = true;
   xdg.mime.enable = true;
 }

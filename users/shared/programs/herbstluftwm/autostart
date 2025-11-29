@@ -1,0 +1,111 @@
+#! /usr/bin/env fish
+
+# Configuration for Herbtluftwm
+hc emit_hook reload
+# Setting the Modifier key
+set Mod Mod4
+
+# Establish tags
+hc and , \
+    try rename default down , \
+    new_attr string tags.by-name."down".my_monitor, \
+    set_attr tags.by-name."down".my_monitor 0
+
+hc and , \
+    add 1 , \
+    rename 1 main , \
+    new_attr string tags.1.my_monitor , \
+    set_attr tags.$tag.my_monitor 1
+
+hc and , \
+    add 2 , \
+    rename 2 right , \
+    new_attr string tags.2.my_monitor , \
+    set_attr tags.$tag.my_monitor 2
+
+# Other config
+source ~/.config/herbstluftwm/conf.d/keybindings.fish
+source ~/.config/herbstluftwm/conf.d/rules.fish
+source ~/.config/herbstluftwm/conf.d/theme.fish
+source ~/.config/herbstluftwm/conf.d/tags.fish
+
+# Screen_setup
+hc unlock
+source ~/.config/herbstluftwm/conf.d/screen_setup.fish
+
+# Autostart applications
+# check if this is the first run
+if hc silent new_attr bool my_first_run
+
+    # Implement Notebook-Screen fix
+    sudo /home/joachim/psr_fix/psr_fix.sh
+
+    # Start applications that do not depend on secret-service or ssh-agent
+
+    # Start composition manager
+    hc spawn picom
+    # Hide the mouse pointer after a while
+    hc spawn /usr/bin/unclutter -b
+    # Set numlock to on
+    hc spawn /usr/bin/numlockx on
+    # Start Polkit
+    hc spawn /usr/lib/polkit-kde-authentication-agent-1
+    # Start Notification agent
+    hc spawn /usr/bin/dunst
+    # Start Bluetoohth manager applet
+    hc spawn /usr/bin/blueman-applet
+    # Start clipboard tool
+    hc spawn /usr/bin/copyq
+    # Start Screenshot tool
+    hc spawn /usr/bin/flameshot
+    # Start panel
+    hc spawn /usr/bin/tint2
+    # Start update-check script
+    hc spawn .config/herbstluftwm/bin/updates.sh
+
+    # Start Keepassxc and wait for it to be unlocked
+    hc focus_monitor 3
+    hc and , \
+        rule once class="KeePassXC" tag="down" , \
+        spawn /usr/bin/keepassxc
+
+    while ! secret-tool lookup KeepassXC 'unlocked?'
+    end
+
+    # start SSH-Agent
+    if not pgrep -f ssh-agent >/dev/null
+        eval (ssh-agent -c)
+        set -Ux SSH_AUTH_SOCK $SSH_AUTH_SOCK
+        set -Ux SSH_AGENT_PID $SSH_AGENT_PID
+        set -Ux SSH_AUTH_SOCK $SSH_AUTH_SOCK
+    end
+
+    # Start applications that depend on secret-service or SSH-Agent
+    # Start Control Panel applications
+    hc spawn /usr/bin/nm-applet
+    hc spawn /usr/bin/nextcloud --background
+
+    # Set up private tag
+    hc and , \
+        rule once class="Signal" tag="down" , \
+        spawn /usr/bin/signal-desktop
+
+    hc and , \
+        focus_monitor down , \
+        use down
+
+    # Start main applications
+    hc and , \
+        # rule once class="Vivaldi-stable" tag="web" , \
+        # spawn /usr/bin/vivaldi-stable , \
+        rule once class="floorp" tag="main" , \
+        spawn /usr/bin/floorp , \
+        rule once class="Slack" tag="down" , \
+        spawn /usr/bin/slack , \
+        rule once title="general_terminal" tag="right" , \
+        spawn /usr/bin/alacritty --title general_terminal
+
+    # Set up main screen
+    hc focus_monitor main
+
+end
