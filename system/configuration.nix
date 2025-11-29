@@ -81,10 +81,10 @@
     age
     sops
 
-    # Wayland
-    wayland
-    wayland-utils
-    wl-clipboard
+    # # Wayland
+    # wayland
+    # wayland-utils
+    # wl-clipboard
 
     # Terminal
     kitty
