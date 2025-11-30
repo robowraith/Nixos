@@ -5,8 +5,8 @@ function hc
 end
 
 # Screen setup
-if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep 'DP2')
-    if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep '.DP2 3840')
+if test (xrandr --listmonitors | grep 'DP2')
+    if test (xrandr --listmonitors | grep '.DP2 3840')
         set screen1 DP2
         set screen2 DP1
     else
@@ -14,7 +14,7 @@ if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep 'DP2')
         set screen2 DP2
     end
 
-    /usr/bin/xrandr \
+    xrandr \
         --output eDP1 \
         --mode 1680x1050 \
         --pos 1080x1800 \
@@ -40,14 +40,12 @@ if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep 'DP2')
     # Add padding for panel
     hc pad 1 "" 35 "" ""
 
-else if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep 'HDMI1')
+else if test (xrandr --listmonitors | grep 'HDMI-0')
 
-    /usr/bin/xrandr \
-        --output eDP1 \
-        --off \
-        --output HDMI1 \
+    xrandr \
+        --output HDMI-0 \
         --mode 3840x2160 \
-        --rate 30 \
+        --rate 60 \
         --pos 0x0 \
         --rotate normal
 
@@ -62,9 +60,9 @@ else if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep 'HDMI1')
     # Add padding for panel
     hc pad 3 "" 35 "" ""
 
-else if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep ' DP1')
+else if test (xrandr --listmonitors | grep ' DP1')
 
-    /usr/bin/xrandr \
+    xrandr \
         --output eDP1 \
         --mode 1680x1050 \
         --rate 90 \
@@ -87,7 +85,7 @@ else if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep ' DP1')
     hc pad 3 "" 35 "" ""
 
 else
-    /usr/bin/xrandr \
+    xrandr \
         --output eDP1 \
         --primary \
         --mode 1680x1050 \
@@ -104,5 +102,5 @@ else
 end
 
 # Wallpaper
-# /usr/bin/feh --no-fehbg --bg-fill ~/wallpaper/Pillars1.jpg
+# feh --no-fehbg --bg-fill ~/wallpaper/Pillars1.jpg
 ~/.fehbg
