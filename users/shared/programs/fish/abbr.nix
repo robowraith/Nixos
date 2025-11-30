@@ -3,6 +3,7 @@
     cl = "clear";
     d = "docker";
     dc = "docker compose";
+    hc = "herbstclient";
     hms = "home-manager switch --flake ~/nixos#joachim@reason -b backup";
     k = "kubectl";
     kc = "kubectl";
