@@ -33,7 +33,8 @@
     options = "--delete-older-than 14d";
   };
 
-  nix.optimize = {
+  # Automatic opimization of nix store
+  nix.optimise = {
     automatic = true;
     dates = [ "weekly" ];
   };
