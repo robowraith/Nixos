@@ -117,6 +117,8 @@
   services.xserver = {
     enable = true;
     windowManager.herbstluftwm.enable = true;
+    layout = "de";
+    xkbVariant = "nodeadkeys";
   };
 
   # Emergency shell access on TTY1

@@ -8,13 +8,6 @@
   xsession = {
     enable = true;
     windowManager.command = "${pkgs.herbstluftwm}/bin/herbstluftwm";
-    
-    # Set locale and keyboard layout
-    initExtra = ''
-      export LANG=de_DE.UTF-8
-      export LC_ALL=de_DE.UTF-8
-      setxkbmap de nodeadkeys
-    '';
   };
 
   # Write the autostart config to XDG config
