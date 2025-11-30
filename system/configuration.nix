@@ -72,10 +72,12 @@
 
   environment.systemPackages = with pkgs; [
     # Core utilities
+    feh
     file
     fish
     git
     helix
+    xrandr
 
     # Secrets management
     age
