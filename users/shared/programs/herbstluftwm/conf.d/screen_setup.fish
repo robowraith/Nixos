@@ -1,5 +1,9 @@
 #! /usr/bin/env fish
 
+function hc
+    herbstclient $argv
+end
+
 # Screen setup
 if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep 'DP2')
     if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep '.DP2 3840')
@@ -81,7 +85,6 @@ else if test (/usr/bin/xrandr --listmonitors | /usr/bin/grep ' DP1')
 
     # Add padding for panel
     hc pad 3 "" 35 "" ""
-
 
 else
     /usr/bin/xrandr \

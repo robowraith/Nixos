@@ -1,5 +1,9 @@
 #! /usr/bin/env fish
 
+function hc
+    herbstclient $argv
+end
+
 # Script to set up tag layouts
 hc set default_frame_layout vertical
 

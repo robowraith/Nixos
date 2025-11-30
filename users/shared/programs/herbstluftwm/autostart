@@ -1,11 +1,10 @@
 #! /usr/bin/env fish
 
-# Configuration for Herbtluftwm
-# Define hc function as herbstclient shorthand
 function hc
     herbstclient $argv
 end
 
+# Configuration for Herbtluftwm
 hc emit_hook reload
 # Setting the Modifier key
 set Mod Mod4
@@ -53,8 +52,6 @@ if hc silent new_attr bool my_first_run
     hc spawn /usr/bin/unclutter -b
     # Set numlock to on
     hc spawn /usr/bin/numlockx on
-    # Start Polkit
-    hc spawn /usr/lib/polkit-kde-authentication-agent-1
     # Start Notification agent
     hc spawn /usr/bin/dunst
     # Start Bluetoohth manager applet
@@ -63,10 +60,6 @@ if hc silent new_attr bool my_first_run
     hc spawn /usr/bin/copyq
     # Start Screenshot tool
     hc spawn /usr/bin/flameshot
-    # Start panel
-    hc spawn /usr/bin/tint2
-    # Start update-check script
-    hc spawn .config/herbstluftwm/bin/updates.sh
 
     # Start Keepassxc and wait for it to be unlocked
     hc focus_monitor 3
@@ -103,10 +96,6 @@ if hc silent new_attr bool my_first_run
     hc and , \
         # rule once class="Vivaldi-stable" tag="web" , \
         # spawn /usr/bin/vivaldi-stable , \
-        rule once class="floorp" tag="main" , \
-        spawn /usr/bin/floorp , \
-        rule once class="Slack" tag="down" , \
-        spawn /usr/bin/slack , \
         rule once title="general_terminal" tag="right" , \
         spawn /usr/bin/alacritty --title general_terminal
 

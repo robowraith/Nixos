@@ -1,5 +1,8 @@
 #! /usr/bin/env fish
 
+function hc
+    herbstclient $argv
+end
 
 hc set swap_monitors_to_get_tag 1
 
