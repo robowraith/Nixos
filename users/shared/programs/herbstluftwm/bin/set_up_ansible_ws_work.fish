@@ -1,5 +1,8 @@
 #! /usr/bin/env fish
 
+function hc
+    herbstclient $argv
+end
 
 set ansibledir ~/code/ansible
 set vagrantdir "$ansibledir/vagrant"

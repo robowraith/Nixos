@@ -1,4 +1,9 @@
 #! /usr/bin/env fish
+
+function hc
+    herbstclient $argv
+end
+
 set -l target_monitor $argv[1]
 set -l focused_monitor (hc attr monitors.focus.index)
 

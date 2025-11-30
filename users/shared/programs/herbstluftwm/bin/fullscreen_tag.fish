@@ -2,6 +2,10 @@
 
 # This script will move a window to a new fullscreen monitor and back
 
+function hc
+    herbstclient $argv
+end
+
 set tag_to_fullscreen (hc attr tags.focus.name)
 set original_monitor (hc attr monitors.focus.name)
 set fullscreen_monitor_name fullscreen

@@ -1,6 +1,11 @@
 #! /usr/bin/env fish
 
 # Configuration for Herbtluftwm
+# Define hc function as herbstclient shorthand
+function hc
+    herbstclient $argv
+end
+
 hc emit_hook reload
 # Setting the Modifier key
 set Mod Mod4

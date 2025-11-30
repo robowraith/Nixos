@@ -1,5 +1,9 @@
 #! /usr/bin/env fish
 
+function hc
+    herbstclient $argv
+end
+
 set configdir ~/.config
 
 # rules

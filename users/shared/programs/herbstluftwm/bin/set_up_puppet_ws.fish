@@ -1,5 +1,9 @@
 #! /usr/bin/env fish
 
+function hc
+    herbstclient $argv
+end
+
 set puppetdir ~/code/puppet_files/environments/production
 
 # rules

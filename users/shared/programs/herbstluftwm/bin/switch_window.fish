@@ -2,6 +2,10 @@
 
 # Script to switch windows
 
+function hc
+    herbstclient $argv
+end
+
 set sourcetagname (hc attr tags.focus.name)
 set sourcewindowid (hc attr clients.focus.winid)
 set direction $argv[1]

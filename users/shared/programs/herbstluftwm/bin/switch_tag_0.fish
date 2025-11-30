@@ -2,6 +2,10 @@
 
 # Script to switch to tag 0 if not on tag 0 and to cycle clients if already on tag 0
 
+function hc
+    herbstclient $argv
+end
+
 if test (hc attr tags.focus.name) = private
     hc cycle +1
 else

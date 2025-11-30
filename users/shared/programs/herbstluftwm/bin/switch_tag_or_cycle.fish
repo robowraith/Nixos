@@ -2,6 +2,10 @@
 
 # Script to switch to tag $argv[2] on monitor $argv[1]
 
+function hc
+    herbstclient $argv
+end
+
 set target_monitor $argv[1]
 set target_tag $argv[2]
 
