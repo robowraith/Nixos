@@ -17,13 +17,19 @@ hc and , \
 
 hc and , \
     add 1 , \
-    rename 1 main , \
+    rename 1 left , \
     new_attr string tags.1.my_monitor , \
     set_attr tags.$tag.my_monitor 1
 
 hc and , \
     add 2 , \
-    rename 2 right , \
+    rename 2 main , \
+    new_attr string tags.1.my_monitor , \
+    set_attr tags.$tag.my_monitor 1
+
+hc and , \
+    add 3 , \
+    rename 3 right , \
     new_attr string tags.2.my_monitor , \
     set_attr tags.$tag.my_monitor 2
 
@@ -49,23 +55,23 @@ if hc silent new_attr bool my_first_run
     # Start composition manager
     hc spawn picom
     # Hide the mouse pointer after a while
-    hc spawn /usr/bin/unclutter -b
+    hc spawn unclutter -b
     # Set numlock to on
-    hc spawn /usr/bin/numlockx on
+    hc spawn numlockx on
     # Start Notification agent
-    hc spawn /usr/bin/dunst
+    hc spawn dunst
     # Start Bluetoohth manager applet
-    hc spawn /usr/bin/blueman-applet
+    hc spawn blueman-applet
     # Start clipboard tool
-    hc spawn /usr/bin/copyq
+    hc spawn copyq
     # Start Screenshot tool
-    hc spawn /usr/bin/flameshot
+    hc spawn flameshot
 
     # Start Keepassxc and wait for it to be unlocked
     hc focus_monitor 3
     hc and , \
         rule once class="KeePassXC" tag="down" , \
-        spawn /usr/bin/keepassxc
+        spawn keepassxc
 
     while ! secret-tool lookup KeepassXC 'unlocked?'
     end
@@ -80,13 +86,13 @@ if hc silent new_attr bool my_first_run
 
     # Start applications that depend on secret-service or SSH-Agent
     # Start Control Panel applications
-    hc spawn /usr/bin/nm-applet
-    hc spawn /usr/bin/nextcloud --background
+    hc spawn nm-applet
+    hc spawn nextcloud --background
 
     # Set up private tag
     hc and , \
         rule once class="Signal" tag="down" , \
-        spawn /usr/bin/signal-desktop
+        spawn signal-desktop
 
     hc and , \
         focus_monitor down , \
@@ -95,9 +101,9 @@ if hc silent new_attr bool my_first_run
     # Start main applications
     hc and , \
         # rule once class="Vivaldi-stable" tag="web" , \
-        # spawn /usr/bin/vivaldi-stable , \
+        # spawn vivaldi-stable , \
         rule once title="general_terminal" tag="right" , \
-        spawn /usr/bin/alacritty --title general_terminal
+        spawn alacritty --title general_terminal
 
     # Set up main screen
     hc focus_monitor main
