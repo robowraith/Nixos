@@ -39,6 +39,11 @@
     dates = [ "weekly" ];
   };
 
+  # Add better "Command not found"
+  programs.nix-index.enable = true;
+  programs.command-not-found.enable = false; # nix-index handles it instead
+  #programs.nix-index-database.comma.enable = true;
+
   nixpkgs.config.allowUnfree = true;
 
   # ============================================================================
