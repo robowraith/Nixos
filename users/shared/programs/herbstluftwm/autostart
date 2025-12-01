@@ -39,9 +39,9 @@ source ~/.config/herbstluftwm/conf.d/rules.fish
 source ~/.config/herbstluftwm/conf.d/theme.fish
 source ~/.config/herbstluftwm/conf.d/tags.fish
 
-# Screen_setup
+# Screen setup is now handled by autorandr
+# See users/shared/programs/autorandr/autorandr.nix
 hc unlock
-source ~/.config/herbstluftwm/conf.d/screen_setup.fish
 
 # Autostart applications
 # check if this is the first run
