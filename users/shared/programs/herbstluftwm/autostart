@@ -41,6 +41,9 @@ source ~/.config/herbstluftwm/conf.d/tags.fish
 
 # Screen setup is now handled by autorandr
 # See users/shared/programs/autorandr/autorandr.nix
+# Run autorandr
+hc silent spawn autorandr -c
+
 hc unlock
 
 # Autostart applications

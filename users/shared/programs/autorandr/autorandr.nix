@@ -22,14 +22,11 @@
             "LG38")
               # Configure HerbstluftWM monitor for "old" office setup
               hc and , \
-                set_monitors 1120x1600+0+0 1600x1200+1120+0 1120x1600+2720+0 1600x400+2720+0, \
-                rename_monitor 1 main , \
-                rename_monitor 2 right , \
-                rename_monitor 3 left , \
-                rename_monitor 0 left
-              
-              # Add padding for panel on main monitor
-              hc pad 1 "" 35 "" ""
+                set_monitors 1600x400+1120+1200 1120x1600+0+0 1600x1200+1120+0 1120x1600+2720+0 , \
+                rename_monitor 1 left , \
+                rename_monitor 2 main , \
+                rename_monitor 3 right , \
+                rename_monitor 0 down
               ;;
               
             "Office_4K")
@@ -40,25 +37,16 @@
                 rename_monitor 2 main , \
                 rename_monitor 3 right , \
                 rename_monitor 0 down
-              
-              # Add padding for panel
-              hc pad 3 "" 35 "" ""
               ;;
               
             "Gaming_1080p")
               # Configure HerbstluftWM monitor for Living room setup in 1080p
               hc rename_monitor 0 main
-              
-              # Add padding for panel
-              hc pad 1 "" 35 "" ""
               ;;
               
             "Gaming_4K")
               # Configure HerbstluftWM monitor for living room setup in 4K
               hc rename_monitor 0 main
-              
-              # Add padding for panel
-              hc pad 1 "" 35 "" ""
               ;;
           esac
           
