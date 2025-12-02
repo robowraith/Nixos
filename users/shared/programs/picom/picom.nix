@@ -46,19 +46,4 @@ in
 		text = picomConf;
 	};
 
-	# Start picom as a systemd --user service so it's managed by Home Manager
-	systemd.user.services.picom = {
-		description = "Picom compositor (X11)";
-		wantedBy = [ "default.target" ];
-		unitConfig = {
-			After = "graphical-session.target";
-		};
-		serviceConfig = {
-			Type = "simple";
-			ExecStart = "${pkgs.picom}/bin/picom --config ${config.home.homeDirectory}/.config/picom/picom.conf";
-			Restart = "on-failure";
-			RestartSec = 5;
-		};
-	};
-
 }
