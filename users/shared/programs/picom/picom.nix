@@ -6,7 +6,8 @@ let
 backend = "glx";
 glx-no-stencil = true;
 glx-no-rebind-pixmap = true;
-glx-swap-method = "buffer-age";
+# glx-swap-method = "buffer-age";
+use-damage = true;
 
 shadow = true;
 shadow-radius = 12;
@@ -29,10 +30,10 @@ detect-client-opacity = true;
 detect-transient = true;
 detect-rounded-corners = true;
 
-blur-background-exclude = [ "window_type = 'dock'" "window_type = 'desktop'" "class_g = 'slop'" ];
-opacity-rule = [ "90:class_g = 'Polybar'" ];
-shadow-exclude = [ "class_g = 'dunst'" "class_g = 'Polybar'" "_GTK_FRAME_EXTENTS@='0,0,0,0'" ];
-fade-exclude = [ "class_g = 'dunst'" "window_type = 'dock'" ];
+# blur-background-exclude = [ "window_type = 'dock'" "window_type = 'desktop'" "class_g = 'slop'" ];
+# opacity-rule = [ "90:class_g = 'Polybar'" ];
+# shadow-exclude = [ "class_g = 'dunst'" "class_g = 'Polybar'" "_GTK_FRAME_EXTENTS@='0,0,0,0'" ];
+# fade-exclude = [ "class_g = 'dunst'" "window_type = 'dock'" ];
 
 '';
 in
