@@ -22,11 +22,10 @@
             "LG38")
               # Configure HerbstluftWM monitor for "old" office setup
               hc and , \
-                set_monitors 1600x400+1120+1200 1120x1600+0+0 1600x1200+1120+0 1120x1600+2720+0 , \
-                rename_monitor 1 left , \
-                rename_monitor 2 main , \
-                rename_monitor 3 right , \
-                rename_monitor 0 down
+                set_monitors 960x1600+0+0 1920x1600+960+0 960x1600+2880+0 , \
+                rename_monitor 0 left , \
+                rename_monitor 1 main , \
+                rename_monitor 2 right
               ;;
               
             "Office_4K")
