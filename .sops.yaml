@@ -1,21 +1,13 @@
-# This file is used by sops to configure encryption.
-# Multi-machine and multi-user secrets configuration
+# SOPS encryption
+# This can be expanded to separate secrets
+# by user, usergroups, host and hostgrqups
+# so each can only read the secrets pertinent to it.
+
+keys:
+  - &shared age175q4v69wa6ud8kygctpazx8nxgs9r598ecdeq0rprdlkk5qt23hshjn8v3
 
 creation_rules:
-  # Host-specific secrets
-  - path_regex: secrets/reason\.yaml$
-    key_groups:
-      - age:
-          - age175q4v69wa6ud8kygctpazx8nxgs9r598ecdeq0rprdlkk5qt23hshjn8v3
-  
-  # Shared secrets (if needed in the future)
   - path_regex: secrets/shared\.yaml$
     key_groups:
       - age:
-          - age175q4v69wa6ud8kygctpazx8nxgs9r598ecdeq0rprdlkk5qt23hshjn8v3
-  
-  # Legacy support for old location
-  - path_regex: secrets\.yaml$
-    key_groups:
-      - age:
-          - age175q4v69wa6ud8kygctpazx8nxgs9r598ecdeq0rprdlkk5qt23hshjn8v3
+          - *shared

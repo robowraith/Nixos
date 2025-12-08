@@ -1,428 +1,137 @@
-# NixOS Configuration
+# Dendritic Nix Configuration
 
-A comprehensive NixOS and Home Manager configuration using flakes, featuring modular system organization, declarative dotfiles management, and encrypted secrets handling.
+A personal approach to a modular, scalable, and "Dendritic" NixOS and Home Manager configuration.
 
-## 📋 Table of Contents
+## 🖥️ Systems Overview
 
-- [Features](#features)
-- [Structure](#structure)
-- [Prerequisites](#prerequisites)
-- [Initial Setup](#initial-setup)
-- [Daily Usage](#daily-usage)
-- [Secrets Management](#secrets-management)
-- [Adding Programs](#adding-programs)
-- [Rollback & Recovery](#rollback--recovery)
-- [Tips & Best Practices](#tips--best-practices)
+| Hostname | Type | Primary User | Primary use |
+|----------|------|--------------|-------------|
+| **reason** | Desktop | `joachim` | All-round development, limited gaming, day-to-day tasks. |
+| **42he-Infinitybook** | Laptop | `joachim` | Work notebook (DevOps, Ansible, Development). |
+| **stella** | Laptop | `iris` | Day-to-day tasks. |
+| **wintermute** | Server | `dixie` | Homelab, Emby, and File server. |
+| **neuromancer** | VPS (Hetzner) | `case` | Mailcow, Nextcloud. |
 
-## ✨ Features
+## 🧭 Guiding Principles
 
-- **Flakes-based**: Reproducible and hermetic builds
-- **Modular Organization**: Logical separation of system components
-- **Home Manager Integration**: Declarative user environment and dotfiles
-- **Encrypted Secrets**: SOPS-nix for secure credential management
-- **Multiple Configurations**: Support for different users/machines
-- **Automatic Cleanup**: Weekly garbage collection
-- **Development Environment**: Built-in devShell for working with the config
-- **Performance Optimized**: CachyOS kernel with LTO, binary cache enabled
+### Core Philosophy
+1.  **Nix Flakes**: Utilize Nix Flakes for reproducible and hermetic project structure.
+2.  **Dendritic Structure**: Organize configuration in a tree-like, branching structure for modularity (inspired by [vic/dendrix](https://github.com/vic/dendrix)).
+3.  **DRY (Don't Repeat Yourself)**: Maximize code reuse across systems and users.
+4.  **Nix-Native**: Prefer Nix language configuration over external config files where possible.
 
-## 📁 Structure
+### Configuration Management
+5.  **Split Configuration**:
+    *   `system/`: NixOS system-level configurations.
+    *   `dotfiles/`: Home Manager user-level configurations.
+6.  **Atomic Organization**: One folder per program/service (unless trivial).
+7.  **Cascading Logic**:
+    *   **System**: `Shared` -> `Hostgroup` -> `Host`.
+    *   **User**: `Shared` -> `Usergroup` -> `Host-Specific` -> `User`.
+    *   Selection logic driven by variables defined in `flake.nix` passed via `specialArgs` (NixOS) and `extraSpecialArgs` (Home Manager).
+8.  **Config Linking**: `home.programs` should link configuration files from the store (e.g., `fish/config.fish` links to `~/.config/fish/config.fish`).
+
+### Security & Networking
+9.  **Secrets Management**: All secrets must be encrypted using **SOPS** (`sops-nix`).
+10. **Connectivity**: All systems reachable via SSH.
+11. **Defense**:
+    *   **Firewall**: `nftables` enabled on all hosts.
+    *   **Intrusion Prevention**: `fail2ban` enabled for all open ports.
+
+### Environment & Packages
+12. **Nixpkgs**: Track `nixpkgs-unstable` for latest software.
+13. **Binary Cache**: Utilize **Chaotic-Nyx** for pre-built binaries.
+14. **Shell**: **Fish** shell as the default for all users.
+15. **Maintenance**: Automatic garbage collection and store optimization for both NixOS and Home Manager.
+16. **Theming**: Use **Stylix** for unified system-wide theming (NixOS & Home Manager).
+
+## 🛠️ Best Practices & Tooling
+
+### Formatting
+Code consistency is enforced using **Alejandra** (or `nixfmt`).
+*   **Usage**:
+    ```bash
+    nix fmt
+    # or directly
+    alejandra .
+    ```
+
+### Linting
+Static analysis helps catch errors and unused code early.
+*   **Statix**: Checks for anti-patterns and suggestions.
+    ```bash
+    statix check .
+    statix fix . # Automatically fix issues
+    ```
+*   **Deadnix**: Scans for unused variable bindings.
+    ```bash
+    deadnix .
+    deadnix -e . # Automatically remove unused code
+    ```
+
+### Pre-commit Hooks
+To ensure quality before pushing, `pre-commit-hooks.nix` is used to run checks automatically.
+*   **Setup**: Run `nix develop` to enter the dev shell which installs the hooks.
+*   **Manual Run**:
+    ```bash
+    pre-commit run --all-files
+    ```
+
+### Documentation
+Practical documentation for secrets and security is provided in the `docs/` folder:
+- `docs/SOPS.md`: Practical `sops` and `sops-nix` usage, commands, and examples.
+- `docs/SECURITY.md`: Repo hygiene, key rotation, backup and incident response guidance.
+
+## 📂 Directory Structure (Target)
 
 ```
 .
-├── flake.nix                    # Main flake configuration
-├── flake.lock                   # Locked dependency versions
-├── .sops.yaml                   # SOPS encryption rules
-├── secrets.yaml                 # Encrypted secrets (sops-encrypted)
+├── dotfiles/
+│   ├── shared/
+│   │   ├── modules/                           # Configuration modules for all users
+│   │   ├── programs/                          # Cofiguration directory for home.programs for all users
+│   │   │   ├── _uninstalled/                  # Configuration data for programs which should be kept although the programs are not installed at the moment
+│   │   │   │   └── {program2}/                # Configuration directory for "program"
+│   │   │   │       └── {program2}.nix         # Configures "program2"
+│   │   │   └── {program1}/                    # Configuration directory for "program1"
+│   │   │       └── {program1}.nix             # Configures "program1"
+│   │   └── default.nix                        # Imports all configuration modules from ./modules and all programs from ./programs/ not in ./program/_uninstalled/
+│   ├── usergroups/
+│   │   └── {usergroup1}/
+│   │       ├── modules/                       # Configuration modules specific to "usergroup1"
+│   │       ├── programs/                      # Cofiguration directory for home.programs for "usergroup1"
+│   │       │   ├── _uninstalled/              # Configuration data for programs which should be kept although the programs are not installed at the moment
+│   │       │   │   └── {program2}/            # Configuration directory for "program"
+│   │       │   │       └── {program2}.nix     # Configures "program2"
+│   │       │   └── {program1}/                # Configuration directory for "program1"
+│   │       │       └── {program1}.nix         # Configures "program1". May import configuration from dotfiles/shared/programs/program1.nix
+│   │       └── default.nix                    # Imports all configuration modules from ./modules and all programs from ./programs/ not in ./program/_uninstalled/
+│   └── users/
+│       └── {user1}/                           # Configuration directory for "user1"
+│           ├── modules/                       # Configuration modules specific to "user1"
+│           ├── programs/                      # Cofiguration directory for home.programs for "user1"
+│           │   └── _uninstalled/              # Configuration data for programs which should be kept although the programs are not installed at the moment
+│           │       │   └── {program2}/        # Configuration directory for "program"
+│           │       │       └── {program2}.nix # Configures "program2"
+│           │       └── {program1}/            # Configuration directory for "program1"
+│           │           └── {program1}.nix     # Configures "program1". May import configuration from dotfiles/shared/programs/program1.nix or dotfiles/usergroups/{usergroup}/programs/program1.nix
+│           └── default.nix                    # Imports all configuration modules from ./modules and all programs from ./programs/ not in ./program/_uninstalled/
+├── secrets/                                   # The SOPS-encrypted secrets
+│   └── shared.yml                             # Secrets shared by all systems/users
 ├── system/
-│   ├── configuration.nix        # Main system configuration
-│   ├── hardware-configuration.nix  # Hardware-specific settings
-│   ├── sops/
-│   │   └── sops.nix            # System-level secrets config
-│   └── modules/
-│       ├── boot.nix            # Boot loader & kernel settings
-│       ├── networking.nix      # Network configuration
-│       ├── nvidia.nix          # NVIDIA GPU settings
-│       ├── filesystems.nix     # CIFS mounts & filesystems
-│       ├── users.nix           # User account definitions
-│       └── localization.nix    # Locale, timezone, keyboard
-└── dotfiles/
-    ├── home.nix                # Main Home Manager config
-    └── programs/               # Per-program configurations
-        ├── fish/
-        ├── git/
-        ├── helix/
-        └── ...                 # One directory per program
-```
+│   ├── hostgroups/
+│   │   └── {hostgroup1}/                      # Configuration directory for "hostgroup1"
+│   │       ├── modules/                       # Configuration modules specific to this hostgroup
+│   │       └── default.nix                    # Imports all configuration modules from ./modules
+│   ├── hosts/
+│   │   └── {host1}/                           # Configuration directory for "host1"
+│   │       ├── modules/                       # Configuration modules specific to this host
+│   │       └── default.nix                    # MAIN TARGET -> imports all configuration for this host
+│   └── shared/                                # Configuration directory for all systems
+│       ├── modules/                           # Configuration modules shared by all systems
+│       └── default.nix                        # Imports all configuration modules in ./modules
+├── flake.nix                                  # Main flake configuration for NixOS and Home Manager
+├── flake.lock                                 # Locked dependecy versions
+├── README.md                                  # This Document
+└── .sops.yaml                                 # The SOPS rules file for this project
 
-## 🔧 Prerequisites
-
-- NixOS installed (minimal or desktop)
-- Git installed
-- Age key for decrypting secrets (see [Secrets Management](#secrets-management))
-
-## 🚀 Initial Setup
-
-### 1. Clone the Repository
-
-```bash
-git clone <your-repo-url> ~/nixos-config
-cd ~/nixos-config
-```
-
-### 2. Generate Age Key (First Time Only)
-
-```bash
-# Create the sops directory
-sudo mkdir -p /var/lib/sops/age
-
-# Generate a new age key
-sudo age-keygen -o /var/lib/sops/age/keys.txt
-
-# Get your public key
-sudo age-keygen -y /var/lib/sops/age/keys.txt
-```
-
-**⚠️ IMPORTANT**: Backup your age key! Store it securely outside your system.
-
-```bash
-# Backup example
-sudo cp /var/lib/sops/age/keys.txt ~/backup/age-key-backup.txt
-# Then move to secure location (encrypted USB, password manager, etc.)
-```
-
-### 3. Update .sops.yaml
-
-Replace the age public key in `.sops.yaml` with your generated key:
-
-```yaml
-creation_rules:
-  - path_regex: secrets.yaml$
-    key_groups:
-      - age:
-          - age1your_actual_public_key_here
-```
-
-### 4. Create/Edit Secrets
-
-```bash
-# Edit secrets (will open in $EDITOR)
-sops secrets.yaml
-```
-
-Add your credentials:
-
-```yaml
-system-secrets:
-  cifs_credentials:
-    username: your_network_username
-    password: your_network_password
-hm-secrets: null
-```
-
-### 5. Adjust Hardware Configuration
-
-Update the network interface name in `system/modules/networking.nix`:
-
-```bash
-# Find your interface name
-ip link
-
-# Edit the file and replace 'enp7s0' with your interface
-```
-
-### 6. Build and Switch
-
-```bash
-# Build the system configuration
-sudo nixos-rebuild switch --flake .#reason
-
-# Build the home-manager configuration
-home-manager switch --flake .#joachim
-```
-
-## 🔄 Daily Usage
-
-### Updating the System
-
-```bash
-# Update flake inputs
-nix flake update
-
-# Or update specific inputs
-nix flake lock --update-input nixpkgs
-
-# Apply updates
-sudo nixos-rebuild switch --flake .#reason
-home-manager switch --flake .#joachim
-```
-
-### Testing Changes Before Applying
-
-```bash
-# Test system changes without switching boot default
-sudo nixos-rebuild test --flake .#reason
-
-# Build without activating
-sudo nixos-rebuild build --flake .#reason
-```
-
-### Checking Configuration
-
-```bash
-# Format all Nix files
-nix fmt
-
-# Check for errors
-nix flake check
-
-# Enter development shell
-nix develop
-```
-
-## 🔐 Secrets Management
-
-### Viewing Secrets
-
-```bash
-sops secrets.yaml
-```
-
-### Adding New Secrets
-
-1. Edit `secrets.yaml`:
-   ```bash
-   sops secrets.yaml
-   ```
-
-2. Add your secret:
-   ```yaml
-   system-secrets:
-     my_new_secret: some_value
-   ```
-
-3. Reference in configuration:
-   ```nix
-   sops.secrets."my_new_secret" = {
-     sopsFile = ../../secrets.yaml;
-     key = "system-secrets/my_new_secret";
-   };
-   ```
-
-### Rotating Age Keys
-
-```bash
-# Generate new key
-sudo age-keygen -o /var/lib/sops/age/keys-new.txt
-
-# Get public key
-sudo age-keygen -y /var/lib/sops/age/keys-new.txt
-
-# Update .sops.yaml with new public key
-
-# Re-encrypt secrets with both old and new keys (temporarily)
-sops updatekeys secrets.yaml
-
-# Test that everything works, then remove old key
-```
-
-## ➕ Adding Programs
-
-### Method 1: Simple Package Addition
-
-1. Create directory: `dotfiles/programs/program-name/`
-2. Create file: `program-name.nix`
-3. Add configuration:
-
-```nix
-{ config, pkgs, ... }:
-
-{
-  programs.program-name = {
-    enable = true;
-    # ... configuration
-  };
-}
-```
-
-The package will be automatically installed if it exists in nixpkgs with the same name.
-
-### Method 2: Explicit Package
-
-If the package name differs from the directory name:
-
-Edit `dotfiles/home.nix` and add to `home.packages`:
-
-```nix
-home.packages = with pkgs; [
-  # ... existing packages
-  actual-package-name
-];
-```
-
-### Method 3: Custom Package
-
-For packages not in nixpkgs:
-
-```nix
-{ config, pkgs, ... }:
-
-let
-  customPackage = pkgs.stdenv.mkDerivation {
-    # ... derivation
-  };
-in
-{
-  home.packages = [ customPackage ];
-}
-```
-
-## 🔙 Rollback & Recovery
-
-### System Rollback
-
-```bash
-# List generations
-sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
-
-# Rollback to previous generation
-sudo nixos-rebuild switch --rollback
-
-# Or select specific generation
-sudo nix-env --profile /nix/var/nix/profiles/system --switch-generation <number>
-sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
-```
-
-### Home Manager Rollback
-
-```bash
-# List generations
-home-manager generations
-
-# Activate specific generation
-/nix/store/<hash>-home-manager-generation/activate
-```
-
-### Boot Menu Recovery
-
-At boot, select an older generation from the systemd-boot menu.
-
-### Emergency Access
-
-If the system fails to boot:
-1. Select an older generation from boot menu
-2. Or boot into recovery mode
-3. Access TTY1 (emergency shell is enabled)
-
-## 💡 Tips & Best Practices
-
-### Performance
-
-- **Binary Cache**: Chaotic Nyx cache is configured for faster CachyOS kernel builds
-- **Garbage Collection**: Runs weekly, keeps last 30 days
-- **Build Optimization**: Use `--cores 0` for parallel builds
-
-### Security
-
-- **SSH**: Root login disabled, password authentication disabled
-- **Secrets**: Never commit unencrypted secrets
-- **Age Key**: Keep multiple encrypted backups in different locations
-
-### Maintenance
-
-```bash
-# Clean old generations manually
-sudo nix-collect-garbage --delete-older-than 30d
-
-# Optimize Nix store
-nix-store --optimise
-
-# Repair Nix store
-nix-store --verify --check-contents --repair
-```
-
-### Git Workflow
-
-```bash
-# Before making changes
-git checkout -b feature/my-changes
-
-# After testing
-git add .
-git commit -m "description of changes"
-git push origin feature/my-changes
-
-# After reviewing
-git checkout main
-git merge feature/my-changes
-```
-
-### Multi-Machine Setup
-
-1. Create new user config in `flake.nix`:
-   ```nix
-   userConfigs = {
-     joachim = { ... };
-     work = {
-       username = "work-user";
-       homeDirectory = "/home/work-user";
-     };
-   };
-   ```
-
-2. Create new system config:
-   ```nix
-   nixosConfigurations.work-machine = nixpkgs.lib.nixosSystem {
-     # ... configuration
-   };
-   ```
-
-3. Deploy:
-   ```bash
-   sudo nixos-rebuild switch --flake .#work-machine
-   home-manager switch --flake .#work
-   ```
-
-## 🐛 Troubleshooting
-
-### "error: access to URI is forbidden"
-
-Make sure all files are tracked in git:
-```bash
-git add .
-```
-
-### Secrets not decrypting
-
-1. Check age key exists: `sudo cat /var/lib/sops/age/keys.txt`
-2. Verify public key matches in `.sops.yaml`
-3. Re-encrypt: `sops updatekeys secrets.yaml`
-
-### Network shares not mounting
-
-1. Check credentials: `sudo cat /etc/cifs-credentials`
-2. Verify network connectivity to NAS
-3. Check mount points exist
-4. Review logs: `journalctl -u 'home-joachim-*.mount'`
-
-### Hyprland not starting
-
-1. Check NVIDIA drivers loaded: `lsmod | grep nvidia`
-2. Verify Wayland variables: `echo $NIXOS_OZONE_WL`
-3. Try from TTY: `Hyprland`
-4. Check logs: `journalctl -b | grep hyprland`
-
-## 📚 Resources
-
-- [NixOS Manual](https://nixos.org/manual/nixos/stable/)
-- [Home Manager Manual](https://nix-community.github.io/home-manager/)
-- [SOPS-nix Documentation](https://github.com/Mic92/sops-nix)
-- [Nix Flakes Wiki](https://nixos.wiki/wiki/Flakes)
-- [CachyOS Kernel](https://github.com/CachyOS/linux-cachyos)
-
-## 📝 License
-
-This configuration is provided as-is for personal use. Adapt as needed.
-
-## 🤝 Contributing
-
-This is a personal configuration, but suggestions are welcome via issues or pull requests.

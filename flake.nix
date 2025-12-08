@@ -1,105 +1,134 @@
 {
-  description = "Multi-machine, multi-user NixOS and Home Manager configuration";
+  description = "My take on a dendritic, DRY, hierarchical multi-machine, multi-user NixOS and Home Manager configuration.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    chaotic.url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    stylix = {
-      url = "github:nix-community/stylix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    chaotic = {
+      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    stylix = {
+      url = "github:danth/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, chaotic, home-manager, stylix, sops-nix, ... }@inputs:
-    let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-      
-      # Import our library functions
-      lib = import ./lib { inherit inputs; };
-      
-      # Define all hosts
-      hosts = {
-        reason = {
-          hostname = "reason";
-          modules = [
-            chaotic.nixosModules.default
-          ];
-        };
-        # Add more hosts here as needed
-        # laptop = {
-        #   hostname = "laptop";
-        #   modules = [ ./profiles/minimal.nix ];
-        # };
-      };
-      
-      # Define all users and which hosts they use
-      users = {
-        joachim = {
-          username = "joachim";
-          hosts = [ "reason" ]; # Can add more: [ "reason" "laptop" ]
-        };
-        # Add more users here
-        # work = {
-        #   username = "work-user";
-        #   hosts = [ "laptop" ];
-        # };
-      };
-      
-      # Generate user@host combinations
-      mkUserHostConfigs = userName:
-        let
-          userConfig = users.${userName};
-        in
-        builtins.map (host: {
-          name = "${userName}@${host}";
-          value = lib.users.mkUser {
-            inherit (userConfig) username;
-            inherit host;
-          };
-        }) userConfig.hosts;
-      
-    in {
-      # NixOS system configurations for all hosts
-      nixosConfigurations = builtins.mapAttrs 
-        (name: config: lib.hosts.mkHost config) 
-        hosts;
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    sops-nix,
+    chaotic,
+    stylix,
+    pre-commit-hooks,
+    ...
+  } @ inputs: let
+    system = "x86_64-linux";
+    pkgs = nixpkgs.legacyPackages.${system};
 
-      # Home Manager configurations for all user@host combinations
-      homeConfigurations = builtins.listToAttrs (
-        builtins.concatLists (
-          builtins.map mkUserHostConfigs (builtins.attrNames users)
-        )
-      );
-      
-      # Development shell
-      devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          nixpkgs-fmt
-          nil # Nix LSP
-          age
-          sops
-          git
-        ];
-        
-        shellHook = ''
-          echo "NixOS multi-machine configuration development environment"
-          echo "Available tools: nixpkgs-fmt, nil, age, sops"
-          echo ""
-          echo "Hosts: ${builtins.concatStringsSep ", " (builtins.attrNames hosts)}"
-          echo "Users: ${builtins.concatStringsSep ", " (builtins.attrNames users)}"
-        '';
+    # Helper function to create a host configuration
+    mkHost = {
+      hostname,
+      username,
+      platform ? "x86_64-linux",
+      stateVersion ? "25.11",
+    }: let
+      specialArgs = {
+        inherit inputs hostname username platform stateVersion;
       };
-      
-      # Formatter for 'nix fmt'
-      formatter.${system} = pkgs.nixpkgs-fmt;
+    in
+      nixpkgs.lib.nixosSystem {
+        system = platform;
+        inherit specialArgs;
+        modules = [
+          # Core System Configuration
+          ./system/hosts/${hostname}
+          ./system/shared
+
+          # Modules
+          sops-nix.nixosModules.sops
+          chaotic.nixosModules.default
+          stylix.nixosModules.stylix
+          home-manager.nixosModules.home-manager
+
+          # Home Manager Configuration
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = specialArgs;
+            home-manager.users.${username} = import ./dotfiles/users/${username};
+          }
+        ];
+      };
+  in {
+    nixosConfigurations = {
+      # My Desktop
+      reason = mkHost {
+        hostname = "reason";
+        username = "joachim";
+      };
+      # Her Notebook
+      stella = mkHost {
+        hostname = "stella";
+        username = "iris";
+      };
+      # My Work Notebook
+      deepthought = mkHost {
+        hostname = "deepthought";
+        username = "jhoss";
+      };
+      wintermute = mkHost {
+        hostname = "wintermute";
+        username = "dixie";
+      };
+      neuromancer = mkHost {
+        hostname = "neuromancer";
+        username = "case";
+      };
+
+      # You can add other hosts here using the helper
+      # "42he-Infinitybook" = mkHost { hostname = "42he-Infinitybook"; username = "joachim"; };
     };
+
+    # Pre-commit checks
+    checks.${system}.pre-commit-check = pre-commit-hooks.lib.${system}.run {
+      src = ./.;
+      hooks = {
+        alejandra.enable = true;
+        statix.enable = true;
+        deadnix.enable = true;
+      };
+    };
+
+    # Devshell for bootstrapping and maintenance
+    devShells.${system}.default = pkgs.mkShell {
+      inherit (self.checks.${system}.pre-commit-check) shellHook;
+      buildInputs = with pkgs; [
+        git
+        alejandra
+        statix
+        deadnix
+        sops
+        ssh-to-age
+        home-manager.packages.${system}.home-manager
+      ];
+    };
+  };
 }
