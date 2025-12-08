@@ -6,5 +6,4 @@
   # User specific packages
   home.packages = with pkgs; [
   ];
-
 }

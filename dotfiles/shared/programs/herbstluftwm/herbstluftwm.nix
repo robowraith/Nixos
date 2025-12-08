@@ -1,8 +1,6 @@
-{ config, pkgs, ... }:
-
-{
+{pkgs, ...}: {
   # Install HerbstluftWM
-  home.packages = [ pkgs.herbstluftwm ];
+  home.packages = [pkgs.herbstluftwm];
 
   # Enable X session for HerbstluftWM
   xsession = {
@@ -11,19 +9,21 @@
   };
 
   # Write the autostart config to XDG config
-  xdg.configFile."herbstluftwm/autostart" = {
-    source = ./autostart;
-    executable = true;
-    force = true;
-  };
+  xdg.configFile = {
+    "herbstluftwm/autostart" = {
+      source = ./autostart;
+      executable = true;
+      force = true;
+    };
 
-  # Copy other configuration files and scripts
-  xdg.configFile."herbstluftwm/bin" = {
-    source = ./bin;
-    recursive = true;
-  };
-  xdg.configFile."herbstluftwm/conf.d" = {
-    source = ./conf.d;
-    recursive = true;
+    # Copy other configuration files and scripts
+    "herbstluftwm/bin" = {
+      source = ./bin;
+      recursive = true;
+    };
+    "herbstluftwm/conf.d" = {
+      source = ./conf.d;
+      recursive = true;
+    };
   };
 }

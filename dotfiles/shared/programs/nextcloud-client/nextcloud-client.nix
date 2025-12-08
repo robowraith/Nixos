@@ -1,6 +1,4 @@
-{ config, pkgs, ... }:
-
-{
+{pkgs, ...}: {
   # Nextcloud client
-  home.packages = [ pkgs.nextcloud-client ];
+  home.packages = [pkgs.nextcloud-client];
 }

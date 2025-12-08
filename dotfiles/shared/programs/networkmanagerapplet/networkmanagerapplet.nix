@@ -1,6 +1,4 @@
-{ config, pkgs, ... }:
-
-{
+{pkgs, ...}: {
   # NetworkManager applet
-  home.packages = [ pkgs.networkmanagerapplet ];
+  home.packages = [pkgs.networkmanagerapplet];
 }

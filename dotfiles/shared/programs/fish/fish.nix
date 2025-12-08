@@ -1,9 +1,7 @@
-{ config, pkgs, lib, ... }:
-
-{
+{pkgs, ...}: {
   programs.fish = {
     enable = true;
-    
+
     # Configure Tide prompt on first run
     interactiveShellInit = ''
       # Configure Tide if not already configured
@@ -12,13 +10,28 @@
         set -U tide_prompt_configured yes
       end
     '';
-    
+
     plugins = with pkgs.fishPlugins; [
-      { name = "tide"; src = tide.src; }
-      { name = "fzf-fish"; src = fzf-fish.src; }
-      { name = "bass"; src = bass.src; }
-      { name = "plugin-git"; src = plugin-git.src; }
-      { name = "autopair"; src = autopair.src; }
+      {
+        name = "tide";
+        inherit (tide) src;
+      }
+      {
+        name = "fzf-fish";
+        inherit (fzf-fish) src;
+      }
+      {
+        name = "bass";
+        inherit (bass) src;
+      }
+      {
+        name = "plugin-git";
+        inherit (plugin-git) src;
+      }
+      {
+        name = "autopair";
+        inherit (autopair) src;
+      }
     ];
   };
 

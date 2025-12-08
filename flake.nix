@@ -70,10 +70,12 @@
 
           # Home Manager Configuration
           {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.${username} = import ./dotfiles/users/${username};
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = specialArgs;
+              users.${username} = import ./dotfiles/users/${username};
+            };
           }
         ];
       };

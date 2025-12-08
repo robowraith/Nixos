@@ -1,18 +1,16 @@
-{ pkgs, inputs, hostname, username, stateVersion, ...}:
-
-{
-  imports =
-    let
-      modulesPath = ./modules;
-      nixFilesInDir = lib.filterAttrs (name: type:
+{stateVersion, ...}: {
+  imports = let
+    modulesPath = ./modules;
+    nixFilesInDir = lib.filterAttrs (
+      name: type:
         type == "regular" && lib.hasSuffix ".nix" name
-      ) (builtins.readDir modulesPath);
-    in
+    ) (builtins.readDir modulesPath);
+  in
     lib.mapAttrsToList (name: _: modulesPath + "/${name}") nixFilesInDir;
 
   # System State Version
   system.stateVersion = stateVersion;
-  
+
   # Nix Configuration
   nix = {
     settings = {
@@ -29,9 +27,11 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  
+
   # Better "command not found"
-  programs.nix-index.enable = true;
-  programs.nix-index-database.comma.enable = true;
-  programs.command-not-found.enable = false;
+  programs = {
+    nix-index.enable = true;
+    nix-index-database.comma.enable = true;
+    command-not-found.enable = false;
+  };
 }

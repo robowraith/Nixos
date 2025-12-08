@@ -1,6 +1,4 @@
-{ config, lib, hostname, username, ... }:
-
-{
+{...}: {
   programs.git = {
     settings = {
       user = {

@@ -1,5 +1,4 @@
 {
-
   # FZF configuration
   programs.fzf = {
     enable = true;

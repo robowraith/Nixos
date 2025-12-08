@@ -1,11 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-
-{
+{pkgs, ...}: {
   environment.systemPackages = with pkgs; [
     # Core utilities
     file
@@ -18,8 +11,8 @@
     sops
   ];
 
-programs = {
-  fish.enable = true;
-  dconf.enable = true;
-};
+  programs = {
+    fish.enable = true;
+    dconf.enable = true;
+  };
 }

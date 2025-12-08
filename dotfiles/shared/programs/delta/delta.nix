@@ -1,5 +1,4 @@
 {
- 
   programs.delta = {
     enable = true;
     enableGitIntegration = true;
@@ -9,5 +8,4 @@
       side-by-side = true;
     };
   };
-
 }

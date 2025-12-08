@@ -1,12 +1,10 @@
-{ config, lib, pkgs, username, ... }:
-
-{
-  imports =
-    let
-      modulesPath = ./modules;
-      nixFilesInDir = lib.filterAttrs (name: type:
+{lib, ...}: {
+  imports = let
+    modulesPath = ./modules;
+    nixFilesInDir = lib.filterAttrs (
+      name: type:
         type == "regular" && lib.hasSuffix ".nix" name
-      ) (builtins.readDir modulesPath);
-    in
+    ) (builtins.readDir modulesPath);
+  in
     lib.mapAttrsToList (name: _: modulesPath + "/${name}") nixFilesInDir;
 }

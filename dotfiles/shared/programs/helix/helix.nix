@@ -1,6 +1,4 @@
-{ config, pkgs, ... }:
-
-{
+{config, ...}: {
   programs.helix = {
     enable = true;
 
@@ -58,22 +56,22 @@
       language = [
         {
           name = "go";
-          language-servers = [ "go" ];
+          language-servers = ["go"];
         }
         {
           name = "puppet";
           scope = "source.puppet";
-          file-types = [ "pp" ];
-          language-servers = [ "solargraph" ];
+          file-types = ["pp"];
+          language-servers = ["solargraph"];
         }
         {
           name = "python";
-          language-servers = [ "pylsp" "ruff" "jedi-language-server" ];
+          language-servers = ["pylsp" "ruff" "jedi-language-server"];
         }
         {
           name = "yaml";
-          file-types = [ "yaml" "yml" ];
-          language-servers = [ "yaml" ];
+          file-types = ["yaml" "yml"];
+          language-servers = ["yaml"];
         }
       ];
     };
