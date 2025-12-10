@@ -7,5 +7,6 @@
     grep = "rg -S";
     helix = "hx";
     ll = "eza -aghl --group-directories-first --icons";
+    psg = "procs";
   };
 }
