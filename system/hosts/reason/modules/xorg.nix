@@ -1,4 +1,4 @@
-{...}: {
+_: {
   # ============================================================================
   # Display Manager
   # ============================================================================
@@ -17,7 +17,9 @@
   services.xserver = {
     enable = true;
     windowManager.herbstluftwm.enable = true;
-    layout = "de";
-    xkbVariant = "nodeadkeys";
+    xkb = {
+      layout = "de";
+      variant = "nodeadkeys";
+    };
   };
 }

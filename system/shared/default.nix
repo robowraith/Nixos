@@ -1,4 +1,8 @@
-{stateVersion, ...}: {
+{
+  stateVersion,
+  lib,
+  ...
+}: {
   imports = let
     modulesPath = ./modules;
     nixFilesInDir = lib.filterAttrs (

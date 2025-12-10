@@ -1,4 +1,5 @@
 {
+  inputs,
   lib,
   stateVersion,
   username,
@@ -28,7 +29,12 @@
 
   program-imports = collectNixFiles programs-path;
 in {
-  imports = program-imports;
+  imports =
+    [
+      inputs.sops-nix.homeManagerModules.sops
+      inputs.nix-index-database.homeModules.nix-index
+    ]
+    ++ program-imports;
 
   home = {
     inherit username stateVersion;

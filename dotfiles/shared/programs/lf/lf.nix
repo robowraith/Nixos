@@ -51,11 +51,11 @@
 
     extraConfig = ''
       set cleaner '~/.config/lf/cleaner'
-        
+
       cmd on-cd &{{
         zoxide add "$PWD"
       }}
-        
+
       cmd on-select &{{
         lf -remote "send $id set statfmt \"$(eza -ld --color=always \"$f\" | sed 's/\\/\\\\/g;s/\"/\\\"/g')\""
       }}'';

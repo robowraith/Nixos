@@ -24,6 +24,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -37,6 +42,7 @@
     sops-nix,
     chaotic,
     stylix,
+    nix-index-database,
     pre-commit-hooks,
     ...
   } @ inputs: let
@@ -66,6 +72,7 @@
           sops-nix.nixosModules.sops
           chaotic.nixosModules.default
           stylix.nixosModules.stylix
+          nix-index-database.nixosModules.nix-index
           home-manager.nixosModules.home-manager
 
           # Home Manager Configuration
@@ -87,23 +94,23 @@
         username = "joachim";
       };
       # Her Notebook
-      stella = mkHost {
-        hostname = "stella";
-        username = "iris";
-      };
+      # stella = mkHost {
+      #   hostname = "stella";
+      #   username = "iris";
+      # };
       # My Work Notebook
-      deepthought = mkHost {
-        hostname = "deepthought";
-        username = "jhoss";
-      };
-      wintermute = mkHost {
-        hostname = "wintermute";
-        username = "dixie";
-      };
-      neuromancer = mkHost {
-        hostname = "neuromancer";
-        username = "case";
-      };
+      # deepthought = mkHost {
+      #   hostname = "deepthought";
+      #   username = "jhoss";
+      # };
+      # wintermute = mkHost {
+      #   hostname = "wintermute";
+      #   username = "dixie";
+      # };
+      # neuromancer = mkHost {
+      #   hostname = "neuromancer";
+      #   username = "case";
+      # };
 
       # You can add other hosts here using the helper
       # "42he-Infinitybook" = mkHost { hostname = "42he-Infinitybook"; username = "joachim"; };

@@ -1,5 +1,5 @@
 # /dotfiles/programs/sops/sops.nix
-{...}: {
+_: {
   # sops-nix configuration for home-manager
   sops = {
     defaultSopsFile = ../../../secrets.yaml;

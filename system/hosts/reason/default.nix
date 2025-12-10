@@ -6,7 +6,7 @@
       # Shared configuration for all systems
       ../../shared
       # System groups this system belongs to
-      ../../groups/home
+      ../../hostgroups/home
     ]
     ++ (
       # System specific configuration

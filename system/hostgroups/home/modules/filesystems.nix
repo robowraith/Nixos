@@ -15,8 +15,7 @@
       "vers=3.0"
       "uid=${toString config.users.users.${username}.uid}"
       "gid=${toString config.users.groups.${username}.gid}"
-      "username=${config.sops.secrets.home_cifs_credentials.username}"
-      "password=${config.sops.secrets.home_ccifs_credentials.password}"
+      "credentials=${config.sops.templates."cifs-credentials".path}"
     ];
   };
 
@@ -29,6 +28,17 @@ in {
   # ============================================================================
   # Filesystems - CIFS Network Shares
   # ============================================================================
+
+  sops = {
+    secrets = {
+      "home_cifs_credentials/username" = {};
+      "home_cifs_credentials/password" = {};
+    };
+    templates."cifs-credentials".content = ''
+      username=${config.sops.placeholder."home_cifs_credentials/username"}
+      password=${config.sops.placeholder."home_cifs_credentials/password"}
+    '';
+  };
 
   fileSystems =
     lib.genAttrs

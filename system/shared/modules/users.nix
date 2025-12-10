@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   username,
   ...
@@ -19,8 +18,13 @@
   # Users
   # ============================================================================
 
-  users.users = lib.attrsets.nameValuePair username {
+  users.groups.${username} = {
+    gid = 1000;
+  };
+
+  users.users.${username} = {
     uid = 1000;
+    group = username;
     isNormalUser = true;
     createHome = true;
     extraGroups = ["networkmanager" "wheel" "video" "input" "audio"];
