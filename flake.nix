@@ -80,6 +80,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+              backupFileExtension = ".backup";
               extraSpecialArgs = specialArgs;
               users.${username} = import ./dotfiles/users/${username};
             };
