@@ -1,10 +1,17 @@
 {pkgs, ...}: {
   environment.systemPackages = with pkgs; [
     # Core utilities
+    dysk
     file
     fish
     git
     helix
+    procs
+    tldr
+    wget
+
+    # Fonts
+    nerd-fonts.fira-code
 
     # Secrets management
     age

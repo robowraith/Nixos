@@ -1,3 +1,0 @@
-{
-  programs.procs.enable = true;
-}

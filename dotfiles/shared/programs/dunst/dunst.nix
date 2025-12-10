@@ -1,3 +1,0 @@
-{
-  programs.dunst.enable = true;
-}

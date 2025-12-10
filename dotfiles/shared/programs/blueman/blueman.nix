@@ -1,3 +1,0 @@
-{
-  programs.blueman.enable = true;
-}

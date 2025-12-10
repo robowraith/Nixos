@@ -1,3 +1,0 @@
-{
-  programs.numlockx.enable = true;
-}

@@ -1,3 +1,0 @@
-{
-  programs.tldr.enable = true;
-}
