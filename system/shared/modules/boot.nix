@@ -27,6 +27,13 @@
     consoleLogLevel = 3;
     initrd.verbose = false;
 
+    # Plymouth boot splash
+    plymouth = {
+      enable = true;
+      theme = "catppuccin-mocha";
+      themePackages = [(pkgs.catppuccin-plymouth.override {variant = "mocha";})];
+    };
+
     # Systemd in initrd for themed LUKS password prompt
     initrd.systemd.enable = true;
   };
