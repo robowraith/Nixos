@@ -1,1 +1,3 @@
-{}
+{
+  programs.dysk.enable = true;
+}

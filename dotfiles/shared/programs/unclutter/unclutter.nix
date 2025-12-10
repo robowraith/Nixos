@@ -1,1 +1,3 @@
-{}
+{
+  programs.unclutter.enable = true;
+}

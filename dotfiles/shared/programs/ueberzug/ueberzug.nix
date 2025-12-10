@@ -1,1 +1,3 @@
-{}
+{
+  programs.ueberzug.enable = true;
+}

@@ -1,1 +1,3 @@
-{}
+{
+  programs.kitty.enable = true;
+}

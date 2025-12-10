@@ -1,1 +1,3 @@
-{}
+{
+  programs.fastfetch.enable = true;
+}

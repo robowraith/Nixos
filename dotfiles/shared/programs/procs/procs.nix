@@ -1,1 +1,3 @@
-{}
+{
+  programs.procs.enable = true;
+}

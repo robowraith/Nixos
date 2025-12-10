@@ -1,1 +1,3 @@
-{}
+{
+  programs.flameshot.enable = true;
+}

@@ -1,0 +1,3 @@
+{
+  programs.slack.enable = true;
+}
