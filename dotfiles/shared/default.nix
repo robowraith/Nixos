@@ -41,6 +41,28 @@ in {
     homeDirectory = "/home/${username}";
   };
 
+  # Environment variables
+  home.sessionVariables = {
+    EDITOR = "hx";
+    VISUAL = "hx";
+    BROWSER = "vivaldi";
+    PAGER = "less -R";
+    LANG = "de_DE.UTF-8";
+  };
+
+  # Enable Stylix
+  stylix = {
+    enable = true;
+    enableReleaseChecks = false;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+  };
+  # Enable fontconfig
+  fonts.fontconfig.enable = true;
+
+  # Enable XDG desktop integration
+  xdg.enable = true;
+  xdg.mime.enable = true;
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
