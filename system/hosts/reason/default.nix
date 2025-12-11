@@ -7,6 +7,7 @@
       ../../shared
       # System groups this system belongs to
       ../../hostgroups/home
+      ../../hostgroups/mine
     ]
     ++ (
       # System specific configuration
