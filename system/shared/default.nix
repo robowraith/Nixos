@@ -1,4 +1,5 @@
 {
+  pkgs,
   stateVersion,
   lib,
   ...
@@ -31,6 +32,12 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  # Enable Stylix
+  stylix = {
+    enable = true;
+    enableReleaseChecks = false;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+  };
 
   # Better "command not found"
   programs = {

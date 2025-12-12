@@ -30,8 +30,9 @@
     # Plymouth boot splash
     plymouth = {
       enable = true;
-      theme = "catppuccin-mocha";
-      themePackages = [(pkgs.catppuccin-plymouth.override {variant = "mocha";})];
+      # Theme set by stylix
+      # theme = "catppuccin-mocha";
+      # themePackages = [(pkgs.catppuccin-plymouth.override {variant = "mocha";})];
     };
 
     # Systemd in initrd for themed LUKS password prompt
