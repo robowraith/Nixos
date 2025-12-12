@@ -16,7 +16,7 @@
           if path == programs-path && name == "_uninstalled"
           then []
           else collectNixFiles newPath
-        else if type == "regular" && lib.strings.hasSuffix ".nix" name
+        else if type == "regular" && lib.strings.hasSuffix ".nix" name && ! (path == programs-path && name == "default.nix")
         then [newPath]
         else []
     ) (builtins.attrNames entries);
