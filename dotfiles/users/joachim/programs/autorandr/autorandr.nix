@@ -8,49 +8,14 @@
           # Wait for X to settle
           sleep 1
 
-          # Function to call herbstclient
-          hc() {
-            ${pkgs.herbstluftwm}/bin/herbstclient "$@"
-          }
+          /usr/bin/env fish -c "set -Ux AUTORANDR_CURRENT_PROFILE $AUTORANDR_CURRENT_PROFILE"
+          /usr/bin/env fish -c "set -Ux AUTORANDR_CURRENT_PROFILES $AUTORANDR_CURRENT_PROFILES"
+          /usr/bin/env fish -c "set -Ux AUTORANDR_PROFILE_FOLDER $AUTORANDR_PROFILE_FOLDER"
+          /usr/bin/env fish -c "set -Ux AUTORANDR_MONITORS $AUTORANDR_MONITORS"
 
-          # Get current profile
-          PROFILE="$AUTORANDR_CURRENT_PROFILE"
+          notify-send -i display "Display profile" "$AUTORANDR_CURRENT_PROFILE"
 
-          case "$PROFILE" in
-            "LG38")
-              # Configure HerbstluftWM monitor for "old" office setup
-              hc and , \
-                set_monitors 960x1600+0+0 1920x1600+960+0 960x1600+2880+0 , \
-                rename_monitor 0 left , \
-                rename_monitor 1 main , \
-                rename_monitor 2 right
-              ;;
-
-            "Office_4K")
-              # Configure HerbstluftWM monitor for the "new" office setup
-              hc and , \
-                set_monitors 1600x960+1120+1200 1120x2160+0+0 1600x1200+1120+0 1120x2160+2720+0 , \
-                rename_monitor 1 left , \
-                rename_monitor 2 main , \
-                rename_monitor 3 right , \
-                rename_monitor 0 down
-              ;;
-
-            "Gaming_1080p")
-              # Configure HerbstluftWM monitor for Living room setup in 1080p
-              hc rename_monitor 0 main
-              ;;
-
-            "Gaming_4K")
-              # Configure HerbstluftWM monitor for living room setup in 4K
-              hc rename_monitor 0 main
-              ;;
-          esac
-
-          # Restore wallpaper
-          if [ -f ~/.fehbg ]; then
-            ~/.fehbg
-          fi
+          exit 0
         '';
       };
     };
