@@ -1,7 +1,7 @@
 {pkgs, ...}: {
-  ######################################
-  # Configuration for the user joachim #
-  ######################################
+  ####################################
+  # Configuration for the user jhoss #
+  ####################################
   imports = [
     # Configuration shared by all users
     ../../shared

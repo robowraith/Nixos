@@ -100,10 +100,10 @@
       #   username = "iris";
       # };
       # My Work Notebook
-      # deepthought = mkHost {
-      #   hostname = "deepthought";
-      #   username = "jhoss";
-      # };
+      deepthought = mkHost {
+        hostname = "deepthought";
+        username = "jhoss";
+      };
       # wintermute = mkHost {
       #   hostname = "wintermute";
       #   username = "dixie";
