@@ -1,3 +1,3 @@
 _: {
-  services.lxqt-policykit.enable = true;
+  option.services.lxqt-policykit.enable = true;
 }

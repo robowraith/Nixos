@@ -1,3 +1,3 @@
 _: {
-  services.unclutter.enable = true;
+  option.services.unclutter.enable = true;
 }

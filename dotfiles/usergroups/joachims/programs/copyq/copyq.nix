@@ -1,3 +1,3 @@
 _: {
-  services.copyq.enable = true;
+  option.services.copyq.enable = true;
 }
