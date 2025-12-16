@@ -8,5 +8,8 @@
 
     # Terminals
     kitty
+
+    # Sound
+    pavucontrol
   ];
 }
