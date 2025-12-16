@@ -38,7 +38,7 @@ source ~/.config/herbstluftwm/conf.d/keybindings.fish
 source ~/.config/herbstluftwm/conf.d/rules.fish
 source ~/.config/herbstluftwm/conf.d/theme.fish
 source ~/.config/herbstluftwm/conf.d/tags.fish
-source ~/.config/herbstluftwm/screen_setup.fish
+source ~/.config/herbstluftwm/conf.d/screen_setup.fish
 
 hc unlock
 
