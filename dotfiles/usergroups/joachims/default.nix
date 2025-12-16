@@ -9,5 +9,6 @@
 
   # User specific packages
   home.packages = with pkgs; [
+    lxqt.lxqt-policykit
   ];
 }
