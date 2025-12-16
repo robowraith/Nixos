@@ -38,11 +38,7 @@ source ~/.config/herbstluftwm/conf.d/keybindings.fish
 source ~/.config/herbstluftwm/conf.d/rules.fish
 source ~/.config/herbstluftwm/conf.d/theme.fish
 source ~/.config/herbstluftwm/conf.d/tags.fish
-
-# Screen setup is now handled by autorandr
-# See users/shared/programs/autorandr/autorandr.nix
-# Run autorandr
-hc silent spawn autorandr -c
+source ~/.config/herbstluftwm/screen_setup.fish
 
 hc unlock
 
