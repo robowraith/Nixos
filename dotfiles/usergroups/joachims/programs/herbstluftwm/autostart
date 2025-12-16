@@ -11,27 +11,28 @@ set Mod Mod4
 
 # Establish tags
 hc and , \
-    try rename default down , \
-    new_attr string tags.by-name."down".my_monitor, \
-    set_attr tags.by-name."down".my_monitor 0
+    try add 0 , \
+    rename 0 left , \
+    new_attr string tags.0.my_monitor , \
+    set_attr tags.0.my_monitor 0
 
 hc and , \
     add 1 , \
     rename 1 left , \
     new_attr string tags.1.my_monitor , \
-    set_attr tags.$tag.my_monitor 1
+    set_attr tags.1.my_monitor 1
 
 hc and , \
     add 2 , \
     rename 2 main , \
     new_attr string tags.1.my_monitor , \
-    set_attr tags.$tag.my_monitor 1
+    set_attr tags.2.my_monitor 1
 
 hc and , \
     add 3 , \
     rename 3 right , \
     new_attr string tags.2.my_monitor , \
-    set_attr tags.$tag.my_monitor 2
+    set_attr tags.3.my_monitor 2
 
 # Other config
 source ~/.config/herbstluftwm/conf.d/keybindings.fish
@@ -48,6 +49,9 @@ if hc silent new_attr bool my_first_run
 
     # Implement Notebook-Screen fix
     sudo /home/joachim/psr_fix/psr_fix.sh
+
+    # Start polkit agent
+    hc spawn lxqt-policykit-agent
 
     # Start applications that do not depend on secret-service or ssh-agent
 
@@ -90,18 +94,14 @@ if hc silent new_attr bool my_first_run
 
     # Set up private tag
     hc and , \
-        rule once class="Signal" tag="down" , \
+        rule once class="Signal" tag=4 , \
         spawn signal-desktop
-
-    hc and , \
-        focus_monitor down , \
-        use down
 
     # Start main applications
     hc and , \
-        # rule once class="Vivaldi-stable" tag="web" , \
-        # spawn vivaldi-stable , \
-        rule once title="general_terminal" tag="right" , \
+        rule once class="Vivaldi-stable" tag=5 , \
+        spawn vivaldi , \
+        rule once title="general_terminal" tag=6 , \
         spawn alacritty --title general_terminal
 
     # Set up main screen
