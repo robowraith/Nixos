@@ -1,3 +1,6 @@
 {
-  programs.keepassxc.enable = true;
+  programs.keepassxc = {
+    enable = true;
+    enableSecretService = true;
+  };
 }
