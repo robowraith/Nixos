@@ -16,4 +16,4 @@ switch $AUTORANDR_CURRENT_PROFILE
 end
 
 # Wallpaper
-feh --no-fehbg --bg-fill ~/Bilder/Wallpaper/BladeRunnerWP.jpg
+feh --no-fehbg --bg-fill ~/Bilder/Wallpaper/Rechner/BladeRunnerWP.jpg
