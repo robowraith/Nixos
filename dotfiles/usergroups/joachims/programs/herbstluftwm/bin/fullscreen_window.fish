@@ -16,7 +16,7 @@ hc silent try add $fullscreen_tag_name
 hc silent try new_attr string tags.by-name.$fullscreen_tag_name.my_original_tag
 hc silent try new_attr string tags.by-name.$fullscreen_tag_name.my_original_monitor
 
-if hc add_monitor 3840x1600+0+200 $fullscreen_tag_name $fullscreen_monitor_name
+if hc add_monitor 3840x2160+0+000 $fullscreen_tag_name $fullscreen_monitor_name
     hc attr tags.by-name.$fullscreen_tag_name.my_original_tag $original_tag
     hc attr tags.by-name.$fullscreen_tag_name.my_original_monitor $original_monitor
     hc and , \

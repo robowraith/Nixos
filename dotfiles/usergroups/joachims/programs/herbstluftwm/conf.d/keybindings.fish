@@ -38,43 +38,43 @@ hc keybind $Mod+Return spawn kitty
 # hc keybind $Mod+o focus_monitor down
 
 # Focus tags
-hc keybind $Mod+1 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish left other1
+hc keybind $Mod+1 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish left left_lower
 # hc keybind $Mod+1 chain , \
 #    focus_monitor 1 , \
 #    use other1
-hc keybind $Mod+2 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish main editor
+hc keybind $Mod+2 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish main main_lower
 # hc keybind $Mod+2 chain , \
 #    focus_monitor 2 , \
 #    use editor
-hc keybind $Mod+3 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish right other2
+hc keybind $Mod+3 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish right right_lower
 # hc keybind $Mod+3 chain , \
 #    focus_monitor 3 , \
 #    use other2
-hc keybind $Mod+4 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish left terminal
+hc keybind $Mod+4 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish left left_main
 # hc keybind $Mod+4 chain , \
 #    focus_monitor 1 , \
 #    use terminal
-hc keybind $Mod+5 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish main web
+hc keybind $Mod+5 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish main main_main
 #hc keybind $Mod+5 chain , \
 #    focus_monitor 2 , \
 #    use web
-hc keybind $Mod+6 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish right chat
+hc keybind $Mod+6 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish right right_main
 # hc keybind $Mod+6 chain , \
 #    focus_monitor 3 , \
 #    use chat
-hc keybind $Mod+7 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish left left
+hc keybind $Mod+7 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish left left_upper
 # hc keybind $Mod+7 chain , \
 #    focus_monitor 1 , \
 #    use left
-hc keybind $Mod+8 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish main main
+hc keybind $Mod+8 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish main main_upper
 # hc keybind $Mod+8 chain , \
 #    focus_monitor 2 , \
 #    use main
-hc keybind $Mod+9 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish right right
+hc keybind $Mod+9 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish right right_upper
 # hc keybind $Mod+9 chain , \
 #    focus_monitor 3 , \
 #    use right
-hc keybind $Mod+0 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish down private
+hc keybind $Mod+0 spawn ~/.config/herbstluftwm/bin/switch_tag_or_cycle.fish down down
 # hc keybind $Mod+0 chain , \
 # focus_monitor 0 , \
 # use private
@@ -100,28 +100,28 @@ hc keybind $Mod+Shift+Up shift up
 hc keybind $Mod+Shift+Right shift right
 
 # Move client to tag
-hc keybind $Mod+Shift+1 move other1
-hc keybind $Mod+Shift+2 move editor
-hc keybind $Mod+Shift+3 move other2
-hc keybind $Mod+Shift+4 move terminal
-hc keybind $Mod+Shift+5 move web
-hc keybind $Mod+Shift+6 move chat
-hc keybind $Mod+Shift+7 move left
-hc keybind $Mod+Shift+8 move main
-hc keybind $Mod+Shift+9 move right
-hc keybind $Mod+Shift+0 move private
+hc keybind $Mod+Shift+1 move left_lower
+hc keybind $Mod+Shift+2 move main_lower
+hc keybind $Mod+Shift+3 move right_lower
+hc keybind $Mod+Shift+4 move left_main
+hc keybind $Mod+Shift+5 move main_main
+hc keybind $Mod+Shift+6 move right_main
+hc keybind $Mod+Shift+7 move left_upper
+hc keybind $Mod+Shift+8 move main_upper
+hc keybind $Mod+Shift+9 move right_upper
+hc keybind $Mod+Shift+0 move down
 
 # Bring tag to monitor
-hc keybind $Mod+Ctrl+1 use other1
-hc keybind $Mod+Ctrl+2 use editor
-hc keybind $Mod+Ctrl+3 use other2
-hc keybind $Mod+Ctrl+4 use terminal
-hc keybind $Mod+Ctrl+5 use web
-hc keybind $Mod+Ctrl+6 use chat
-hc keybind $Mod+Ctrl+7 use left
-hc keybind $Mod+Ctrl+8 use main
-hc keybind $Mod+Ctrl+9 use right
-hc keybind $Mod+Ctrl+0 use private
+hc keybind $Mod+Ctrl+1 use left_lower
+hc keybind $Mod+Ctrl+2 use main_lower
+hc keybind $Mod+Ctrl+3 use right_lower
+hc keybind $Mod+Ctrl+4 use left_main
+hc keybind $Mod+Ctrl+5 use main_main
+hc keybind $Mod+Ctrl+6 use right_main
+hc keybind $Mod+Ctrl+7 use left_upper
+hc keybind $Mod+Ctrl+8 use main_upper
+hc keybind $Mod+Ctrl+9 use right_upper
+hc keybind $Mod+Ctrl+0 use down
 
 # Switching adjacent windows
 # hc keybind $Mod+Ctrl+Left spawn ~/.config/herbstluftwm/bin/switch_window.fish left
