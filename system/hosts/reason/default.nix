@@ -6,6 +6,7 @@
       # Shared configuration for all systems
       ../../shared
       # System groups this system belongs to
+      ../../hostgroups/desktop
       ../../hostgroups/home
       ../../hostgroups/mine
     ]
