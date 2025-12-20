@@ -12,7 +12,7 @@
     };
 
     # Kernel
-    kernelPackages = pkgs.linuxPackages_cachyos-lto;
+    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
     kernelParams = [
       "quiet"
       "splash"

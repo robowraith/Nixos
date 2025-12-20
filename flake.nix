@@ -14,8 +14,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    chaotic = {
-      url = "github:chaotic-cx/nyx/nyxpkgs-unstable";
+    nix-cachyos-kernel = {
+      url = "github:xddxdd/nix-cachyos-kernel";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -40,7 +40,7 @@
     nixpkgs,
     home-manager,
     sops-nix,
-    chaotic,
+    nix-cachyos-kernel,
     stylix,
     nix-index-database,
     pre-commit-hooks,
@@ -70,10 +70,12 @@
 
           # Modules
           sops-nix.nixosModules.sops
-          chaotic.nixosModules.default
           stylix.nixosModules.stylix
           nix-index-database.nixosModules.nix-index
           home-manager.nixosModules.home-manager
+
+          # Overlays
+          {nixpkgs.overlays = [nix-cachyos-kernel.overlays.default];}
 
           # Home Manager Configuration
           {
