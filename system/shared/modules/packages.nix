@@ -6,6 +6,7 @@
     fish
     git
     helix
+    killall
     procs
     tldr
     wget
