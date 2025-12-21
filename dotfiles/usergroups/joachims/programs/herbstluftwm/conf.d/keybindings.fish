@@ -195,10 +195,6 @@ hc keybind XF86AudioPause spawn /usr/bin/playerctl play-pause
 hc keybind XF86AudioNext spawn /usr/bin/playerctl next
 hc keybind XF86AudioPrev spawn /usr/bin/playerctl previous
 
-# Sreen brightness controls
-hc keybind XF86MonBrightnessUp spawn /usr/bin/xbacklight -inc 20 # increase screen brightness
-hc keybind XF86MonBrightnessDown spawn /usr/bin/xbacklight -dec 20 # decrease screen brightness
-
 # Switch camera light
 hc keybind $Mod+Shift+ssharp spawn ~/.local/bin/litracontrol on
 hc keybind $Mod+Ctrl+ssharp spawn ~/.local/bin/litracontrol off
