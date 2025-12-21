@@ -21,20 +21,5 @@ _: {
     };
   };
 
-  # Systemd service to auto-detect and switch on login/resume
-  systemd.user.services.autorandr = {
-    Unit = {
-      Description = "Autorandr execution hook";
-      After = ["graphical-session-pre.target"];
-      PartOf = ["graphical-session.target"];
-    };
-
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.autorandr}/bin/autorandr --change";
-      RemainAfterExit = false;
-    };
-
-    Install.WantedBy = ["graphical-session.target"];
-  };
+  imports = [ ./systemd.nix ];
 }
