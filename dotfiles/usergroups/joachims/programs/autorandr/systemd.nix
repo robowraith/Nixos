@@ -32,7 +32,10 @@
         sleep 5
         ${pkgs.xrandr}/bin/xrandr --output HDMI-0 --off
         sleep 1
+        ${pkgs.autorandr}/bin/autorandr --change
+        sleep 1
         ${pkgs.xrandr}/bin/xrandr --output HDMI-0 --auto
+        sleep 1
         ${pkgs.autorandr}/bin/autorandr --change
       ''}";
     };
