@@ -1,9 +1,13 @@
-_: {
+{ pkgs, ...}: {
   # ============================================================================
   # Audio
   # ============================================================================
 
   security.rtkit.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    pulseaudio
+  ];
 
   services.pipewire = {
     enable = true;
