@@ -203,7 +203,7 @@ hc keybind $Mod+Ctrl+ssharp spawn ~/.local/bin/litracontrol off
 # Application Hotkeys #
 #######################
 
-hc keybind Control+space spawn /usr/bin/copyq show
-hc keybind Print spawn /usr/bin/flameshot gui
-hc keybind $Mod+Ctrl+d spawn /usr/bin/dunstctl close
-hc keybind $Mod+Shift+Ctrl+d spawn /usr/bin/dunstctl close-all
+hc keybind Control+space spawn copyq show
+hc keybind Print spawn flameshot gui
+hc keybind $Mod+Ctrl+d spawn dunstctl close
+hc keybind $Mod+Shift+Ctrl+d spawn dunstctl close-all
