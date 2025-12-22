@@ -22,4 +22,6 @@ _: {
       variant = "nodeadkeys";
     };
   };
+
+  services.libinput.enable = true;
 }

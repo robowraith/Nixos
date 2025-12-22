@@ -183,17 +183,17 @@ hc keybind $Mod+Tab cycle
 # Multimedia Keys #
 ###################
 
-# Use /usr/bin/pactl to adjust volume in PulseAudio.
-hc keybind XF86AudioRaiseVolume spawn /usr/bin/pactl set-sink-volume @DEFAULT_SINK@ +10%
-hc keybind XF86AudioLowerVolume spawn /usr/bin/pactl set-sink-volume @DEFAULT_SINK@ -10%
-hc keybind XF86AudioMute spawn /usr/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle
-hc keybind XF86AudioMicMute spawn /usr/bin/pactl set-source-mute @DEFAULT_SOURCE@ toggle
+# Use pactl to adjust volume in PulseAudio.
+hc keybind XF86AudioRaiseVolume spawn pactl set-sink-volume @DEFAULT_SINK@ +10%
+hc keybind XF86AudioLowerVolume spawn pactl set-sink-volume @DEFAULT_SINK@ -10%
+hc keybind XF86AudioMute spawn pactl set-sink-mute @DEFAULT_SINK@ toggle
+hc keybind XF86AudioMicMute spawn pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
 # Media player controls
-hc keybind XF86AudioPlay spawn /usr/bin/playerctl play-pause
-hc keybind XF86AudioPause spawn /usr/bin/playerctl play-pause
-hc keybind XF86AudioNext spawn /usr/bin/playerctl next
-hc keybind XF86AudioPrev spawn /usr/bin/playerctl previous
+hc keybind XF86AudioPlay spawn playerctl play-pause
+hc keybind XF86AudioPause spawn playerctl play-pause
+hc keybind XF86AudioNext spawn playerctl next
+hc keybind XF86AudioPrev spawn playerctl previous
 
 # Switch camera light
 hc keybind $Mod+Shift+ssharp spawn ~/.local/bin/litracontrol on

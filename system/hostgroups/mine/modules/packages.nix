@@ -11,5 +11,8 @@
 
     # Sound
     pavucontrol
+
+    #input
+    libinput
   ];
 }
