@@ -32,7 +32,7 @@
     # This points to the decrypted file containing the hashed password.
     # sops-nix provides this path.
     hashedPasswordFile = config.sops.secrets."users_${username}_password_hash".path;
-    openssh.authorizedKeys = [
+    openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOvw24pG1yoIoRJOG9txTtN8YC5gVy5uURs59CwY1jIh jhoss"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC7xEgQh5j5zse3gFZmIUzfbtVIsYaZ4ksBT/Sx0dshm joachim"
     ];
