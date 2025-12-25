@@ -74,9 +74,9 @@ if hc silent new_attr bool my_first_run
 
     # Start main applications
     hc and , \
-        rule once class="Vivaldi-stable" tag="main_main", \
+        rule once class="Vivaldi-stable" tag="main_main" , \
         spawn vivaldi , \
-        rule once title="general_terminal" tag="right_main", \
+        rule once title="kitty" tag="right_main" , \
         spawn kitty
 
     # Set up main screens
