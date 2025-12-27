@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, inputs, ...}: {
   environment.systemPackages = with pkgs; [
     # Core utilities
 
@@ -9,5 +9,6 @@
 
     # Other apps
     signal-desktop
+    inputs.zen-browser.packages.${pkgs.system}.zen-browser
   ];
 }
