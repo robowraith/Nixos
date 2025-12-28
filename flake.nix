@@ -35,7 +35,12 @@
     };
 
     zen-browser = {
-      url = "github:youwen5/zen-browser-flake";
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -50,6 +55,7 @@
     nix-index-database,
     pre-commit-hooks,
     zen-browser,
+    firefox-addons,
     ...
   } @ inputs: let
     system = "x86_64-linux";

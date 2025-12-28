@@ -9,6 +9,6 @@
 
     # Other apps
     signal-desktop
-    inputs.zen-browser.packages.${pkgs.system}.zen-browser
+    inputs.zen-browser.packages.${pkgs.system}.default
   ];
 }
