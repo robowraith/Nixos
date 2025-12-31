@@ -68,4 +68,13 @@ hc and , \
     new_attr string tags.9.my_monitor , \
     set_attr tags.9.my_monitor right
 
+hc and , \
+    focus_monitor left , \
+    use left_main , \
+    focus_monitor right , \
+    use right_main , \
+    focus_monitor main , \
+    use main_main , \
+    split bottom 0.75
+
 exit 0

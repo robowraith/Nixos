@@ -79,12 +79,4 @@ if hc silent new_attr bool my_first_run
         rule once title="kitty" tag="right_main" , \
         spawn kitty
 
-    # Set up main screens
-    hc chain , \
-        focus_monitor left , \
-        use left_main , \
-        focus_monitor right , \
-        use right_main , \
-        focus_monitor main , \
-        use main_main
 end
