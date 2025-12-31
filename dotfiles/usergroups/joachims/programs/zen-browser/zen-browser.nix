@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ config, pkgs, inputs, ... }:
 {
   imports = [ inputs.zen-browser.homeModules.default ];
 
@@ -32,4 +32,5 @@
       ];
     };
   };
+  stylix.targets.zen-browser.profileNames = ["default"];
 }
