@@ -89,8 +89,8 @@ hc keybind $Mod+Up focus up
 hc keybind $Mod+Right focus right
 
 # Fullscreen
-hc keybind $Mod+Ctrl+f spawn ~/.config/herbstluftwm/bin/fullscreen_window.fish
-hc keybind $Mod+Shift+f spawn ~/.config/herbstluftwm/bin/fullscreen_tag.fish
+hc keybind $Mod+Ctrl+f fullscreen
+hc keybind $Mod+Shift+f spawn ~/.config/herbstluftwm/bin/fullscreen_window.fish
 # hc keybind $Mod+Shift+f fullscreen toggle
 
 # moving clients
