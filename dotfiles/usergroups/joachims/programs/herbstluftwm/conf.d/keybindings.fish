@@ -196,8 +196,8 @@ hc keybind XF86AudioNext spawn playerctl next
 hc keybind XF86AudioPrev spawn playerctl previous
 
 # Switch camera light
-hc keybind $Mod+Shift+ssharp spawn ~/.local/bin/litracontrol on
-hc keybind $Mod+Ctrl+ssharp spawn ~/.local/bin/litracontrol off
+hc keybind $Mod+Shift+l spawn litra on
+hc keybind $Mod+Ctrl+l spawn litra off
 
 #######################
 # Application Hotkeys #
