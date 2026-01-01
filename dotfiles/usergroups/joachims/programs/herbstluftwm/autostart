@@ -30,8 +30,6 @@ if hc silent new_attr bool my_first_run
 
     # Start applications that do not depend on secret-service or ssh-agent
 
-    # Start composition manager
-    hc spawn picom
     # Hide the mouse pointer after a while
     hc spawn unclutter -b
     # Set numlock to on
@@ -87,4 +85,7 @@ if hc silent new_attr bool my_first_run
         use right_main , \
         focus_monitor main , \
         use main_main
+
+    # Start composition manager
+    hc spawn picom
 end
