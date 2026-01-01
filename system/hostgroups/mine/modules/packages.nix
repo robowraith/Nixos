@@ -14,5 +14,8 @@
 
     #input
     libinput
+
+    # Keyboard firmware
+    qmk
   ];
 }
