@@ -144,10 +144,10 @@ hc keybind $Mod+f floating toggle
 hc keybind $Mod+p pseudotile toggle
 
 # .Rofi
-hc keybind $Mod+space spawn rofi -combi-modi drun,run -show combi -config ~/.config/rofi/jolauncher.rasi
-hc keybind $Mod+w spawn rofi -modi window -show window -config ~/.config/rofi/jowindow.rasi
+hc keybind $Mod+space spawn rofi -combi-modi drun,run -show combi
+hc keybind $Mod+w spawn rofi -modi window -show window
 hc keybind $Mod+Shift+w spawn ~/.config/herbstluftwm/bin/workspaces.sh
-hc keybind $Mod+s spawn rofi -modi ssh -show ssh -config ~/.config/rofi/jossh.rasi
+hc keybind $Mod+s spawn rofi -modi ssh -show ssh
 hc keybind $Mod+Shift+s spawn ~/.config/i3/bin/sshtunnel
 hc keybind $Mod+Shift+p spawn ~/.config/rofi/applets/android/powermenu.sh
 
