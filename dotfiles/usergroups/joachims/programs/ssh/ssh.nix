@@ -460,10 +460,11 @@
 
       Host  *_rescue
             User          jollymaeh
-
-      Host  *
-            User          joachim
-            Port          22
     '';
+    enableDefaultConfig = false;
+    matchBlocks."*" = {
+      user = "joachim";
+      port = 22;
+    };
   };
 }

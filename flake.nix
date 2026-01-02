@@ -73,9 +73,9 @@
       };
     in
       nixpkgs.lib.nixosSystem {
-        system = platform;
         inherit specialArgs;
         modules = [
+          {nixpkgs.hostPlatform = platform;}
           # Core System Configuration
           ./system/hosts/${hostname}
           ./system/shared
