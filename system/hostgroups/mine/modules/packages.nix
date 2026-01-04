@@ -5,6 +5,7 @@
     feh
     flameshot
     ueberzug
+    wtfutil
 
     # Terminals
     kitty

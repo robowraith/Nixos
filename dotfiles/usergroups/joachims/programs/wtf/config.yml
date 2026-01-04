@@ -1,0 +1,142 @@
+wtf:
+  colors:
+    #background: black
+    border:
+      focusable: darkslateblue
+      focused: orange
+      normal: gray
+    checked: yellow
+    highlight:
+      fore: black
+      back: gray
+    rows:
+      even: yellow
+      odd: white
+  grid:
+    columns: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+    rows: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 3]
+  refreshInterval: 1
+  openFileUtil: "open"
+  navigation:
+    shortcuts: false
+  mods:
+    time:
+      withDatePrefix: False
+      dateFormat: "Monday 02. Jan 2006"
+      color: orange
+      enabled: true
+      font: bigfont
+      hourFormat: 24
+      position:
+        top: 0
+        left: 0
+        height: 2
+        width: 7
+      refreshInterval: 1s
+      title: "Time"
+      type: "digitalclock"
+    battery:
+      type: power
+      title: "Power"
+      enabled: true
+      position:
+        top: 0
+        left: 7
+        height: 1
+        width: 7
+      refreshInterval: 15
+    ipv6:
+      title: IPv6
+      type: cmdrunner
+      cmd: "curl"
+      args: ["ifconfig.co"]
+      enabled: true
+      refreshInterval: 3600
+      position:
+        top: 0
+        left: 14
+        height: 1
+        width: 7
+    uptime:
+      type: cmdrunner
+      title: "Uptime"
+      cmd: "uptime"
+      args: ["--pretty"]
+      enabled: true
+      position:
+        top: 1
+        left: 7
+        height: 1
+        width: 7
+      refreshInterval: 30
+    ipv4:
+      title: IPv4
+      type: cmdrunner
+      cmd: "curl"
+      args: ["ifconfig.me"]
+      enabled: true
+      refreshInterval: 3600
+      position:
+        top: 1
+        left: 14
+        height: 1
+        width: 7
+    date:
+      title: "Date"
+      type: cmdrunner
+      cmd: "cal"
+      args: ["-mw", "--color=always"]
+      enabled: true
+      pty: true
+      refreshInterval: 3600
+      position:
+        top: 2
+        left: 0
+        height: 2
+        width: 7
+    security_info:
+      type: security
+      title: "Network"
+      enabled: true
+      position:
+        top: 2
+        left: 7
+        height: 4
+        width: 7
+      refreshInterval: 3600
+    updates:
+      type: cmdrunner
+      title: Updates
+      cmd: "checkupdates"
+      args: []
+      enabled: true
+      tail: true
+      position:
+        top: 2
+        left: 14
+        height: 4
+        width: 7
+      refreshInterval: 3600
+    resources:
+      type: resourceusage
+      title: "Ressources"
+      enabled: true
+      position:
+        top: 4
+        left: 0
+        height: 3
+        width: 7
+      refreshInterval: 1
+    disks:
+      type: cmdrunner
+      title: HDD
+      cmd: "df"
+      args: ["-H", "/", "--output=target,size,used,avail,pcent"]
+      enabled: true
+      position:
+        top: 6
+        left: 7
+        height: 1
+        width: 14
+      refreshInterval: 3600
+
