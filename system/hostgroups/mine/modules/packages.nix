@@ -18,5 +18,9 @@
 
     # Keyboard firmware
     qmk
+
+    # Logitech mouse
+    solaar
+    logitech-udev-rules
   ];
 }
