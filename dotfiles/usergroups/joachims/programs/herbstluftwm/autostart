@@ -44,7 +44,6 @@ if hc silent new_attr bool my_first_run
     hc spawn flameshot
 
     # Start Keepassxc and wait for it to be unlocked
-    hc focus_monitor 3
     hc and , \
         rule once class="KeePassXC" tag="left_main" , \
         spawn keepassxc
@@ -79,14 +78,18 @@ if hc silent new_attr bool my_first_run
 
     # Set up main screens
     hc chain , \
-        focus_monitor down , \
-        use down , \
         focus_monitor left , \
         use left_main , \
         focus_monitor right , \
         use right_main , \
         focus_monitor main , \
         use main_main
+
+    hc and , \
+        split bottom 0.75 , \
+        focus down , \
+        spawn kitty , \
+        focus up
 
     hc merge_tag default down
 
