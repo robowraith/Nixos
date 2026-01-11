@@ -7,6 +7,8 @@
     ueberzug
     wtfutil
 
+    # For secret-tool
+    libsecret
     # Terminals
     kitty
 
