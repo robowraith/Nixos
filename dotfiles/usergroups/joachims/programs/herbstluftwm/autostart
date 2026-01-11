@@ -86,6 +86,7 @@ if hc silent new_attr bool my_first_run
         use main_main
 
     hc and , \
+        focus_monitor main , \
         split bottom 0.75 , \
         focus down , \
         spawn kitty , \
