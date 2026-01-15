@@ -87,7 +87,20 @@
           home-manager.nixosModules.home-manager
 
           # Overlays
-          {nixpkgs.overlays = [nix-cachyos-kernel.overlays.default];}
+          {
+            nixpkgs.overlays = [
+              nix-cachyos-kernel.overlays.default
+              (final: prev: {
+                herbstluftwm = prev.herbstluftwm.overrideAttrs (oldAttrs: {
+                  postPatch =
+                    (oldAttrs.postPatch or "")
+                    + ''
+                      sed -i '15i #include <cstdint>' src/xconnection.cpp
+                    '';
+                });
+              })
+            ];
+          }
 
           # Home Manager Configuration
           {
