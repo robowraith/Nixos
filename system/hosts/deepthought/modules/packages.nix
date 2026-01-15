@@ -4,12 +4,6 @@
     feh
     xrandr
 
-    # # Wayland
-    # wayland
-    # wayland-utils
-    # wl-clipboard
-
-    # NVIDIA utilities
-    nvtopPackages.nvidia
+    slack
   ];
 }
