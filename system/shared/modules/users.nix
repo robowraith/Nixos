@@ -27,7 +27,7 @@
     group = username;
     isNormalUser = true;
     createHome = true;
-    extraGroups = ["networkmanager" "wheel" "video" "input" "audio"];
+    extraGroups = ["networkmanager" "wheel" "video" "input" "audio" "docker"];
     shell = pkgs.fish;
     # This points to the decrypted file containing the hashed password.
     # sops-nix provides this path.
