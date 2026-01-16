@@ -56,9 +56,9 @@
         zoxide add "$PWD"
       }}
 
-      cmd on-select &{{
-        lf -remote "send $id set statfmt \"$(eza -ld --color=always \"$f\" | sed 's/\\/\\\\/g;s/\"/\\\"/g')\""
-      }}'';
+      # cmd on-select &{{
+      #   lf -remote "send $id set statfmt \"$(eza -ld --color=always \"$f\" | sed 's/\\/\\\\/g;s/\"/\\\"/g')\""
+      # }}'';
 
     # cmd fzf_search ${{
     #   cmd="rg --column --line-number --no-heading --color=always --smart-case"
