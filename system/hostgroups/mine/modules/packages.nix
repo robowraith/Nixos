@@ -7,6 +7,11 @@
     ueberzug
     wtfutil
 
+    # Nixos
+    alejandra
+    statix
+    deadnix
+
     # For secret-tool
     libsecret
     # Terminals
