@@ -21,33 +21,45 @@
 
   # List of network share directories
   networkShares = ["Backup" "Bilder" "Dokumente" "Install" "Musik" "Videos"];
-
-  # Generate mount point paths
-  mountPoints = map (name: "/home/${username}/${name}") networkShares;
 in {
-  # ============================================================================
-  # Filesystems - CIFS Network Shares
-  # ============================================================================
-
-  sops = {
-    secrets = {
-      "home_cifs_credentials/username" = {};
-      "home_cifs_credentials/password" = {};
+  options.home.cifs = {
+    mountPoints = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = map (name: "/home/${username}/${name}") networkShares;
+      description = "List of mount points for CIFS shares";
     };
-    templates."cifs-credentials".content = ''
-      username=${config.sops.placeholder."home_cifs_credentials/username"}
-      password=${config.sops.placeholder."home_cifs_credentials/password"}
-    '';
   };
 
-  fileSystems =
-    lib.genAttrs
-    (map (name: "/home/${username}/${name}") networkShares)
-    (path: mkCifsMount (builtins.baseNameOf path));
+  config = {
+    # ============================================================================
+    # Filesystems - CIFS Network Shares
+    # ============================================================================
 
-  # Create mount point directories
-  systemd.tmpfiles.rules =
-    map
-    (path: "d ${path} 0755 ${username} ${username} -")
-    mountPoints;
+    sops = {
+      secrets = {
+        "home_cifs_credentials/username" = {};
+        "home_cifs_credentials/password" = {};
+      };
+      templates."cifs-credentials".content = ''
+        username=${config.sops.placeholder."home_cifs_credentials/username"}
+        password=${config.sops.placeholder."home_cifs_credentials/password"}
+      '';
+    };
+
+    fileSystems =
+      lib.genAttrs
+      config.home.cifs.mountPoints
+      (path: mkCifsMount (builtins.baseNameOf path));
+
+    # Create mount point directories
+    systemd.tmpfiles.rules = let
+      # Get unique parent directories that are not the home directory itself
+      parentDirs = lib.unique (map (path: builtins.dirOf path) config.home.cifs.mountPoints);
+      filteredParentDirs = builtins.filter (dir: dir != "/home/${username}") parentDirs;
+    in
+      (map (path: "d ${path} 0755 ${username} ${username} -") filteredParentDirs)
+      ++ (map
+        (path: "d ${path} 0755 ${username} ${username} -")
+        config.home.cifs.mountPoints);
+  };
 }
