@@ -1,2 +1,3 @@
-_: {
+{
+  imports = [ ./code.nix ];
 }
