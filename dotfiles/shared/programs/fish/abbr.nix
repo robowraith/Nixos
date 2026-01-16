@@ -12,6 +12,7 @@
     nhs = "nh search";
     nos = "nh os switch";
     nrs = "sudo nixos-rebuild switch --flake ~/nixos#reason";
+    va = "vagrant";
     zj = "zellij";
   };
 }
