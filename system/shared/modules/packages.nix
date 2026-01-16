@@ -17,9 +17,6 @@
     # Secrets management
     age
     sops
-
-    # Webcam
-    guvcview
   ];
 
   programs = {
