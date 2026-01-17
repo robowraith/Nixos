@@ -4,6 +4,10 @@
     feh
     xrandr
 
+    # Audio
+    freac
+    lame
+
     # # Wayland
     # wayland
     # wayland-utils

@@ -98,6 +98,32 @@
                       sed -i '15i #include <cstdint>' src/xconnection.cpp
                     '';
                 });
+                freac = prev.freac.overrideAttrs (oldAttrs: {
+                  nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [prev.makeWrapper];
+                  buildInputs = (oldAttrs.buildInputs or []) ++ [
+                    prev.lame
+                    prev.flac
+                    prev.faac
+                    prev.faad2
+                    prev.libvorbis
+                    prev.libopus
+                    prev.mpg123
+                  ];
+                  postFixup =
+                    (oldAttrs.postFixup or "")
+                    + ''
+                      wrapProgram $out/bin/freac \
+                        --prefix LD_LIBRARY_PATH : "${prev.lib.makeLibraryPath [
+                        prev.lame
+                        prev.flac
+                        prev.faac
+                        prev.faad2
+                        prev.libvorbis
+                        prev.libopus
+                        prev.mpg123
+                      ]}"
+                    '';
+                });
               })
             ];
           }
