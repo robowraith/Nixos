@@ -26,6 +26,10 @@
     # Keyboard firmware
     qmk
 
+    # Kubernetes
+    kubectl
+    kubectx
+    
     # Logitech mouse
     solaar
     logitech-udev-rules
