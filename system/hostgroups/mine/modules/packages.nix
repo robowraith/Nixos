@@ -4,6 +4,7 @@
     dunst
     feh
     flameshot
+    numlockx
     ueberzug
     wtfutil
 
