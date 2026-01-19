@@ -22,6 +22,9 @@ hc unlock
 # check if this is the first run
 if hc silent new_attr bool my_first_run
 
+    # Wallpaper
+    hc spawn ~/.fehbg
+
     # Implement Notebook-Screen fix
     sudo /home/joachim/psr_fix/psr_fix.sh
 
@@ -94,7 +97,7 @@ if hc silent new_attr bool my_first_run
         spawn kitty , \
         focus up
 
-    hc merge_tag default down
+    hc merge_tag default left_main
 
     # Start composition manager
     hc spawn picom
