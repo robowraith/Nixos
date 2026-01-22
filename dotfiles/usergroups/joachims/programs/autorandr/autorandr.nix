@@ -13,7 +13,7 @@ _: {
           /usr/bin/env fish -c "set -Ux AUTORANDR_PROFILE_FOLDER $AUTORANDR_PROFILE_FOLDER"
           /usr/bin/env fish -c "set -Ux AUTORANDR_MONITORS $AUTORANDR_MONITORS"
 
-          dunstify-send -i display "Display profile" "$AUTORANDR_CURRENT_PROFILE"
+          dunstify -i display "Display profile" "$AUTORANDR_CURRENT_PROFILE"
 
           exit 0
         '';
