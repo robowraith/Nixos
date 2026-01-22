@@ -5,6 +5,7 @@ function hc
 end
 
 hc set swap_monitors_to_get_tag 1
+hc set focus_stealing_prevention off
 
 # Permanent rules for HerbstluftWM
 hc unrule --all
