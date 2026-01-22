@@ -46,7 +46,9 @@ if hc silent new_attr bool my_first_run
 
     # Start Keepassxc and wait for it to be unlocked
     hc and , \
-        rule once class="KeePassXC" tag="left_main" , \
+        focus_monitor left , \
+        use left_lower , \
+        rule once class="KeePassXC" tag="left_lower" , \
         spawn keepassxc
 
     while ! secret-tool lookup KeepassXC 'unlocked?'
@@ -65,40 +67,9 @@ if hc silent new_attr bool my_first_run
     hc spawn nm-applet
     hc spawn nextcloud --background
 
-    # Set up private tag
-    hc and , \
-        rule once class="Slack" tag="left_main" , \
-        spawn slack , \
-        rule once class="Signal" tag="left_main" , \
-        spawn signal-desktop
-
-    # Start main applications
-    hc and , \
-        rule once class="Vivaldi-stable" tag="main_main" , \
-        spawn vivaldi , \
-        rule once title="k9s_apps" tag="right_main" , \
-        rule once title="k9s_dev" tag="right_main" , \
-        spawn alacritty --title k9s_apps --command k9s --context apps-cluster , \
-        spawn alacritty --title k9s_dev --command k9s --context dev-cluster
-
-    # Set up main screens
-    hc chain , \
-        focus_monitor left , \
-        use left_main , \
-        focus_monitor right , \
-        use right_main , \
-        focus_monitor main , \
-        use main_main
-
-    hc chain , \
-        focus_monitor main , \
-        split bottom 0.75 , \
-        focus down , \
-        spawn kitty , \
-        focus up
-
-    hc merge_tag default left_main
-
     # Start composition manager
     hc spawn picom
+
+    # Setup main workspace
+    hc spawn ~/.config/herbstluftwm/bin/setup_main_workspace.fish
 end
