@@ -23,7 +23,7 @@
       recursive = true;
     };
     "herbstluftwm/conf.d/keybindings.fish".source = ./conf.d/keybindings.fish;
-    "herbstluftwm/conf.d/ruless.fish".source = ./conf.d/rules.fish;
+    "herbstluftwm/conf.d/rules.fish".source = ./conf.d/rules.fish;
     "herbstluftwm/conf.d/tags.fish".source = ./conf.d/tags.fish;
     "herbstluftwm/conf.d/theme.fish".source = ./conf.d/theme.fish;
   };
