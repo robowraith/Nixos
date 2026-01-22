@@ -62,23 +62,6 @@ _: {
         };
       };
 
-      # Notebook only in 2880x1800
-      "Notebook_1800" = {
-        fingerprint = {
-          "eDP-1" = "00ffffffffffff000e6f021400000000001e0104b51e137802ee95a3544c99260f505400000001010101010101010101010101010101b6c840a0b0084e70302036002ebc10000018000000000000000000000000000000000018000000fe0043534f542054330a2020202020000000fe004d4e453030375a41312d310a2000d3";
-        };
-        config = {
-          eDP-1 = {
-            enable = true;
-            primary = true;
-            mode = "2880x1800";
-            position = "0x0";
-            rate = "90";
-            rotate = "normal";
-          };
-        };
-      };
-
       # Notebook and USB-C-display
       "Notebook_USBC" = {
         fingerprint = {
