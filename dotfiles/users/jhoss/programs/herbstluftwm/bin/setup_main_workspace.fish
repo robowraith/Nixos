@@ -39,7 +39,7 @@ hc and , \
     rule once class="Vivaldi-stable" tag="main_main" index=0 , \
     rule once title="main_term" tag="main_main" index=1 , \
     spawn vivaldi , \
-    spawn kitty --title="main_term"
+    spawn kitty --title="main_term" --hold --detach fastfetch
 # sleep 3
 # hc split explode 0.7
 
