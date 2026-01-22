@@ -131,10 +131,14 @@ hc keybind $Mod+Ctrl+0 use down
 
 # splitting frames
 # create an empty frame at the specified direction
-hc keybind $Mod+Ctrl+Shift+Left split left 0.5
-hc keybind $Mod+Ctrl+Shift+Down split bottom 0.5
-hc keybind $Mod+Ctrl+Shift+Up split up 0.5
-hc keybind $Mod+Ctrl+Shift+Right split right 0.5
+hc keybind $Mod+Ctrl+Shift+Left split explode left 0.5
+hc keybind $Mod+Ctrl+Shift+Down split explode bottom 0.5
+hc keybind $Mod+Ctrl+Shift+Up split explode up 0.5
+hc keybind $Mod+Ctrl+Shift+Right split explode right 0.5
+hc keybind $Mod+Alt+Shift+Left split explode left 0.7
+hc keybind $Mod+Alt+Shift+Down split explode bottom 0.7
+hc keybind $Mod+Alt+Shift+Up split explode up 0.7
+hc keybind $Mod+Alt+Shift+Right split explode right 0.7
 hc keybind $Mod+Ctrl+e split explode
 hc keybind $Mod+Ctrl+a split auto
 hc keybind $Mod+r remove
