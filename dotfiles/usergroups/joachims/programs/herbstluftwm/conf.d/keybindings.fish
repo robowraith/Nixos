@@ -211,3 +211,4 @@ hc keybind Control+space spawn copyq show
 hc keybind Print spawn flameshot gui
 hc keybind $Mod+Ctrl+d spawn dunstctl close
 hc keybind $Mod+Shift+Ctrl+d spawn dunstctl close-all
+hc keybind $Mod+k spawn keepassxc
