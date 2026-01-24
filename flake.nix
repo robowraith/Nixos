@@ -100,15 +100,17 @@
                 });
                 freac = prev.freac.overrideAttrs (oldAttrs: {
                   nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [prev.makeWrapper];
-                  buildInputs = (oldAttrs.buildInputs or []) ++ [
-                    prev.lame
-                    prev.flac
-                    prev.faac
-                    prev.faad2
-                    prev.libvorbis
-                    prev.libopus
-                    prev.mpg123
-                  ];
+                  buildInputs =
+                    (oldAttrs.buildInputs or [])
+                    ++ [
+                      prev.lame
+                      prev.flac
+                      prev.faac
+                      prev.faad2
+                      prev.libvorbis
+                      prev.libopus
+                      prev.mpg123
+                    ];
                   postFixup =
                     (oldAttrs.postFixup or "")
                     + ''

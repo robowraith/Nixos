@@ -1,10 +1,14 @@
-{ config, pkgs, inputs, ... }:
 {
-  imports = [ inputs.zen-browser.homeModules.default ];
+  config,
+  pkgs,
+  inputs,
+  ...
+}: {
+  imports = [inputs.zen-browser.homeModules.default];
 
   programs.zen-browser = {
     enable = true;
-    nativeMessagingHosts = [ pkgs.keepassxc ];
+    nativeMessagingHosts = [pkgs.keepassxc];
     policies = {
       AutofillAddressEnabled = true;
       AutofillCreditCardEnabled = false;

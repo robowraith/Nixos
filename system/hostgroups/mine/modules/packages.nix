@@ -30,7 +30,7 @@
     # Kubernetes
     kubectl
     kubectx
-    
+
     # Logitech mouse
     solaar
     logitech-udev-rules

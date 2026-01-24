@@ -1,4 +1,4 @@
-_:{
+_: {
   services.dunst.enable = true;
 
   xdg.configFile = {

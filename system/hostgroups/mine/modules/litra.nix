@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-let
+{pkgs, ...}: let
   litra-rs = pkgs.rustPlatform.buildRustPackage rec {
     pname = "litra-rs";
     version = "2.5.1";
@@ -11,8 +10,8 @@ let
       sha256 = "sha256-lUybdnaVfXUjbIMEBw4Ai5m0OMZ9XNEK5gGHty/yK0M=";
     };
 
-    nativeBuildInputs = [ pkgs.pkg-config ];
-    buildInputs = [ pkgs.libusb1 ];
+    nativeBuildInputs = [pkgs.pkg-config];
+    buildInputs = [pkgs.libusb1];
 
     # Set to a fake hash initially. The build will fail and provide the correct hash.
     cargoHash = "sha256-j8T15LzA8ZjzNdI+UuHDhMIpYCdWdXR+cU7BgYt5Rno=";
@@ -25,9 +24,8 @@ let
       mainProgram = "litra";
     };
   };
-in
-{
-  environment.systemPackages = [ litra-rs ];
+in {
+  environment.systemPackages = [litra-rs];
 
   services.udev.extraRules = ''
     # Logitech Litra Glow

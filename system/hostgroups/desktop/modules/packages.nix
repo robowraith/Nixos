@@ -1,4 +1,8 @@
-{pkgs, inputs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   environment.systemPackages = with pkgs; [
     # Core utilities
 
@@ -15,7 +19,7 @@
     guvcview
 
     # DRM-Playback
-    (chromium.override { enableWideVine = true; })
-    (vivaldi.override { enableWidevine = true; })
+    (chromium.override {enableWideVine = true;})
+    (vivaldi.override {enableWidevine = true;})
   ];
 }

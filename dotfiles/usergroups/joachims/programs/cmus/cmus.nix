@@ -1,3 +1,3 @@
-_:{
+_: {
   programs.cmus.enable = true;
 }

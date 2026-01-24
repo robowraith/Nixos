@@ -1,4 +1,8 @@
-{lib, pkgs, ...}:{
+{
+  lib,
+  pkgs,
+  ...
+}: {
   programs.kitty = {
     font = {
       name = lib.mkForce "FiraCode Nerd Font Mono";

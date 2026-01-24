@@ -21,5 +21,5 @@ _: {
     };
   };
 
-  imports = [ ./systemd.nix ];
+  imports = [./systemd.nix];
 }

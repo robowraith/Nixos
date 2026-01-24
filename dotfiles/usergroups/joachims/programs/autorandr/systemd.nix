@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   systemd.user.services.autorandr = {
     Unit = {
       Description = "Autorandr execution hook";
@@ -20,7 +18,7 @@
   systemd.user.services.fix-monitor-on-resume = {
     Unit = {
       Description = "Fix monitor on resume";
-      After = [ "suspend.target" "hibernate.target" "hybrid-sleep.target" ];
+      After = ["suspend.target" "hibernate.target" "hybrid-sleep.target"];
     };
 
     Service = {
@@ -40,6 +38,6 @@
       ''}";
     };
 
-    Install.WantedBy = [ "suspend.target" "hibernate.target" "hybrid-sleep.target" ];
+    Install.WantedBy = ["suspend.target" "hibernate.target" "hybrid-sleep.target"];
   };
 }

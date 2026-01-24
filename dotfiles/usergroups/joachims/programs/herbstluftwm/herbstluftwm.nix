@@ -10,12 +10,12 @@
 
   # Write the autostart config to XDG config
   xdg.configFile = {
-  # Overwritten in user specific configs
-  #   "herbstluftwm/autostart" = {
-  #     source = ./autostart;
-  #     executable = true;
-  #     force = true;
-  #   };
+    # Overwritten in user specific configs
+    #   "herbstluftwm/autostart" = {
+    #     source = ./autostart;
+    #     executable = true;
+    #     force = true;
+    #   };
 
     # Copy other configuration files and scripts
     "herbstluftwm/bin" = {
