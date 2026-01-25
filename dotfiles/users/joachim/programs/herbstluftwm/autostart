@@ -62,35 +62,8 @@ if hc silent new_attr bool my_first_run
     hc spawn nm-applet
     hc spawn nextcloud --background
 
-    # Set up private tag
-    hc and , \
-        rule once class="Signal" tag="left_main" , \
-        spawn signal-desktop
-
-    # Start main applications
-    hc and , \
-        rule once class="Vivaldi-stable" tag="main_main" , \
-        spawn vivaldi , \
-        rule once title="kitty" tag="right_main" , \
-        spawn kitty
-
-    # Set up main screens
-    hc chain , \
-        focus_monitor left , \
-        use left_main , \
-        focus_monitor right , \
-        use right_main , \
-        focus_monitor main , \
-        use main_main
-
-    hc and , \
-        focus_monitor main , \
-        split bottom 0.75 , \
-        focus down , \
-        spawn kitty , \
-        focus up
-
-    hc merge_tag default left_main
+    # Main layout
+    hc spawn ~/.config/herbstluftwm/bin/setup_main_workspace.fish
 
     # Start composition manager
     hc spawn picom

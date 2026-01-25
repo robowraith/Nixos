@@ -9,5 +9,8 @@ _: {
     "herbstluftwm/conf.d/screen_setup.fish" = {
       source = ./conf.d/screen_setup.fish;
     };
+    "herbstluftwm/bin/setup_main_workspace.fish" = {
+      source = ./bin/setup_main_workspace.fish;
+    };
   };
 }
