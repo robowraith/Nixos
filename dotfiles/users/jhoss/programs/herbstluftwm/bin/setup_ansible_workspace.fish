@@ -53,6 +53,6 @@ hc and , \
 
 hc and , \
     focus_monitor main , \
-    split explode 0.7
+    split explode 0.715
 
 exit 0
