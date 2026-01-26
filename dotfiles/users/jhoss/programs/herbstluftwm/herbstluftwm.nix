@@ -12,5 +12,8 @@ _: {
     "herbstluftwm/bin/setup_main_workspace.fish" = {
       source = ./bin/setup_main_workspace.fish;
     };
+    "herbstluftwm/bin/setup_ansible_workspace.fish" = {
+      source = ./bin/setup_ansible_workspace.fish;
+    };
   };
 }
