@@ -29,8 +29,6 @@ hc and , \
     spawn vivaldi , \
     spawn kitty --title="main_term" --hold --detach fastfetch
 
-hc merge_tag default left_main
-
 sleep 5
 hc and , \
     focus_monitor main , \

@@ -6,12 +6,6 @@ end
 
 # Set up main workspace
 
-# Layouts
-# hc and , \
-#     load left_main (split vertical:0.7:0 (clients vertical:0) (clients vertical:0)) , \
-#     load main_main (split vertical:0.7:0 (clients vertical:0) (clients vertical:0)) , \
-#     load right_main (clients vertical:0)
-
 set workingdirectory ~/nixos
 
 # Right screen

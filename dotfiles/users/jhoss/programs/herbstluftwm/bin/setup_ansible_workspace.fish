@@ -6,12 +6,6 @@ end
 
 # Set up main workspace
 
-# Layouts
-# hc and , \
-#     load left_main (split vertical:0.7:0 (clients vertical:0) (clients vertical:0)) , \
-#     load main_main (split vertical:0.7:0 (clients vertical:0) (clients vertical:0)) , \
-#     load right_main (clients vertical:0)
-
 set workingdirectory ~/code/ansible
 
 # Right screen
@@ -40,7 +34,6 @@ hc and , \
     rule once title="ansible_gemini" tag="main_upper" index=1 , \
     spawn kitty --title ansible_main --working-directory $workingdirectory --detach lf , \
     spawn kitty --title ansible_gemini --working-directory $workingdirectory --detach gemini ,
-hc merge_tag default left_main
 
 # sleep 5
 hc and , \

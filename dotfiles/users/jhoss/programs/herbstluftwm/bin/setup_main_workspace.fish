@@ -6,12 +6,6 @@ end
 
 # Set up main workspace
 
-# Layouts
-# hc and , \
-#     load left_main (split vertical:0.7:0 (clients vertical:0) (clients vertical:0)) , \
-#     load main_main (split vertical:0.7:0 (clients vertical:0) (clients vertical:0)) , \
-#     load right_main (clients vertical:0)
-
 # Right screen
 hc focus_monitor right
 hc use right_main
@@ -29,8 +23,6 @@ hc and , \
     rule once class="Signal" tag="left_main" index=1 , \
     spawn slack , \
     spawn signal-desktop
-# sleep 3
-# hc split explode 0.7
 
 # Main screen
 hc focus_monitor main
@@ -40,10 +32,6 @@ hc and , \
     rule once title="main_term" tag="main_main" index=1 , \
     spawn vivaldi , \
     spawn kitty --title="main_term" --hold --detach fastfetch
-# sleep 3
-# hc split explode 0.7
-
-hc merge_tag default left_main
 
 sleep 5
 hc and , \
