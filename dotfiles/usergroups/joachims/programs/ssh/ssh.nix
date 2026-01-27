@@ -102,22 +102,9 @@
               Hostname      db2.42he.com
               #Hostname      81.95.13.183
 
-      Host storage4 storage4_zellij storage4_rescue st4 st4_zellij st4_rescue
-           Hostname       storage4.42he.com
-           #Hostname       195.201.193.174
-
-      ###############
-      # Mail-Server #
-      ###############
-
-      Host mail1 mail1_zellij
-           Hostname mail1.42he.com
-           #Hostnam 188.245.219.216
-
-      Host mail2 mail2_zellij
-           Hostname mail2.42he.com
-           #Hostnam 162.55.61.28
-
+      Host jolly1 jolly1_zellij jl1
+           Hostname       jolly1.42he.com
+           #Hostname       81.95.13.189
 
       #################
       # Backup Server #
@@ -148,22 +135,6 @@
       #####################
 
       # Application Cluster
-      Host  k1 k1_zellij k1_rescue
-              Hostname      k1.42he.com
-              #Hostname      81.95.3.178
-
-      Host  k2 k2_zellij k2_rescue
-              Hostname      k2.42he.com
-              #Hostname      81.95.3.179
-
-      Host  k3 k3_zellij k3_rescue
-              Hostname      k3.42he.com
-              #Hostname      81.95.3.180
-
-      Host  k4 k4_zellij k4_rescue
-            Hostname      k4.42he.com
-            #Hostname      81.95.3.181
-
       Host  ac1 ac1_zellij ac1_rescue
               Hostname      ac1.42he.com
               #Hostname      81.95.3.178
@@ -192,10 +163,6 @@
       Host  dc3 dc3_zellij dc3_rescue
               Hostname      dc3.42he.com
               #Hostname      65.21.44.253
-
-      # Marketing Pages Cluster
-      Host  ws7 ws7_zellij ws7_rescue
-            Hostname     ws7.42he.com
 
       ##########
       # Tunnel #
@@ -244,10 +211,6 @@
       Host  tunnel_puma_ass
             Hostname      ass.42he.com
             LocalForward  4443 10.10.0.12:443
-
-      Host  tunnel_kibana_dbc
-            Hostname      dbc.42he.com
-            LocalForward  5601 10.10.0.203:5601
 
       Host  tunnel_minio1_dba tunnel_minio1_storage1
               Hostname      dba.42he.com
@@ -357,6 +320,12 @@
             # LocalForward  8012 10.10.10.113:80
             LocalForward  4442 10.10.10.113:443
             LocalForward  5900 10.10.10.113:5900
+
+      Host  ipmi_jolly1
+            Hostname      db2.42he.com
+            # LocalForward  8012 10.10.10.151:80
+            LocalForward  4442 10.10.10.151:443
+            LocalForward  5900 10.10.10.151:5900
 
       #######################
       # Virtuelle Maschinen #
