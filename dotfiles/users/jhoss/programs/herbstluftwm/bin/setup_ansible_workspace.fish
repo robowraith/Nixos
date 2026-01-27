@@ -21,8 +21,8 @@ hc and , \
 hc focus_monitor left
 hc use left_upper
 hc and , \
-    rule once class="ansible_dev" tag="left_upper" index=0 , \
-    rule once class="ansible_vargrant" tag="left_upper" index=1 , \
+    rule once title="ansible_dev" tag="left_upper" index=0 , \
+    rule once title="ansible_vargrant" tag="left_upper" index=1 , \
     spawn kitty --title ansible_dev --working-directory $workingdirectory , \
     spawn kitty --title ansible_term --working-directory $workingdirectory/vagrant
 
@@ -30,7 +30,7 @@ hc and , \
 hc focus_monitor main
 hc use main_upper
 hc and , \
-    rule once class="ansible_main" tag="main_upper" index=0 , \
+    rule once title="ansible_main" tag="main_upper" index=0 , \
     rule once title="ansible_gemini" tag="main_upper" index=1 , \
     spawn kitty --title ansible_main --working-directory $workingdirectory --detach lf , \
     spawn kitty --title ansible_gemini --working-directory $workingdirectory --detach gemini ,

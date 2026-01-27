@@ -17,14 +17,14 @@ hc and , \
 hc focus_monitor left
 hc use left_main
 hc and , \
-    rule once class="Signal" tag="left_main" index=1 , \
+    rule once title="Signal" tag="left_main" index=1 , \
     spawn signal-desktop
 
 # Main screen
 hc focus_monitor main
 hc use main_main
 hc and , \
-    rule once class="Vivaldi-stable" tag="main_main" index=0 , \
+    rule once title="Vivaldi-stable" tag="main_main" index=0 , \
     rule once title="main_term" tag="main_main" index=1 , \
     spawn vivaldi , \
     spawn kitty --title="main_term" --hold --detach fastfetch
