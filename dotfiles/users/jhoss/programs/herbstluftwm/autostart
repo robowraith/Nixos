@@ -46,9 +46,9 @@ if hc silent new_attr bool my_first_run
 
     # Start Keepassxc and wait for it to be unlocked
     hc and , \
-        focus_monitor left , \
-        use left_lower , \
-        rule once class="KeePassXC" tag="left_lower" , \
+        focus_monitor main , \
+        use main_main , \
+        rule once class="KeePassXC" tag="main_main" , \
         spawn keepassxc
 
     while ! secret-tool lookup KeepassXC 'unlocked?'
