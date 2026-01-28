@@ -68,35 +68,6 @@ Programs are configured under `users/shared/programs/`:
 
 Example: The configuration for Helix is in `users/shared/programs/helix/helix.nix`.
 
-## Remote System Access
-
-The NixOS system being configured (hostname "reason") is a **remote machine** accessible via SSH:
-- **SSH Connection**: `ssh privat_reason`
-- **All Commands**: Execute all terminal commands (nixos-rebuild, home-manager, etc.) via SSH
-- **File Editing**: Edit files locally in the workspace, deploy changes remotely
-
-### Running Commands on the Remote System
-
-Always prefix commands with `ssh privat_reason` when they need to execute on the target system:
-
-```bash
-# System rebuild (remote)
-ssh privat_reason "sudo nixos-rebuild switch --flake .#reason"
-ssh privat_reason "sudo nixos-rebuild test --flake .#reason"
-
-# Home Manager (remote)
-ssh privat_reason "home-manager switch --flake .#joachim@reason"
-
-# Checking system state (remote)
-ssh privat_reason "nixos-rebuild list-generations"
-ssh privat_reason "journalctl -xe"
-
-# Local operations (no SSH needed)
-nix flake check
-nix fmt
-git status
-```
-
 ## Best Practices
 
 ### General Guidelines
@@ -254,25 +225,6 @@ git status
 3. Add to `flake.nix` in the `users` attribute set with target hosts
 4. Add system user in appropriate host config(s)
 5. Deploy: `home-manager switch --flake .#<username>@<hostname>`
-
-**Deployment Commands:**
-```bash
-# System configuration (remote execution required)
-ssh privat_reason "sudo nixos-rebuild switch --flake .#<hostname>"
-ssh privat_reason "sudo nixos-rebuild test --flake .#<hostname>"      # Test without activation
-ssh privat_reason "sudo nixos-rebuild build --flake .#<hostname>"     # Build without activation
-
-# User configuration (remote execution required, note the @hostname suffix)
-ssh privat_reason "home-manager switch --flake .#<username>@<hostname>"
-
-# Example for current system
-ssh privat_reason "sudo nixos-rebuild switch --flake .#reason"
-ssh privat_reason "home-manager switch --flake .#joachim@reason"
-
-# Local validation (no SSH needed)
-nix flake check
-nix fmt
-```
 
 ### Troubleshooting
 
