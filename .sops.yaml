@@ -5,14 +5,9 @@
 
 keys:
   - &shared age175q4v69wa6ud8kygctpazx8nxgs9r598ecdeq0rprdlkk5qt23hshjn8v3
-  - &deepthought age17a5uwgtjmnfzam0lj4f66lennw4dnyhylprs5gq9qp6yuna8d3yqu0aqnj
 
 creation_rules:
   - path_regex: secrets/shared\.yaml$
     key_groups:
       - age:
           - *shared
-  - path_regex: secrets/deepthought\.yaml$
-    key_groups:
-      - age:
-          - *deepthought
