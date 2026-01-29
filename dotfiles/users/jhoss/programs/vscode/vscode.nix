@@ -25,6 +25,9 @@
       # Disable RedHat telemetry
       "ansible.lightspeed.enabled" = false;
       "redhat.telemetry.enabled" = false;
+
+      # General settings
+      "workbench.startupEditor" = "none";
     };
   };
 }
