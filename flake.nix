@@ -89,7 +89,7 @@
           # Overlays
           {
             nixpkgs.overlays = [
-              nix-cachyos-kernel.overlays.default
+              nix-cachyos-kernel.overlays.pinned
               (final: prev: {
                 herbstluftwm = prev.herbstluftwm.overrideAttrs (oldAttrs: {
                   postPatch =
