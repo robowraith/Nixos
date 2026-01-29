@@ -2,7 +2,7 @@
 _: {
   # sops-nix configuration for home-manager
   sops = {
-    defaultSopsFile = ../../../secrets.yaml;
+    defaultSopsFile = ../../../../secrets/shared.yaml;
     defaultSopsFormat = "yaml";
     secrets = {
       # No secrets defined yet for home-manager
