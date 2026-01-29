@@ -6,7 +6,7 @@ end
 
 # Screen setup
 switch $AUTORANDR_CURRENT_PROFILE
-    case "Office_4K*"
+    case "Work*"
         hc and , \
             set_monitors 1120x2160+0+0 1600x2160+1120+0 1120x2160+2720+0 , \
             rename_monitor 0 left , \
@@ -34,6 +34,3 @@ switch $AUTORANDR_CURRENT_PROFILE
             rename_monitor 0 main , \
             rename_monitor 1 up
 end
-
-# Wallpaper
-# feh --no-fehbg --bg-fill ~/Bilder/wallpaper/Rechner/Köln.jpg
