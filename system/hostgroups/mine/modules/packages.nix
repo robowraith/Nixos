@@ -30,6 +30,7 @@
     # Kubernetes
     kubectl
     kubectx
+    kubernetes-helm
 
     # Logitech mouse
     solaar
