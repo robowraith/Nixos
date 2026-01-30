@@ -5,6 +5,15 @@
 }: {
   programs.ssh = {
     enable = true;
+    enableDefaultConfig = false;
+
+    matchBlocks."*" = {
+      # Default settings that apply to all hosts unless overridden
+      extraOptions = {
+        "AddKeysToAgent" = "yes";
+      };
+    };
+
     extraConfig = ''
       ############
       ############
