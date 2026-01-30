@@ -3,6 +3,7 @@
   home.packages = with pkgs; [
     ueberzug
     mediainfo
+    exiftool
     imagemagick
     inkscape
     djvulibre
@@ -73,9 +74,18 @@
 
   xdg.configFile = {
     "lf/icons".source = ./icons;
-    "lf/cleaner".source = ./cleaner;
-    "lf/scope".source = ./scope;
-    "lf/lfub.sh".source = ./lfub.sh;
+    "lf/cleaner" = {
+      source = ./cleaner;
+      executable = true;
+    };
+    "lf/scope" = {
+      source = ./scope;
+      executable = true;
+    };
+    "lf/lfub.sh" = {
+      source = ./lfub.sh;
+      executable = true;
+    };
   };
 
   imports = [
