@@ -1,7 +1,7 @@
 {pkgs, lib, ...}: {
   programs.vscode = {
     enable = true;
-    extensions = with pkgs.vscode-extensions;
+    profiles.default.extensions = with pkgs.vscode-extensions;
       [
         redhat.ansible
         redhat.vscode-yaml
@@ -17,7 +17,7 @@
         }
       ];
 
-    userSettings = {
+    profiles.default.userSettings = {
       # Font configuration
       "editor.fontFamily" = lib.mkForce "'FiraCode Nerd Font', 'Droid Sans Mono', 'monospace', monospace";
       "editor.fontLigatures" = true;
