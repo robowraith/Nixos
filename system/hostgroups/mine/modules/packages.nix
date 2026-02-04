@@ -31,6 +31,7 @@
     kubectl
     kubectx
     kubernetes-helm
+    kubernetes-helmPlugins.helm-diff
 
     # Logitech mouse
     solaar
