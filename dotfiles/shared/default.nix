@@ -32,6 +32,19 @@
   xdg.enable = true;
   xdg.mime.enable = true;
 
+  # Allow unfree packages in Home Manager
+  nixpkgs.config.allowUnfree = true;
+
+  # Config for standalone nix commands (nix-shell, nix-build, etc.)
+  xdg.configFile."nixpkgs/config.nix".text = ''
+    {
+      allowUnfree = true;
+      permittedInsecurePackages = [
+        "googleearth-pro-7.3.6.10201"
+      ];
+    }
+  '';
+
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }
