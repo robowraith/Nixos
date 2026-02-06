@@ -3,7 +3,10 @@
   username,
   ...
 }: {
-  virtualisation.libvirtd.enable = true;
+  virtualisation.libvirtd = {
+    enable = true;
+    onBoot = "ignore";
+  };
   programs.virt-manager.enable = true;
 
   users.users.${username}.extraGroups = ["libvirtd"];
