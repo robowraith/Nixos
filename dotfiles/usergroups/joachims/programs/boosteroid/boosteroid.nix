@@ -1,4 +1,8 @@
-{pkgs, lib, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   boosteroid = pkgs.stdenv.mkDerivation rec {
     pname = "boosteroid";
     version = "2025-11-06";
@@ -18,28 +22,28 @@
       libvdpau
       numactl
       libglvnd
-      xorg.libX11
-      xorg.libXfixes
-      xorg.libXi
-      xorg.libxcb
-      xorg.libXrandr
-      xorg.libXrender
-      xorg.libXext
-      xorg.libXcursor
-      xorg.libXinerama
-      xorg.libXdamage
-      xorg.libXcomposite
-      xorg.libxkbfile
-      xorg.libXau
-      xorg.libXdmcp
-      xorg.libXxf86vm
-      xorg.libXScrnSaver
-      xorg.libXtst
-      xorg.xcbutil
-      xorg.xcbutilimage
-      xorg.xcbutilkeysyms
-      xorg.xcbutilrenderutil
-      xorg.xcbutilwm
+      libx11
+      libxfixes
+      libxi
+      libxcb
+      libxrandr
+      libxrender
+      libxext
+      libxcursor
+      libxinerama
+      libxdamage
+      libxcomposite
+      libxkbfile
+      libxau
+      libxdmcp
+      libxxf86vm
+      libxscrnsaver
+      libxtst
+      libxcb-util
+      libxcb-image
+      libxcb-keysyms
+      libxcb-render-util
+      libxcb-wm
       xcbutilxrm
       libxkbcommon
       wayland

@@ -58,7 +58,7 @@
       }}
 
       cmd on-select &{{
-        lf -remote "send $id set statfmt \"$(eza -ld --color=always "$f" | sed 's/\\/\\\\/g;s/"/\\"/g')\"" 
+        lf -remote "send $id set statfmt \"$(eza -ld --color=always "$f" | sed 's/\\/\\\\/g;s/"/\\"/g')\""
       }}
     '';
 

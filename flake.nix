@@ -54,8 +54,6 @@
     stylix,
     nix-index-database,
     pre-commit-hooks,
-    zen-browser,
-    firefox-addons,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -90,7 +88,7 @@
           {
             nixpkgs.overlays = [
               nix-cachyos-kernel.overlays.pinned
-              (final: prev: {
+              (_final: prev: {
                 herbstluftwm = prev.herbstluftwm.overrideAttrs (oldAttrs: {
                   postPatch =
                     (oldAttrs.postPatch or "")
