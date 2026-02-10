@@ -1,4 +1,8 @@
-{pkgs, lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   programs.vscode = {
     enable = true;
     profiles.default.extensions = with pkgs.vscode-extensions;
@@ -28,6 +32,7 @@
 
       # General settings
       "workbench.startupEditor" = "none";
+      "remote.autoForwardPortsSource" = "hybrid";
     };
   };
 }
