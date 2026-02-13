@@ -8,11 +8,11 @@ end
 hc set default_frame_layout vertical
 
 # Establish tags
-hc and , \
-    try add 0 , \
-    rename 0 down , \
-    new_attr string tags.0.my_monitor , \
-    set_attr tags.0.my_monitor down
+# hc and , \
+#     try add 0 , \
+#     rename 0 down , \
+#     new_attr string tags.0.my_monitor , \
+#     set_attr tags.0.my_monitor down
 
 hc and , \
     add 1 , \
