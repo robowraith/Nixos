@@ -8,6 +8,7 @@
     helix
     killall
     procs
+    serpl
     tldr
     wget
 
