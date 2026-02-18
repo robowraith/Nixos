@@ -1,4 +1,8 @@
-{hostname, ...}: {
+{
+  hostname,
+  pkgs,
+  ...
+}: {
   # ============================================================================
   # Networking
   # ============================================================================
@@ -21,6 +25,33 @@
 
     # Firewall
     firewall.allowedTCPPorts = [];
+
+    networkmanager.dispatcherScripts = [
+      {
+        source = let
+          nmcli = "${pkgs.networkmanager}/bin/nmcli";
+        in
+          pkgs.writeShellScript "wifi-wired-exclusive" ''
+            IFACE=$1
+            ACTION=$2
+
+            case "$IFACE" in
+              en*|eth*)
+                case "$ACTION" in
+                  up)
+                    ${nmcli} radio wifi off
+                    ;;
+                  down)
+                    if ! ${nmcli} -t -f DEVICE,STATE device status | grep -Eq "^(en|eth).*connected$"; then
+                      ${nmcli} radio wifi on
+                    fi
+                    ;;
+                esac
+                ;;
+            esac
+          '';
+      }
+    ];
 
     extraHosts = ''
       192.168.56.20 ac1.local
