@@ -6,8 +6,8 @@ _: {
   boot = {
     # Kernel
     kernelParams = [
-      "nvidia-drm.modeset=1"
-      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+      # Enable Intel framebuffer compression for power saving
+      "i915.enable_fbc=1"
     ];
   };
 }
