@@ -1,4 +1,6 @@
 _: {
+  imports = [./systemd.nix];
+
   programs.autorandr = {
     enable = true;
 
