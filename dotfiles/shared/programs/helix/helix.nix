@@ -22,6 +22,7 @@
         insert.C-q = ":quit";
         normal.C-s = ":write";
         normal.C-q = ":quit";
+        normal.space.w = ":toggle soft-wrap.enable";
       };
     };
 
