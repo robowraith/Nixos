@@ -15,10 +15,11 @@ set -l black '#000000'
 
 # Themeing the frames
 hc and , \
-    set frame_gap 1 , \
+    set frame_gap 0 , \
     set frame_border_width 0 , \
     set frame_normal_opacity 0 , \
-    set frame_active_opacity 0
+    set frame_active_opacity 0 , \
+    set frame_bg_transparent 1
 
 # Themeing the windows
 hc and , \
