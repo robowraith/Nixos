@@ -1,6 +1,4 @@
-{
-  # Git configuration (shared settings)
-  # User name and email are set in users/joachim/default.nix
+{lib, ...}: {
   programs.git = {
     enable = true;
 
@@ -13,6 +11,10 @@
         br = "branch";
         cm = "commit -m";
         cam = "commit -am";
+      };
+      user = {
+        name = lib.mkDefault "Joachim Hoss";
+        email = lib.mkDefault "robowraith@gmail.com";
       };
     };
   };
