@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   environment.systemPackages = with pkgs; [
     # Core utilities
+    dig
     dysk
     file
     fish
