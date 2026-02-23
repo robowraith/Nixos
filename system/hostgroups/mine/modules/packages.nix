@@ -36,5 +36,8 @@
     # Logitech mouse
     solaar
     logitech-udev-rules
+
+    # Tidal
+    high-tide
   ];
 }
