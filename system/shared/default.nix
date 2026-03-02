@@ -21,8 +21,19 @@
     settings = {
       experimental-features = ["nix-command" "flakes"];
       auto-optimise-store = true;
-      substituters = ["https://cache.nixos.org/" "https://attic.xuyh0120.win/lantian" "https://cache.garnix.io"];
-      trusted-public-keys = ["lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="];
+      # Allow nixConfig blocks in flakes (e.g. vicinae) to add their own caches
+      accept-flake-config = true;
+      substituters = [
+        "https://cache.nixos.org/"
+        "https://attic.xuyh0120.win/lantian"
+        "https://cache.garnix.io"
+        "https://vicinae.cachix.org"
+      ];
+      trusted-public-keys = [
+        "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+        "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+        "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
+      ];
     };
     # Automatic garbage collection
     gc = {

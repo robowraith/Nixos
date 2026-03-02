@@ -1,6 +1,13 @@
 {
   description = "My take on a dendritic, DRY, hierarchical multi-machine, multi-user NixOS and Home Manager configuration.";
 
+  # Applied when evaluating the flake (i.e. during `nh os switch`),
+  # so vicinae can be fetched from cache instead of built from source.
+  nixConfig = {
+    extra-substituters = ["https://vicinae.cachix.org"];
+    extra-trusted-public-keys = ["vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="];
+  };
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -43,6 +50,9 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Do NOT add `inputs.nixpkgs.follows = "nixpkgs"` here – it would break the Cachix cache
+    vicinae.url = "github:vicinaehq/vicinae";
   };
 
   outputs = {
@@ -54,6 +64,7 @@
     stylix,
     nix-index-database,
     pre-commit-hooks,
+    vicinae,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -135,6 +146,7 @@
               useUserPackages = true;
               backupFileExtension = ".backup";
               extraSpecialArgs = specialArgs;
+              sharedModules = [vicinae.homeManagerModules.default];
               users.${username} = import ./dotfiles/users/${username};
             };
           }

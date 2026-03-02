@@ -148,7 +148,8 @@ hc keybind $Mod+f floating toggle
 hc keybind $Mod+p pseudotile toggle
 
 # .Rofi
-hc keybind $Mod+space spawn rofi -combi-modi drun,run -show combi -config ~/.config/rofi/jolauncher.rasi
+hc keybind $Mod+Shift+space spawn rofi -combi-modi drun,run -show combi -config ~/.config/rofi/jolauncher.rasi
+hc keybind $Mod+space spawn vicinae toggle
 hc keybind $Mod+w spawn rofi -modi window -show window -config ~/.config/rofi/jowindow.rasi
 hc keybind $Mod+Shift+w spawn ~/.config/rofi/workspaces.fish
 hc keybind $Mod+s spawn rofi -modi ssh -show ssh -config ~/.config/rofi/jossh.rasi
