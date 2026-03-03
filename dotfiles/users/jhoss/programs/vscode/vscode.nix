@@ -11,6 +11,8 @@
         redhat.vscode-yaml
         samuelcolvin.jinjahtml
         ms-vscode-remote.remote-containers
+        github.copilot
+        github.copilot-chat
       ]
       ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
