@@ -1,4 +1,10 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: let
+  vicinaePkg = inputs.vicinae.packages.${pkgs.system}.default;
+in {
   home.packages = with pkgs; [
     vivaldi
   ];
@@ -18,6 +24,9 @@
       # Vimium
       # https://chromewebstore.google.com/detail/vimium/dbepggeogbaibhgnhhndojpepiihcmeb
       {id = "dbepggeogbaibhgnhhndojpepiihcmeb";}
+      # Vicinae Integration
+      # https://chromewebstore.google.com/detail/vicinae-integration/kcmipingpfbohfjckomimmahknoddnke
+      {id = "kcmipingpfbohfjckomimmahknoddnke";}
     ];
 
     nativeMessagingHosts = [
@@ -31,6 +40,21 @@
           type = "stdio";
           allowed_origins = [
             "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"
+          ];
+        };
+      })
+      # Vicinae native messaging host – allows the browser extension to communicate
+      # with the vicinae daemon via the Chrome native messaging protocol.
+      (pkgs.writeTextFile {
+        name = "vicinae-chromium-native-host";
+        destination = "/etc/chromium/native-messaging-hosts/com.vicinae.vicinae.json";
+        text = builtins.toJSON {
+          name = "com.vicinae.vicinae";
+          description = "Vicinae browser integration";
+          path = "${vicinaePkg}/libexec/vicinae/vicinae-browser-link";
+          type = "stdio";
+          allowed_origins = [
+            "chrome-extension://kcmipingpfbohfjckomimmahknoddnke/"
           ];
         };
       })
