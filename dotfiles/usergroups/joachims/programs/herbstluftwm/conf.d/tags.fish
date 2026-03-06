@@ -68,4 +68,7 @@ hc and , \
     new_attr string tags.9.my_monitor , \
     set_attr tags.9.my_monitor right
 
+# merge default tag with left_lower
+hc merge_tag default left_lower
+
 exit 0
