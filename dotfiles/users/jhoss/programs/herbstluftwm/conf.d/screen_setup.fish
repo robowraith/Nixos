@@ -5,6 +5,7 @@ function hc
 end
 
 # Screen setup
+hc spawn autorandr --change
 switch $AUTORANDR_CURRENT_PROFILE
     case "Work*"
         hc and , \
