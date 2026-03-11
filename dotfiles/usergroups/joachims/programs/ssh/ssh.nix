@@ -205,6 +205,13 @@ _: {
             StrictHostKeyChecking no
             IdentityFile  ~/code/ansible/vagrant/.vagrant/machines/ac1/libvirt/private_key
 
+      Host  tunnel_k8s_vagrant_dev_cluster
+            Hostname      dc1.local
+            User          vagrant
+            LocalForward  64439 localhost:6443
+            StrictHostKeyChecking no
+            IdentityFile  ~/code/ansible/vagrant/.vagrant/machines/dc1/libvirt/private_key
+
       Host  tunnel_mysql_dba
               Hostname      dbb.42he.com
               LocalForward  33306 10.10.0.201:3306
