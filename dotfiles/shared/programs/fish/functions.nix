@@ -16,5 +16,11 @@
       '';
       description = "Merge all ~/.kube/*.config files into ~/.kube/config";
     };
+    md = {
+      body = ''
+        mkdir $argv[1] && cd $argv[1]
+      '';
+      description = "Create directory and cd into it";
+    };
   };
 }
