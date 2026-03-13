@@ -13,6 +13,9 @@
     statix
     deadnix
 
+    # Nix devenv
+    devenv
+
     # For secret-tool
     libsecret
     # Terminals
