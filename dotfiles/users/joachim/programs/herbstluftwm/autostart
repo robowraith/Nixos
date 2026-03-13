@@ -69,4 +69,7 @@ if hc silent new_attr bool my_first_run
 
     # Start composition manager
     hc spawn picom
+
+    # Daemon: blue border when a window is fullscreen, yellow otherwise
+    hc spawn ~/.config/herbstluftwm/bin/fullscreen_border.fish
 end
