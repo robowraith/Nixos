@@ -21,6 +21,12 @@
           version = "0.7.0";
           sha256 = "1diwv1q1z8kkx9v0jzzfb5sa5v9825dx872di9k0px66fmb8i341";
         }
+        {
+          name = "gitlab-workflow";
+          publisher = "GitLab";
+          version = "6.71.9";
+          sha256 = "0rs9r09xzbxqn7fh1sxmr2zsw7zxxddi278ccymj9picvs6lvvpk";
+        }
       ];
 
     profiles.default.userSettings = {
