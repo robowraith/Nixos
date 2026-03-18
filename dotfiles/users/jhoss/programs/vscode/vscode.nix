@@ -41,6 +41,33 @@
       # General settings
       "workbench.startupEditor" = "none";
       "remote.autoForwardPortsSource" = "hybrid";
+
+      # GitLab extension settings (pre-populated so the read-only settings.json is not an issue)
+      "gitlab.instanceUrl" = "https://git.42he.com";
+      "gitlab.showStatusBarLinks" = true;
+      "gitlab.showIssueLinkOnStatusBar" = true;
+      "gitlab.showMrStatusOnStatusBar" = true;
+      "gitlab.aiAssistedCodeSuggestions.enabled" = false;
+      "gitlab.duoCodeSuggestions.enabled" = false;
+      "gitlab.duoChat.enabled" = false;
+      "gitlab.duoAgentPlatform.enabled" = false;
+      "gitlab.duo.enabledWithoutGitlabProject" = false;
+      # "gitlab.duoAgentPlatform.defaultNamespace" = "test";
+      "gitlab.keybindingHints.enabled" = false;
+      "gitlab.duoCodeSuggestions.openTabsContext" = false;
+      "gitlab.duoAgentPlatform.editFileDiffBehavior" = "foreground";
+      # "gitlab.ca" = "test";
+      # "gitlab.cert" = "test";
+      # "gitlab.certKey" = "test";
+      "gitlab.ignoreCertificateErrors" = false;
+      "gitlab.real-timeSecurityScan.enabled" = false;
+      "gitlab.real-timeSecurityScan.scanFileOnSave" = true;
+      "gitlab.featureFlags.flowBuilder" = false;
+      "gitlab.debug" = false;
+      "gitlab.branchProtection" = true;
+      # "gitlab.pipelineGitRemoteName" = "test";
+      "gitlab.showClosedMergeRequests" = true;
+      "gitlab.showPipelineUpdateNotifications" = true;
     };
 
     # Hyper key (Shift+Ctrl+Alt+Meta) keybindings
