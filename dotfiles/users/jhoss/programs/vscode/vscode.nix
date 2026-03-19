@@ -33,6 +33,13 @@
       # Font configuration
       "editor.fontFamily" = lib.mkForce "'FiraCode Nerd Font', 'Droid Sans Mono', 'monospace', monospace";
       "editor.fontLigatures" = true;
+      "editor.inlayHints.fontFamily" = lib.mkForce "FiraCode Nerd Font";
+      "terminal.integrated.fontFamily" = lib.mkForce "FiraCode Nerd Font";
+      "chat.editor.fontFamily" = lib.mkForce "FiraCode Nerd Font";
+      "scm.inputFontFamily" = lib.mkForce "FiraCode Nerd Font";
+      "markdown.preview.fontFamily" = lib.mkForce "FiraCode Nerd Font";
+      "debug.console.fontFamily" = lib.mkForce "FiraCode Nerd Font";
+      "notebook.output.fontFamily" = lib.mkForce "FiraCode Nerd Font";
 
       # Disable RedHat telemetry
       "ansible.lightspeed.enabled" = false;
