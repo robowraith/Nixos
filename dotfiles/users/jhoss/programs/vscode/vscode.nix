@@ -50,11 +50,11 @@
       "remote.autoForwardPortsSource" = "hybrid";
 
       # GitLab extension settings (pre-populated so the read-only settings.json is not an issue)
-      "gitlab.instanceUrl" = "https://git.42he.com";
-      "gitlab.showStatusBarLinks" = true;
-      "gitlab.showIssueLinkOnStatusBar" = true;
-      "gitlab.showMrStatusOnStatusBar" = true;
-      "gitlab.aiAssistedCodeSuggestions.enabled" = false;
+      ## "gitlab.instanceUrl" = "https://git.42he.com";
+      ## "gitlab.showStatusBarLinks" = true;
+      ## "gitlab.showIssueLinkOnStatusBar" = true;
+      ## "gitlab.showMrStatusOnStatusBar" = true;
+      ## "gitlab.aiAssistedCodeSuggestions.enabled" = false;
       "gitlab.duoCodeSuggestions.enabled" = false;
       "gitlab.duoChat.enabled" = false;
       "gitlab.duoAgentPlatform.enabled" = false;
