@@ -1,8 +1,38 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }: {
+  # VS Code MCP server configuration (placed at the user-level, not workspace-level)
+  # so GitHub Copilot can access the GitLab MCP server across all projects.
+  # The GitLab PAT is prompted securely by VS Code on first use.
+  xdg.configFile."Code/User/mcp.json".text = builtins.toJSON {
+    inputs = [
+      {
+        type = "promptString";
+        id = "gitlab-token";
+        description = "GitLab Personal Access Token";
+        password = true;
+      }
+    ];
+    servers = {
+      GitLab-MCP = {
+        type = "stdio";
+        command = "npx";
+        args = ["-y" "@zereight/mcp-gitlab"];
+        env = {
+          GITLAB_PERSONAL_ACCESS_TOKEN = "\${input:gitlab-token}";
+          GITLAB_API_URL = "https://git.42he.com/api/v4";
+          GITLAB_READ_ONLY_MODE = "false";
+          USE_GITLAB_WIKI = "true";
+          USE_MILESTONE = "true";
+          USE_PIPELINE = "true";
+        };
+      };
+    };
+  };
+
   programs.vscode = {
     enable = true;
     profiles.default.extensions = with pkgs.vscode-extensions;
