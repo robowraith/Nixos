@@ -6,7 +6,6 @@
   imports = [inputs.zen-browser.homeModules.default];
 
   programs.zen-browser = {
-    suppressXdgMigrationWarning = true;  # Migration warning suppression
     enable = true;
     nativeMessagingHosts = [pkgs.keepassxc];
     policies = {
