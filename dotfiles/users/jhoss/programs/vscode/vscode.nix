@@ -11,7 +11,7 @@
     inputs = [
       {
         type = "promptString";
-        id = "gitlab-token";
+        id = "gitlab-token-for-vscode";
         description = "GitLab Personal Access Token";
         password = true;
       }
@@ -22,7 +22,7 @@
         command = "npx";
         args = ["-y" "@zereight/mcp-gitlab"];
         env = {
-          GITLAB_PERSONAL_ACCESS_TOKEN = "\${input:gitlab-token}";
+          GITLAB_PERSONAL_ACCESS_TOKEN = "\${input:gitlab-token-for-vscode}";
           GITLAB_API_URL = "https://git.42he.com/api/v4";
           GITLAB_READ_ONLY_MODE = "false";
           USE_GITLAB_WIKI = "true";
