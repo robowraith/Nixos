@@ -14,5 +14,6 @@
 
   # User specific packages
   home.packages = with pkgs; [
+    github-copilot-cli
   ];
 }
