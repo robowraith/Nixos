@@ -32,6 +32,7 @@
 
     # Kubernetes
     kubectl
+    yq-go
     kubectx
     kubernetes-helm
     kubernetes-helmPlugins.helm-diff
