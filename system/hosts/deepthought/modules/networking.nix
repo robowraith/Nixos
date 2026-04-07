@@ -10,18 +10,9 @@
   networking = {
     hostName = hostname;
 
-    # Static IP configuration
-    # Note: Adjust the interface name based on your hardware
-    # Use `ip link` to find your actual interface name
-    interfaces.enp7s0 = {
-      useDHCP = false;
-      ipv4.addresses = [
-        {
-          address = "192.168.1.";
-          prefixLength = 24;
-        }
-      ];
-    };
+    # Interface management is delegated to NetworkManager.
+    # The dispatcher script below automatically disables WiFi when a wired
+    # connection is active, and re-enables it when the wired connection drops.
 
     # Firewall
     firewall.allowedTCPPorts = [];
