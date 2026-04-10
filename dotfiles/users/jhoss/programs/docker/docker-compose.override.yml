@@ -2,7 +2,7 @@ services:
   ansible:
     command: tail -f /dev/null
     environment:
-      - SSH_AUTH_SOCK=/ssh-agent
+      - SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock
     volumes:
-      - ${SSH_AUTH_SOCK}:/ssh-agent
+      - ${SSH_AUTH_SOCK}:/run/host-services/ssh-auth.sock
       - /nix/store:/nix/store:ro
