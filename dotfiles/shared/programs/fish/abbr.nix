@@ -7,6 +7,7 @@
     hms = "home-manager switch --flake ~/nixos#joachim@reason -b backup";
     k = "kubectl";
     kc = "kubectl";
+    kx = "kubectx";
     lg = "lazygit";
     nfu = "sudo nix flake update --flake ~/nixos";
     nhs = "nh search";
