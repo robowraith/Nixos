@@ -12,8 +12,8 @@ hc use right_main
 hc and , \
     rule once title="k9s_apps" tag="right_main" index=0 , \
     rule once title="k9s_dev" tag="right_main" index=1 , \
-    spawn alacritty --title k9s_apps --command k9s --context apps-cluster , \
-    spawn alacritty --title k9s_dev --command k9s --context dev-cluster
+    spawn alacritty --title k9s_apps --command k9s --context apps_cluster , \
+    spawn alacritty --title k9s_dev --command k9s --context dev_cluster
 
 # Left screen
 hc focus_monitor left
