@@ -32,10 +32,9 @@ hc use main_upper
 hc and , \
     rule once title="ansible - Visual Studio Code" tag="main_upper" index=0 , \
     rule once title="ansible_gemini" tag="main_upper" index=1 , \
-    spawn code $workingdirectory , \
-    spawn kitty --title ansible_gemini --working-directory $workingdirectory --detach gemini ,
-
-# sleep 5
+    spawn code $workingdirectory # , \
+# spawn kitty --title ansible_gemini --working-directory $workingdirectory --detach gemini ,
+sleep 5
 hc and , \
     focus_monitor right , \
     split explode 0.7
@@ -45,7 +44,6 @@ hc and , \
     split explode 0.7
 
 hc and , \
-    focus_monitor main , \
-    split explode 0.715
-
+    focus_monitor main #, \
+# split explode 0.715
 exit 0
