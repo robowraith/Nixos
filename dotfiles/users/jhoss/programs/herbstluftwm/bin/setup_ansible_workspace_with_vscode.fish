@@ -4,6 +4,18 @@ function hc
     herbstclient $argv
 end
 
+# Wait until herbstluftwm has registered a client whose title contains $argv[1]
+function wait_for_client
+    while true
+        for winid in (hc list_clients 2>/dev/null)
+            if string match -q "*$argv[1]*" -- (hc attr clients.$winid.title 2>/dev/null)
+                return
+            end
+        end
+        sleep 0.1
+    end
+end
+
 # Set up main workspace
 
 set workingdirectory ~/code/ansible
@@ -13,37 +25,35 @@ hc focus_monitor right
 hc use right_upper
 hc and , \
     rule once title="ansible_git" tag="right_upper" index=0 , \
-    rule once title="ansible_term" tag="right_upper" index=1 , \
-    spawn kitty --title ansible_git --working-directory $workingdirectory --detach lazygit , \
-    spawn kitty --title ansible_term --working-directory $workingdirectory
+    rule once title="ansible_term" tag="right_upper" index=1
+kitty --title ansible_git --working-directory $workingdirectory --detach lazygit &
+kitty --title ansible_term --working-directory $workingdirectory &
+wait_for_client ansible_git
+wait_for_client ansible_term
+hc split explode 0.7
 
 # Left screen
 hc focus_monitor left
 hc use left_upper
 hc and , \
     rule once title="ansible_dev" tag="left_upper" index=0 , \
-    rule once title="ansible_vargrant" tag="left_upper" index=1 , \
-    spawn kitty --title ansible_dev --working-directory $workingdirectory , \
-    spawn kitty --title ansible_term --working-directory $workingdirectory/vagrant
+    rule once title="ansible_vargrant" tag="left_upper" index=1
+kitty --title ansible_dev --working-directory $workingdirectory &
+kitty --title ansible_vargrant --working-directory $workingdirectory/vagrant &
+wait_for_client ansible_dev
+wait_for_client ansible_vargrant
+hc split explode 0.7
 
 # Main screen
 hc focus_monitor main
 hc use main_upper
 hc and , \
     rule once title="ansible - Visual Studio Code" tag="main_upper" index=0 , \
-    rule once title="ansible_gemini" tag="main_upper" index=1 , \
-    spawn code $workingdirectory # , \
-# spawn kitty --title ansible_gemini --working-directory $workingdirectory --detach gemini ,
-sleep 5
-hc and , \
-    focus_monitor right , \
-    split explode 0.7
+    rule once title="ansible_gemini" tag="main_upper" index=1
+code $workingdirectory &
+kitty --title ansible_gemini --working-directory $workingdirectory --detach claude &
+wait_for_client "Visual Studio Code"
+hc split explode 0.715
 
-hc and , \
-    focus_monitor left , \
-    split explode 0.7
-
-hc and , \
-    focus_monitor main #, \
-# split explode 0.715
+hc focus_monitor main
 exit 0
