@@ -5,8 +5,9 @@ function hc
 end
 
 # Screen setup
-hc spawn autorandr --change
-switch $AUTORANDR_CURRENT_PROFILE
+autorandr --change
+set -l current_profile (autorandr --current)
+switch $current_profile
     case "Work*"
         hc and , \
             set_monitors 1120x2160+0+0 1600x2160+1120+0 1120x2160+2720+0 , \
