@@ -41,8 +41,8 @@ hc and , \
     rule once title="nixos - Visual Studio Code" tag="main_lower" index=0 , \
     rule once title="nixos_gemini" tag="main_lower" index=1
 code $workingdirectory &
-kitty --title nixos_gemini --working-directory $workingdirectory --detach claude &
 wait_for_client "Visual Studio Code"
+kitty --title nixos_gemini --working-directory $workingdirectory --detach claude &
 wait_for_client nixos_gemini
 hc merge_tag default left_main
 hc split explode 0.715

@@ -25,8 +25,8 @@ hc and , \
     rule once title="k9s_apps" tag="right_main" index=0 , \
     rule once title="k9s_dev" tag="right_main" index=1
 alacritty --title k9s_apps --command k9s --context apps_cluster &
-alacritty --title k9s_dev --command k9s --context dev_cluster &
 wait_for_client k9s_apps
+alacritty --title k9s_dev --command k9s --context dev_cluster &
 wait_for_client k9s_dev
 
 # Left screen
@@ -36,8 +36,8 @@ hc and , \
     rule once class="Slack" tag="left_main" index=0 , \
     rule once class="Signal" tag="left_main" index=1
 slack &
-signal-desktop &
 wait_for_client Slack
+signal-desktop &
 wait_for_client Signal
 hc split explode 0.7
 
@@ -48,8 +48,8 @@ hc and , \
     rule once class="Vivaldi-stable" tag="main_main" index=0 , \
     rule once title="main_term" tag="main_main" index=1
 vivaldi &
-kitty --title="main_term" --working-directory ~/AI --hold --detach claude &
 wait_for_client Vivaldi
+kitty --title="main_term" --working-directory ~/AI --hold --detach claude &
 wait_for_client main_term
 hc split explode 0.715
 

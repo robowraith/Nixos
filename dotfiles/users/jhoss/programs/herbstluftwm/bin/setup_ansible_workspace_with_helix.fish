@@ -27,8 +27,8 @@ hc and , \
     rule once title="ansible_git" tag="right_upper" index=0 , \
     rule once title="ansible_term" tag="right_upper" index=1
 kitty --title ansible_git --working-directory $workingdirectory --detach lazygit &
-kitty --title ansible_term --working-directory $workingdirectory &
 wait_for_client ansible_git
+kitty --title ansible_term --working-directory $workingdirectory &
 wait_for_client ansible_term
 hc split explode 0.7
 
@@ -39,8 +39,8 @@ hc and , \
     rule once title="ansible_dev" tag="left_upper" index=0 , \
     rule once title="ansible_vargrant" tag="left_upper" index=1
 kitty --title ansible_dev --working-directory $workingdirectory &
-kitty --title ansible_vargrant --working-directory $workingdirectory/vagrant &
 wait_for_client ansible_dev
+kitty --title ansible_vargrant --working-directory $workingdirectory/vagrant &
 wait_for_client ansible_vargrant
 hc split explode 0.7
 
@@ -51,8 +51,8 @@ hc and , \
     rule once title="ansible_main" tag="main_upper" index=0 , \
     rule once title="ansible_gemini" tag="main_upper" index=1
 kitty --title ansible_main --working-directory $workingdirectory --detach lf &
-kitty --title ansible_gemini --working-directory $workingdirectory --detach claude &
 wait_for_client ansible_main
+kitty --title ansible_gemini --working-directory $workingdirectory --detach claude &
 wait_for_client ansible_gemini
 hc split explode 0.715
 

@@ -39,8 +39,8 @@ hc and , \
     rule once title="Vivaldi-stable" tag="main_main" index=0 , \
     rule once title="main_term" tag="main_main" index=1
 vivaldi &
-kitty --title="main_term" --working-directory ~/AI --hold --detach claude &
 wait_for_client Vivaldi
+kitty --title="main_term" --working-directory ~/AI --hold --detach claude &
 wait_for_client main_term
 hc split explode 0.715
 
