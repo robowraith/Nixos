@@ -65,6 +65,7 @@
       192.168.56.39 ws2.local
       192.168.56.40 ws9.local
       192.168.56.41 jolly1.local
+      192.168.56.130 loki.ac1.local prometheus.ac1.local alertmanager.ac1.local
     '';
   };
 }
