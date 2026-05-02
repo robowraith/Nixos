@@ -1,7 +1,7 @@
 _: {
   services.flatpak.packages = [
     {
-      appId = "com.opera.OperaGX";
+      appId = "com.opera.opera-gx";
       origin = "flathub";
     }
   ];
