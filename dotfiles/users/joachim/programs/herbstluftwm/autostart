@@ -9,6 +9,12 @@ hc emit_hook reload
 # Setting the Modifier key
 set Mod Mod4
 
+# Claim the first-run flag immediately, before screen_setup.fish triggers
+# autorandr --change which causes a RandR event that makes hlwm re-run
+# this autostart. The re-run must see the flag already taken.
+hc silent new_attr bool my_first_run
+set -l first_run $status
+
 # Other config
 source ~/.config/herbstluftwm/conf.d/keybindings.fish
 source ~/.config/herbstluftwm/conf.d/rules.fish
@@ -19,8 +25,7 @@ source ~/.config/herbstluftwm/conf.d/screen_setup.fish
 hc unlock
 
 # Autostart applications
-# check if this is the first run
-if hc silent new_attr bool my_first_run
+if test $first_run -eq 0
 
     # Wallpaper
     hc spawn ~/.fehbg
