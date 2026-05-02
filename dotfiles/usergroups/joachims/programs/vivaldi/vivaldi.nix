@@ -3,7 +3,7 @@
   inputs,
   ...
 }: let
-  vicinaePkg = inputs.vicinae.packages.${pkgs.system}.default;
+  vicinaePkg = inputs.vicinae.packages.${pkgs.stdenv.hostPlatform.system}.default;
 in {
   home.packages = with pkgs; [
     vivaldi
