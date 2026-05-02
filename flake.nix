@@ -50,6 +50,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-flatpak.url = "github:gmodena/nix-flatpak";
+
     # Do NOT add `inputs.nixpkgs.follows = "nixpkgs"` here – it would break the Cachix cache
     vicinae.url = "github:vicinaehq/vicinae";
   };
@@ -60,6 +62,7 @@
     home-manager,
     sops-nix,
     nix-cachyos-kernel,
+    nix-flatpak,
     stylix,
     nix-index-database,
     pre-commit-hooks,
@@ -93,6 +96,7 @@
           stylix.nixosModules.stylix
           nix-index-database.nixosModules.nix-index
           home-manager.nixosModules.home-manager
+          nix-flatpak.nixosModules.nix-flatpak
 
           # Overlays
           {
