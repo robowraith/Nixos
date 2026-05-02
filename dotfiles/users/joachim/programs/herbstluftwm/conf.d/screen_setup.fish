@@ -6,7 +6,7 @@ end
 
 # Screen setup
 autorandr --change
-set -l current_profile (autorandr --current)
+set -l current_profile (autorandr --detected | head -1)
 switch $current_profile
     case "Work*"
         hc and , \
