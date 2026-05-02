@@ -5,7 +5,8 @@ function hc
 end
 
 # Screen setup
-set -l current_profile $AUTORANDR_CURRENT_PROFILE
+autorandr --change
+set -l current_profile (autorandr --current)
 switch $current_profile
     case "Work*"
         hc and , \
