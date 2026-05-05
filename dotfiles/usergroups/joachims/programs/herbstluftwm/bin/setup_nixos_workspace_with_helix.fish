@@ -27,9 +27,9 @@ hc focus_monitor main
 hc use main_lower
 hc and , \
     rule once title="nixos_main" tag="main_lower" index=0 , \
-    rule once title="nixos_gemini" tag="main_lower" index=1 , \
+    rule once title="nixos_claude" tag="main_lower" index=1 , \
     spawn kitty --title nixos_main --working-directory $workingdirectory --detach lf , \
-    spawn kitty --title nixos_gemini --working-directory $workingdirectory --detach gemini ,
+    spawn kitty --title nixos_claude --working-directory $workingdirectory --detach claude ,
 hc merge_tag default left_main
 
 # sleep 5
