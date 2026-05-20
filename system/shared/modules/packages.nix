@@ -7,6 +7,7 @@
     fish
     git
     helix
+    jq
     killall
     procs
     serpl
