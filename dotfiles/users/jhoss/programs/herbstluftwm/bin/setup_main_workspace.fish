@@ -18,17 +18,6 @@ end
 
 # Set up main workspace
 
-# Right screen
-hc focus_monitor right
-hc use right_main
-hc and , \
-    rule once title="k9s_apps" tag="right_main" index=0 , \
-    rule once title="k9s_dev" tag="right_main" index=1
-alacritty --title k9s_apps --command k9s --context apps_cluster &
-wait_for_client k9s_apps
-alacritty --title k9s_dev --command k9s --context dev_cluster &
-wait_for_client k9s_dev
-
 # Left screen
 hc focus_monitor left
 hc use left_main
@@ -52,6 +41,19 @@ wait_for_client Vivaldi
 kitty --title="main_term" --working-directory ~/AI --hold --detach claude &
 wait_for_client main_term
 hc split explode 0.715
+
+# Right screen
+hc focus_monitor right
+hc use right_main
+hc and , \
+    rule once title="k9s_apps" tag="right_main" index=0 , \
+    rule once title="k9s_dev" tag="right_main" index=1
+alacritty --title k9s_apps --command k9s --context apps_cluster &
+wait_for_client k9s_apps
+alacritty --title k9s_dev --command k9s --context dev_cluster &
+wait_for_client k9s_dev
+
+hc focus monitor main
 
 disown
 
