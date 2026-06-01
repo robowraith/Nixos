@@ -5,25 +5,10 @@
 }: {
   home.activation.cloneCodeRepos = lib.hm.dag.entryAfter ["writeBoundary"] ''
     $DRY_RUN_CMD mkdir -p "$HOME/code"
-    $DRY_RUN_CMD mkdir -p "$HOME/Privat/code"
     export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh"
 
-    # Ansible
-    ANSIBLE_DIR="$HOME/code/ansible"
-    if [ ! -d "$ANSIBLE_DIR/.git" ]; then
-      $DRY_RUN_CMD ${pkgs.git}/bin/git clone git@git.42he.com:devops/ansible.git "$ANSIBLE_DIR" \
-        || echo "Warning: ansible clone failed, will retry on next activation"
-    fi
-
-    # Puppet Files
-    PUPPET_DIR="$HOME/code/puppet_files"
-    if [ ! -d "$PUPPET_DIR/.git" ]; then
-      $DRY_RUN_CMD ${pkgs.git}/bin/git clone git@git.42he.com:devops/puppet_files.git "$PUPPET_DIR" \
-        || echo "Warning: puppet_files clone failed, will retry on next activation"
-    fi
-
     # QMK Firmware (GitHub blocks port 22; use port 443 via ssh.github.com)
-    QMK_DIR="$HOME/Privat/code/qmk"
+    QMK_DIR="$HOME/code/qmk"
     if [ ! -d "$QMK_DIR/.git" ]; then
       QMK_TMPKEY=$(${pkgs.coreutils}/bin/mktemp)
       ${pkgs.coreutils}/bin/cp "$HOME/Nextcloud/Keys/ssh_privat/id_ed25519" "$QMK_TMPKEY"
