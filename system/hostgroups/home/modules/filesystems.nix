@@ -15,6 +15,11 @@
 
   # List of network share directories
   networkShares = ["Backup" "Bilder" "Dokumente" "Install" "Musik" "Videos"];
+
+  # Home SMB server and a known share used as an identity probe so we don't
+  # accidentally mount from a foreign subnet that happens to reuse this IP.
+  smbServer = "192.168.1.3";
+  identityShare = "Dokumente";
 in {
   options.home.cifs = {
     mountPoints = lib.mkOption {
@@ -40,6 +45,9 @@ in {
       '';
     };
 
+    # smbclient for the identity probe (and ad-hoc debugging).
+    environment.systemPackages = [pkgs.samba];
+
     # Create mount point directories
     systemd.tmpfiles.rules = let
       # Get unique parent directories that are not the home directory itself
@@ -51,36 +59,60 @@ in {
         (path: "d ${path} 0755 ${username} ${username} -")
         config.home.cifs.mountPoints);
 
-    # Mount shares automatically when connecting to the home WiFi "Desire",
-    # and unmount them when disconnecting from it.
+    # Mount shares whenever the home SMB server is actually reachable, on any
+    # interface — robust to ethernet+WiFi race orderings and to foreign subnets
+    # that happen to reuse 192.168.1.3 (the share-name probe guards against it).
     # Direct mount/umount calls are used intentionally — no systemd unit files
     # are created, so the activation script never tries to manage these mounts.
     networking.networkmanager.dispatcherScripts = [
       {
-        source = pkgs.writeShellScript "cifs-desire-mounts" ''
-          INTERFACE="$1"
+        source = pkgs.writeShellScript "cifs-home-mounts" ''
+          set -u
           ACTION="$2"
-          # CONNECTION_ID is provided by NetworkManager and matches the WiFi SSID
-          # for auto-created connections.
+
           case "$ACTION" in
-            up)
-              if [ "$CONNECTION_ID" = "Desire" ]; then
-                ${lib.concatMapStrings (path: ''
-                  ${pkgs.cifs-utils}/bin/mount.cifs \
-                    "//192.168.1.3/${builtins.baseNameOf path}" \
-                    "${path}" \
-                    -o "${cifsMountOptions}" 2>/dev/null || true
-                '') config.home.cifs.mountPoints}
-              fi
-              ;;
-            pre-down)
-              if [ "$CONNECTION_ID" = "Desire" ]; then
-                ${lib.concatMapStrings (path: ''
-                  ${pkgs.util-linux}/bin/umount "${path}" 2>/dev/null || true
-                '') config.home.cifs.mountPoints}
-              fi
-              ;;
+            up|down|pre-down|dhcp4-change|dhcp6-change|connectivity-change) ;;
+            *) exit 0 ;;
           esac
+
+          # Serialize concurrent dispatcher invocations (eth + wifi fire together).
+          LOCK=/run/cifs-home-mounts.lock
+          exec 9>"$LOCK"
+          ${pkgs.util-linux}/bin/flock -w 10 9 || exit 0
+
+          CREDS="${config.sops.templates."cifs-credentials".path}"
+          SMBCLIENT="${pkgs.samba}/bin/smbclient"
+          MOUNT_CIFS="${pkgs.cifs-utils}/bin/mount.cifs"
+          UMOUNT="${pkgs.util-linux}/bin/umount"
+          MOUNTPOINT="${pkgs.util-linux}/bin/mountpoint"
+
+          # True iff the server at ${smbServer} is reachable AND advertises the
+          # expected share — guards against foreign subnets reusing the same IP.
+          at_home() {
+            for _ in 1 2; do
+              "$SMBCLIENT" -L "//${smbServer}" -A "$CREDS" -t 2 -g 2>/dev/null \
+                | grep -q "^Disk|${identityShare}|" && return 0
+              sleep 1
+            done
+            return 1
+          }
+
+          if at_home; then
+            ${lib.concatMapStrings (path: ''
+              if ! "$MOUNTPOINT" -q "${path}"; then
+                "$MOUNT_CIFS" "//${smbServer}/${builtins.baseNameOf path}" "${path}" \
+                  -o "${cifsMountOptions}" 2>/dev/null || true
+              fi
+            '')
+            config.home.cifs.mountPoints}
+          else
+            ${lib.concatMapStrings (path: ''
+              if "$MOUNTPOINT" -q "${path}"; then
+                "$UMOUNT" "${path}" 2>/dev/null || true
+              fi
+            '')
+            config.home.cifs.mountPoints}
+          fi
         '';
         type = "basic";
       }
