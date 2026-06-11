@@ -51,6 +51,8 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  # TODO: electron-39 is EOL; remove once bitwarden-desktop migrates to a newer electron version
+  nixpkgs.config.permittedInsecurePackages = ["electron-39.8.10"];
   # Enable Stylix
   stylix = {
     enable = true;
