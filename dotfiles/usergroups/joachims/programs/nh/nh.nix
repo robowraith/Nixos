@@ -1,4 +1,6 @@
 {config, ...}: {
+  home.sessionVariables.NH_SEARCH_CHANNEL = "nixos-25.11";
+
   programs.nh = {
     enable = true;
     flake = "${config.home.homeDirectory}/nixos";
