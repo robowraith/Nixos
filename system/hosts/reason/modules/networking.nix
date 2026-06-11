@@ -6,18 +6,8 @@
   networking = {
     hostName = hostname;
 
-    # Static IP configuration
-    # Note: Adjust the interface name based on your hardware
-    # Use `ip link` to find your actual interface name
-    interfaces.enp7s0 = {
-      useDHCP = false;
-      ipv4.addresses = [
-        {
-          address = "192.168.1.111";
-          prefixLength = 24;
-        }
-      ];
-    };
+    # IP via DHCP (NetworkManager); pin 192.168.1.111 with a DHCP
+    # reservation in the router
 
     # Firewall
     firewall.allowedTCPPorts = [];
