@@ -12,6 +12,7 @@
     alejandra
     statix
     deadnix
+    mcp-nixos
 
     # Nix devenv
     devenv
