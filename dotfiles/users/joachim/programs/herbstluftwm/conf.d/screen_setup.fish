@@ -23,3 +23,18 @@ switch $current_profile
             set_monitors 1920x1080+0+0 , \
             rename_monitor 0 main
 end
+
+# Remove the leftover "default" tag now that set_monitors has pointed every
+# monitor at a named tag (it can't be removed while still displayed). try keeps
+# RandR re-runs quiet once it's already gone.
+hc silent try merge_tag default left_lower
+
+# Launch polybar. No POLYBAR_WIDTH/POLYBAR_OFFSET_X set, so config.ini falls
+# back to the triple-head center-monitor defaults.
+polybar-msg cmd quit 2>/dev/null
+for i in (seq 20)
+    pgrep -x polybar >/dev/null 2>&1; or break
+    sleep 0.1
+end
+polybar bar >/dev/null 2>&1 &
+disown

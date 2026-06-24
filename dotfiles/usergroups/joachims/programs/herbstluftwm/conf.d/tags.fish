@@ -4,8 +4,17 @@ function hc
     herbstclient $argv
 end
 
-# Script to set up tag layouts
-hc set default_frame_layout vertical
+# Script to set up tag layouts.
+# Default frame layout: side-by-side (horizontal) on the notebook setups
+# (Notebook_USBC, Notebook_1200), stacked (vertical) everywhere else. This must
+# run before the tags are added below: default_frame_layout only affects frames
+# created afterwards, it does not retroactively relayout existing tag frames.
+switch (autorandr --detected 2>/dev/null | head -1)
+    case Notebook_USBC Notebook_1200
+        hc set default_frame_layout horizontal
+    case '*'
+        hc set default_frame_layout vertical
+end
 
 # Establish tags
 hc and , \
@@ -68,7 +77,9 @@ hc and , \
     new_attr string tags.9.my_monitor , \
     set_attr tags.9.my_monitor right
 
-# merge default tag with left_lower
-hc merge_tag default left_lower
+# NOTE: the leftover "default" tag is removed in screen_setup.fish, after
+# set_monitors has pointed every monitor at a named tag. herbstluftwm refuses
+# to remove a tag that is currently displayed on a monitor, and at this point
+# "default" is still the viewed tag, so merging here would silently fail.
 
 exit 0

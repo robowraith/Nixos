@@ -12,10 +12,10 @@
     alejandra
     statix
     deadnix
-    mcp-nixos
+    unstable.mcp-nixos # stable 1.0.3 uses dead nixhub.io Remix endpoint; unstable uses search.devbox.sh
 
-    # Nix devenv
-    devenv
+    # Nix devenv (unstable for newer version)
+    unstable.devenv
 
     # For secret-tool
     libsecret

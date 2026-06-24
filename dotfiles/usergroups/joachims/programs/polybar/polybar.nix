@@ -1,4 +1,8 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   hlwm_tags = pkgs.writeShellScript "hlwm_tags.sh" ''
     # Multi monitor support. Needs MONITOR environment variable to be set for each instance of polybar
     # If MONITOR environment variable is not set this will default to monitor 0
@@ -59,10 +63,17 @@
 in {
   services.polybar = {
     enable = true;
-    script = "polybar bar &";
+    # Polybar is launched directly from herbstluftwm's screen_setup.fish so it
+    # inherits the per-profile POLYBAR_WIDTH/POLYBAR_OFFSET_X env vars (the
+    # systemd service's environment can't see them). script is unused.
+    script = "true";
     config = ./config.ini;
     package = pkgs.polybar;
   };
+
+  # Don't auto-start the bar from the systemd service; screen_setup.fish owns
+  # launching it with the right geometry per autorandr profile.
+  systemd.user.services.polybar.Install.WantedBy = lib.mkForce [];
 
   xdg.configFile = {
     "polybar/scripts/hlwm_tags.sh".source = hlwm_tags;
