@@ -23,17 +23,17 @@
       auto-optimise-store = true;
       # Allow nixConfig blocks in flakes (e.g. vicinae) to add their own caches
       accept-flake-config = true;
+      # devenv.cachix.org and nixpkgs-python.cachix.org are added automatically
+      # by the devenv/flake nixConfig (accept-flake-config); listing them here too
+      # triggers "already present" warnings. Keep their keys below so the
+      # flake-added substituters stay trusted.
       substituters = [
         "https://cache.nixos.org/"
-        "https://nix-cachyos.cachix.org"
         "https://attic.xuyh0120.win/lantian"
         "https://cache.garnix.io"
         "https://vicinae.cachix.org"
-        "https://nixpkgs-python.cachix.org"
-        "https://devenv.cachix.org"
       ];
       trusted-public-keys = [
-        "nix-cachyos.cachix.org-1:89qeSnd5K74f3O0oK78Vpbeo68o5v3M02fVpL9l3Lq0="
         "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
         "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
         "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
