@@ -157,7 +157,13 @@
               useUserPackages = true;
               backupFileExtension = ".backup";
               extraSpecialArgs = specialArgs;
-              sharedModules = [vicinae.homeManagerModules.default];
+              sharedModules = [
+                vicinae.homeManagerModules.default
+                # Home Manager now ships its own programs.vicinae module; the
+                # vicinae flake tries to disable it but uses the wrong key
+                # ("programs/vicinae" instead of "programs/vicinae.nix").
+                {disabledModules = ["programs/vicinae.nix"];}
+              ];
               users.${username} = import ./dotfiles/users/${username};
             };
           }
