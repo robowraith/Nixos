@@ -5,6 +5,10 @@
 set -C -f
 IFS="$(printf '%b_' '\n')"; IFS="${IFS%_}"
 
+# Ensure the thumbnail cache directory exists; cached previewers
+# (pdf, video, avif, djvu, svg, epub) fail silently without it.
+mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}/lf"
+
 image() {
 	if [ -n "$KITTY_WINDOW_ID" ] && command -V kitty >/dev/null 2>&1; then
 		kitty +kitten icat --silent --stdin no --transfer-mode file --place "${2}x${3}@${4}x${5}" "$1" < /dev/null > /dev/tty
