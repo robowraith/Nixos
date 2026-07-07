@@ -18,11 +18,15 @@
         whitespace.render = "all";
       };
       keys = {
-        insert.C-s = ":write";
-        insert.C-q = ":quit";
-        normal.C-s = ":write";
-        normal.C-q = ":quit";
-        normal.space.w = ":toggle soft-wrap.enable";
+        insert = {
+          C-s = ":write";
+          C-q = ":quit";
+        };
+        normal = {
+          C-s = ":write";
+          C-q = ":quit";
+          space.w = ":toggle soft-wrap.enable";
+        };
       };
     };
 

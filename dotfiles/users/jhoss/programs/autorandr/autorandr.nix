@@ -57,7 +57,10 @@ _: {
             enable = true;
             primary = true;
             mode = "2880x1800";
-            scale = { x = 0.6666666666666666; y = 0.6666666666666666; };
+            scale = {
+              x = 0.6666666666666666;
+              y = 0.6666666666666666;
+            };
             position = "0x0";
             rate = "90";
             rotate = "normal";
@@ -76,7 +79,10 @@ _: {
             enable = true;
             primary = true;
             mode = "2880x1800";
-            scale = { x = 0.6666666666666666; y = 0.6666666666666666; };
+            scale = {
+              x = 0.6666666666666666;
+              y = 0.6666666666666666;
+            };
             position = "0x1200";
             rate = "90";
             rotate = "normal";

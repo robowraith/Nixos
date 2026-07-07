@@ -1,8 +1,4 @@
-{
-  pkgs,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   # ============================================================================
   # Power Management - Tuxedo InfinityBook 14 Gen 6
   # Intel Core i7-11370H (4 cores / 8 threads)
@@ -19,36 +15,44 @@
   # ---------------------------------------------------------------------------
   hardware.tuxedo-drivers.enable = true;
 
-  # ---------------------------------------------------------------------------
-  # Intel Thermal Daemon
-  # ---------------------------------------------------------------------------
-  services.thermald.enable = true;
+  services = {
+    # -------------------------------------------------------------------------
+    # Intel Thermal Daemon
+    # -------------------------------------------------------------------------
+    thermald.enable = true;
 
-  # ---------------------------------------------------------------------------
-  # auto-cpufreq - Automatic CPU Frequency Scaling
-  # ---------------------------------------------------------------------------
-  services.auto-cpufreq = {
-    enable = true;
-    settings = {
-      charger = {
-        # On AC power: maximize performance
-        governor = "performance";
-        turbo = "auto";
-        # Allow full frequency range
-        scaling_min_freq = 400000; # 400 MHz
-        scaling_max_freq = 4800000; # 4.8 GHz (max turbo)
-        energy_performance_preference = "performance";
-      };
-      battery = {
-        # On battery: conserve power
-        governor = "powersave";
-        turbo = "never";
-        # Limit max frequency to save battery
-        scaling_min_freq = 400000; # 400 MHz
-        scaling_max_freq = 2200000; # 2.2 GHz (well below turbo)
-        energy_performance_preference = "power";
+    # -------------------------------------------------------------------------
+    # auto-cpufreq - Automatic CPU Frequency Scaling
+    # -------------------------------------------------------------------------
+    auto-cpufreq = {
+      enable = true;
+      settings = {
+        charger = {
+          # On AC power: maximize performance
+          governor = "performance";
+          turbo = "auto";
+          # Allow full frequency range
+          scaling_min_freq = 400000; # 400 MHz
+          scaling_max_freq = 4800000; # 4.8 GHz (max turbo)
+          energy_performance_preference = "performance";
+        };
+        battery = {
+          # On battery: conserve power
+          governor = "powersave";
+          turbo = "never";
+          # Limit max frequency to save battery
+          scaling_min_freq = 400000; # 400 MHz
+          scaling_max_freq = 2200000; # 2.2 GHz (well below turbo)
+          energy_performance_preference = "power";
+        };
       };
     };
+
+    # udev rule: trigger the core-toggle service when power supply changes
+    udev.extraRules = ''
+      # When AC adapter is plugged/unplugged, toggle CPU cores
+      SUBSYSTEM=="power_supply", ATTR{type}=="Mains", RUN+="${pkgs.systemd}/bin/systemctl start toggle-cpu-cores.service"
+    '';
   };
 
   # ---------------------------------------------------------------------------
@@ -97,12 +101,6 @@
       RemainAfterExit = false;
     };
   };
-
-  # udev rule: trigger the service when power supply changes
-  services.udev.extraRules = ''
-    # When AC adapter is plugged/unplugged, toggle CPU cores
-    SUBSYSTEM=="power_supply", ATTR{type}=="Mains", RUN+="${pkgs.systemd}/bin/systemctl start toggle-cpu-cores.service"
-  '';
 
   # Also run at boot to set the correct initial state
   systemd.services.toggle-cpu-cores-boot = {

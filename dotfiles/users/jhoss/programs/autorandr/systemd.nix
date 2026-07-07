@@ -1,4 +1,8 @@
-{pkgs, lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   systemd.user.services.fix-monitor-on-resume = {
     Unit = {
       Description = lib.mkForce "Fix Samsung Odyssey Ark HDMI/audio on resume from sleep";

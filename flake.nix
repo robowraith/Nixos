@@ -106,7 +106,7 @@
               nix-cachyos-kernel.overlays.pinned
               (_final: prev: {
                 unstable = import nixpkgs-unstable {
-                  system = prev.system;
+                  inherit (prev.stdenv.hostPlatform) system;
                   config.allowUnfree = true;
                 };
               })
@@ -198,6 +198,8 @@
       # You can add other hosts here using the helper
       # "42he-Infinitybook" = mkHost { hostname = "42he-Infinitybook"; username = "joachim"; };
     };
+
+    formatter.${system} = pkgs.alejandra;
 
     # Pre-commit checks
     checks.${system}.pre-commit-check = pre-commit-hooks.lib.${system}.run {
