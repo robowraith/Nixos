@@ -4,13 +4,8 @@ A personal approach to a modular, scalable, and "Dendritic" NixOS and Home Manag
 
 ## 🖥️ Systems Overview
 
-| Hostname | Type | Primary User | Primary use |
-|----------|------|--------------|-------------|
-| **reason** | Desktop | `joachim` | All-round development, limited gaming, day-to-day tasks. |
-| **42he-Infinitybook** | Laptop | `joachim` | Work notebook (DevOps, Ansible, Development). |
-| **stella** | Laptop | `iris` | Day-to-day tasks. |
-| **wintermute** | Server | `dixie` | Homelab, Emby, and File server. |
-| **neuromancer** | VPS (Hetzner) | `case` | Mailcow, Nextcloud. |
+See [docs/hosts.md](docs/hosts.md) for the full fleet reference, including
+migration status of hosts not yet on NixOS.
 
 ## 🧭 Guiding Principles
 
