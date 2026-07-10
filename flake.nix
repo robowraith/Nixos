@@ -4,8 +4,11 @@
   # Applied when evaluating the flake (i.e. during `nh os switch`),
   # so vicinae can be fetched from cache instead of built from source.
   nixConfig = {
-    extra-substituters = ["https://vicinae.cachix.org"];
-    extra-trusted-public-keys = ["vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="];
+    extra-substituters = ["https://vicinae.cachix.org" "https://attic.xuyh0120.win/lantian"];
+    extra-trusted-public-keys = [
+      "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
+      "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+    ];
   };
 
   inputs = {
@@ -23,7 +26,7 @@
     };
 
     nix-cachyos-kernel = {
-      url = "github:xddxdd/nix-cachyos-kernel";
+      url = "github:xddxdd/nix-cachyos-kernel/release";
     };
 
     stylix = {
