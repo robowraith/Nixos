@@ -3,11 +3,12 @@ _: {
     enable = true;
     enableDefaultConfig = false;
 
-    matchBlocks."*" = {
-      # Default settings that apply to all hosts unless overridden
-      extraOptions = {
-        "AddKeysToAgent" = "yes";
-      };
+    # Default settings that apply to all hosts unless overridden.
+    # `settings` replaces the deprecated `matchBlocks`/`extraOptions` pair in
+    # home-manager 26.05; the attribute name becomes the block header (`Host *`)
+    # and keys are upstream OpenSSH directive names.
+    settings."*" = {
+      AddKeysToAgent = "yes";
     };
 
     extraConfig = ''
