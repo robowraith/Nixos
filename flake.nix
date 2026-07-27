@@ -166,6 +166,21 @@
                 # vicinae flake tries to disable it but uses the wrong key
                 # ("programs/vicinae" instead of "programs/vicinae.nix").
                 {disabledModules = ["programs/vicinae.nix"];}
+                # The vicinae module assigns programs.google-chrome.nativeMessagingHosts,
+                # but this Home Manager version only declares that option for
+                # non-proprietary browsers (extensions/dictionaries/nativeMessagingHosts
+                # are gated behind `!isProprietaryChrome`), so the assignment fails with
+                # "option does not exist" even when enableChromeIntegration is false
+                # (mkIf false does not prune a definition on an undeclared option).
+                # Declare the missing option as a no-op shim to keep evaluation working.
+                ({lib, ...}: {
+                  options.programs.google-chrome.nativeMessagingHosts = lib.mkOption {
+                    type = lib.types.listOf lib.types.package;
+                    default = [];
+                    internal = true;
+                    visible = false;
+                  };
+                })
               ];
               users.${username} = import ./dotfiles/users/${username};
             };
