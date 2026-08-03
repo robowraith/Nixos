@@ -30,11 +30,13 @@
       substituters = [
         "https://cache.nixos.org/"
         "https://attic.xuyh0120.win/lantian"
-        "https://cache.garnix.io"
         "https://vicinae.cachix.org"
       ];
       trusted-public-keys = [
         "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
+        # cache.garnix.io was dropped from `substituters` above: no flake input
+        # declares it, and it served HTTP 502 for every query. Key kept so
+        # re-adding the substituter stays a one-line change.
         "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
         "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
         "nixpkgs-python.cachix.org-1:hxjI7pFxTyuTHn2NkvWCrAUcNZLNS3ZAvfYNuYifcEU="
