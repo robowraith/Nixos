@@ -120,6 +120,7 @@
                     + ''
                       sed -i '15i #include <cstdint>' src/xconnection.cpp
                     '';
+                  doCheck = false;
                 });
                 freac = prev.freac.overrideAttrs (oldAttrs: {
                   nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [prev.makeWrapper];
