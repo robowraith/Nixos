@@ -36,6 +36,14 @@ set -e POLYBAR_WIDTH
 set -e POLYBAR_OFFSET_X
 
 switch $current_profile
+    case Work_Cellar
+        set -gx POLYBAR_WIDTH 1920
+        set -gx POLYBAR_OFFSET_X 0
+        hc and , \
+            set_monitors 1920x1080+0+0 1680x1050+1920+0 , \
+            rename_monitor 0 main , \
+            rename_monitor 1 side
+
     case "Work*"
         hc and , \
             set_monitors 1120x2160+0+0 1600x2160+1120+0 1120x2160+2720+0 , \

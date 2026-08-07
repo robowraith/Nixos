@@ -9,15 +9,25 @@ end
 set target_monitor $argv[1]
 set target_tag $argv[2]
 
-# In the Notebook_USBC two-screen setup the office monitor names
-# (left/main/right) don't exist. Route tags to the two physical monitors
-# instead: lower group (keys 1-5) -> main (0), everything else -> up (1).
-if test (autorandr --detected 2>/dev/null | head -1) = Notebook_USBC
+set profile (autorandr --detected 2>/dev/null | head -1)
+
+# In two-screen setups the office monitor names (left/main/right) don't
+# exist. Route tags to the two physical monitors instead.
+if test "$profile" = Notebook_USBC
+    # lower group (keys 1-5) -> main (0), everything else -> up (1).
     switch $target_tag
         case left_lower main_lower right_lower left_main main_main
             set target_monitor main
         case '*'
             set target_monitor up
+    end
+else if test "$profile" = Work_Cellar
+    # keys 0-5 -> main (HDMI-1), keys 6-9 -> side (eDP-1).
+    switch $target_tag
+        case fullscreen left_lower main_lower right_lower left_main main_main
+            set target_monitor main
+        case '*'
+            set target_monitor side
     end
 end
 
