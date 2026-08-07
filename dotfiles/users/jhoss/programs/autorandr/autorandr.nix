@@ -97,6 +97,55 @@ _: {
         };
       };
 
+      # Notebook and 1080p external display (cellar setup)
+      "Work_Cellar" = {
+        fingerprint = {
+          "eDP-1" = "00ffffffffffff000e6f021400000000001e0104b51e137802ee95a3544c99260f505400000001010101010101010101010101010101b6c840a0b0084e70302036002ebc10000018000000000000000000000000000000000018000000fe0043534f542054330a2020202020000000fe004d4e453030375a41312d310a2000d3";
+          "HDMI-1" = "00ffffffffffff0034a40738010101010b190103804627782aa0b59d5952a0260d5054bfef80b300a940950081408180950f714f9040023a801871382d40582c4500ba882100001e662150b051001b3040703600ba882100001e000000fd00324c1d5311000a202020202020000000fc004d4432323332300a20202020200116020322f24f9f1413121116159005040302070601230907078301000065030c001000023a80d072382d40102c4580ba882100001f011d80d0721c1620102c2580ba882100009f011d00bc52d01e20b8285540ba882100001e8c0ad090204031200c405500ba8821000018023a801871382d40582c4500ba882100001e00000034";
+        };
+        config = {
+          eDP-1 = {
+            enable = true;
+            mode = "2880x1800";
+            # Using transform rather than scale: autorandr's scale handling
+            # emits a redundant identity `--transform` alongside `--scale` in
+            # the same xrandr invocation whenever eDP-1 already carries a
+            # leftover transform from a previous scaled profile (e.g.
+            # Notebook_1200/Notebook_USBC), and the later option wins,
+            # silently cancelling the scale. An explicit transform has no
+            # such conflict.
+            transform = [
+              [
+                0.5833333333333334
+                0.0
+                0.0
+              ]
+              [
+                0.0
+                0.5833333333333334
+                0.0
+              ]
+              [
+                0.0
+                0.0
+                1.0
+              ]
+            ];
+            position = "1920x0";
+            rate = "90";
+            rotate = "normal";
+          };
+          HDMI-1 = {
+            enable = true;
+            primary = true;
+            mode = "1920x1080";
+            position = "0x0";
+            rate = "60";
+            rotate = "normal";
+          };
+        };
+      };
+
       # Living room setup with 65" 4K TV
       "Work_Livingroom_4K" = {
         fingerprint = {
