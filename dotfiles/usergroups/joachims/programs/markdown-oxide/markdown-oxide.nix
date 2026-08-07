@@ -29,12 +29,28 @@
       ];
     };
 
-    # Open today's daily note from any shell, with cwd temporarily in the vault
-    # so the LSP gets the right root.
-    fish.functions.daily = ''
+    # Open today's/yesterday's daily note from any shell, with cwd temporarily
+    # in the vault so the LSP gets the right root.
+    fish.functions.today = ''
       pushd ~/notes
       mkdir -p daily
       $EDITOR daily/(date +%F).md
+      popd
+    '';
+
+    fish.functions.yesterday = ''
+      pushd ~/notes
+      mkdir -p daily
+      # Mind weekends: last journal before today, not literally 1 day back.
+      switch (date +%u)
+        case 1 # Monday -> last Friday
+          set offset 3
+        case 7 # Sunday (shouldn't occur, but just in case) -> Friday
+          set offset 2
+        case '*'
+          set offset 1
+      end
+      $EDITOR daily/(date -d "-$offset days" +%F).md
       popd
     '';
 
