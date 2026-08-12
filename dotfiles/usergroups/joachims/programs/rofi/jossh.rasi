@@ -3,7 +3,7 @@ configuration {
   show-icons:         false;
   disable-history:    false;
   sidebar-mode:       false;
-  terminal:           "alacritty";
+  terminal:           "kitty";
  }
  @theme "~/.config/rofi/themes/catppuccin.rasi"
 
