@@ -25,6 +25,7 @@
     "herbstluftwm/bin/fullscreen_window.fish".source = ./bin/fullscreen_window.fish;
     "herbstluftwm/bin/switch_tag_or_cycle.fish".source = ./bin/switch_tag_or_cycle.fish;
     "herbstluftwm/bin/setup_nixos_workspace_with_helix.fish".source = ./bin/setup_nixos_workspace_with_helix.fish;
+    "herbstluftwm/bin/mark_window_urgent.fish".source = ./bin/mark_window_urgent.fish;
     "herbstluftwm/conf.d/keybindings.fish".source = ./conf.d/keybindings.fish;
     "herbstluftwm/conf.d/rules.fish".source = ./conf.d/rules.fish;
     "herbstluftwm/conf.d/tags.fish".source = ./conf.d/tags.fish;

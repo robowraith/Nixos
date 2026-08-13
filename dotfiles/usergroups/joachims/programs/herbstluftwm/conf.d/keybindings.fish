@@ -182,7 +182,7 @@ hc keybind $Mod+Ctrl+space \
 # hc keybind $Mod+Shift+Tab cycle_all -1
 hc keybind $Mod+Tab cycle
 # hc keybind $Mod+c cycle
-# hc keybind $Mod+Shift+x jumpto urgent
+hc keybind $Mod+Shift+x jumpto urgent
 
 ###################
 # Multimedia Keys #
