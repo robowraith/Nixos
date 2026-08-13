@@ -56,8 +56,6 @@
 
     nix-flatpak.url = "github:gmodena/nix-flatpak";
 
-    herdr.url = "github:herdrdev/herdr";
-
     # Do NOT add `inputs.nixpkgs.follows = "nixpkgs"` here – it would break the Cachix cache
     vicinae.url = "github:vicinaehq/vicinae";
   };
