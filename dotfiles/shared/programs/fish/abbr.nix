@@ -9,7 +9,7 @@
     kc = "kubectl";
     kx = "kubectx";
     lg = "lazygit";
-    nfu = "sudo nix flake update --flake ~/nixos";
+    nfu = "nix flake update --flake ~/nixos";
     nhs = "nh search";
     nos = "nh os switch";
     nrs = "sudo nixos-rebuild switch --flake ~/nixos#reason";
