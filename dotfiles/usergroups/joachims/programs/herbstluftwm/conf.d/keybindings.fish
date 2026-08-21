@@ -182,7 +182,8 @@ hc keybind $Mod+Ctrl+space \
 # hc keybind $Mod+Shift+Tab cycle_all -1
 hc keybind $Mod+Tab cycle
 # hc keybind $Mod+c cycle
-hc keybind $Mod+Shift+x jumpto urgent
+# Jump to an urgent window, press again to return to where you were
+hc keybind $Mod+Shift+x spawn ~/.config/herbstluftwm/bin/jump_urgent_or_back.fish
 
 ###################
 # Multimedia Keys #
