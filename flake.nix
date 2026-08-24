@@ -47,6 +47,9 @@
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
+      # Pinned in flake.lock below the latest commit: newer zen-browser-flake
+      # revisions require ffmpeg_9, which isn't in nixos-26.05 yet (unstable only).
+      # Safe to `nix flake update zen-browser` again once ffmpeg_9 lands in stable.
     };
 
     firefox-addons = {
