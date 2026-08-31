@@ -10,6 +10,9 @@
     # shadows all g-prefixed maps (gn/gd from markdown-oxide, gg, gh).
     gh = "";
     gg = "top";
+    ga = "cd ~/code/ansible";
+    gw = "cd ~/code/ansible.wiki";
+    gx = "cd ~/nixos";
     "<c-g>" = ":fzf_search";
 
     # File operations
