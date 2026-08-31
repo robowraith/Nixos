@@ -25,6 +25,7 @@
         normal = {
           C-s = ":write";
           C-q = ":quit";
+          C-r = ":reload";
           space.w = ":toggle soft-wrap.enable";
         };
       };

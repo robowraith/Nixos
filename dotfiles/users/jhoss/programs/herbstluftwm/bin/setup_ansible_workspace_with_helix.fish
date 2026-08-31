@@ -24,13 +24,16 @@ set workingdirectory ~/code/ansible
 hc focus_monitor right
 hc use right_upper
 hc and , \
-    rule once title="ansible_git" tag="right_upper" index=0 , \
-    rule once title="ansible_term" tag="right_upper" index=1
+    rule once title="ansible_claude1" tag="right_upper" index=0 , \
+    rule once title="ansible_claude2" tag="right_upper" index=1 , \
+    rule once title="ansible_claude3" tag="right_upper" index=2
 kitty --title ansible_claude1 --working-directory $workingdirectory --detach fish -ic 'direnv exec . claude' &
 wait_for_client ansible_claude1
-kitty --title ansible_term --working-directory $workingdirectory &
-wait_for_client ansible_term
-hc split explode 0.7
+kitty --title ansible_claude2 --working-directory $workingdirectory --detach fish -ic 'direnv exec . claude' &
+wait_for_client ansible_claude2
+kitty --title ansible_claude3 --working-directory $workingdirectory --detach fish -ic 'direnv exec . claude' &
+wait_for_client ansible_claude3
+#hc split explode 0.7
 
 # Left screen
 hc focus_monitor left
