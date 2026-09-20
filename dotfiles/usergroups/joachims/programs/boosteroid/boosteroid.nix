@@ -3,9 +3,17 @@
   lib,
   ...
 }: let
+  # The .deb (1.10.4) provides libs, desktop entry and icons; the main binary
+  # comes from the same unversioned tarball the in-app updater downloads,
+  # which can't self-install into the read-only store. Bump hash to update.
+  binTar = pkgs.fetchurl {
+    url = "https://boosteroid.com/linux/installer/boosteroid.tar";
+    hash = "sha256-n7mt7YrHgjWyVWqoL9njXTbyaTKVBZOSH7/IkPVJRxY=";
+  };
+
   boosteroid = pkgs.stdenv.mkDerivation rec {
     pname = "boosteroid";
-    version = "2025-11-06";
+    version = "1.10.23";
 
     src = ./boosteroid-install-x64.deb;
 
@@ -65,6 +73,9 @@
       substituteInPlace $out/usr/share/applications/Boosteroid.desktop \
         --replace "/opt/BoosteroidGamesS.R.L./bin/Boosteroid" "boosteroid" \
         --replace "/usr/share/icons/Boosteroid/icon.svg" "$out/usr/share/icons/Boosteroid/icon.svg"
+
+      tar -xf ${binTar} -C $out/opt/BoosteroidGamesS.R.L./bin Boosteroid
+      chmod +x $out/opt/BoosteroidGamesS.R.L./bin/Boosteroid
 
       mkdir -p $out/bin
       ln -s $out/opt/BoosteroidGamesS.R.L./bin/Boosteroid $out/bin/boosteroid
