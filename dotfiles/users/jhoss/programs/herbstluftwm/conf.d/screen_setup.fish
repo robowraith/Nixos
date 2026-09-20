@@ -34,6 +34,7 @@ end
 # below make the bar span the whole screen.
 set -e POLYBAR_WIDTH
 set -e POLYBAR_OFFSET_X
+set -l launch_bar 1
 
 switch $current_profile
     case Work_Cellar
@@ -52,6 +53,7 @@ switch $current_profile
             rename_monitor 2 right
 
     case Gaming_1080p
+        set launch_bar 0
         hc and , \
             set_monitors 1920x1080+0+0 , \
             rename_monitor 0 main
@@ -82,4 +84,8 @@ end
 # RandR re-runs quiet once it's already gone.
 hc silent try merge_tag default left_lower
 
-launch_polybar
+if test $launch_bar -eq 1
+    launch_polybar
+else
+    polybar-msg cmd quit 2>/dev/null
+end

@@ -5,12 +5,13 @@ function hc
 end
 
 # Script to set up tag layouts.
-# Default frame layout: side-by-side (horizontal) on the notebook setups
-# (Notebook_USBC, Notebook_1200), stacked (vertical) everywhere else. This must
-# run before the tags are added below: default_frame_layout only affects frames
-# created afterwards, it does not retroactively relayout existing tag frames.
+# Default frame layout: side-by-side (horizontal) on the notebook and TV
+# setups (Notebook_USBC, Notebook_1200, Gaming_1080p), stacked (vertical)
+# everywhere else. This must run before the tags are added below:
+# default_frame_layout only affects frames created afterwards, it does not
+# retroactively relayout existing tag frames.
 switch (autorandr --detected 2>/dev/null | head -1)
-    case Notebook_USBC Notebook_1200
+    case Notebook_USBC Notebook_1200 Gaming_1080p
         hc set default_frame_layout horizontal
     case '*'
         hc set default_frame_layout vertical

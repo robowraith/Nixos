@@ -57,10 +57,25 @@ _: {
             enable = true;
             primary = true;
             mode = "2880x1800";
-            scale = {
-              x = 0.6666666666666666;
-              y = 0.6666666666666666;
-            };
+            # transform, not scale: autorandr's scale path cancels itself on
+            # re-apply when a transform is already active (see Work_Cellar)
+            transform = [
+              [
+                0.6666666666666666
+                0.0
+                0.0
+              ]
+              [
+                0.0
+                0.6666666666666666
+                0.0
+              ]
+              [
+                0.0
+                0.0
+                1.0
+              ]
+            ];
             position = "0x0";
             rate = "90";
             rotate = "normal";
@@ -79,10 +94,25 @@ _: {
             enable = true;
             primary = true;
             mode = "2880x1800";
-            scale = {
-              x = 0.6666666666666666;
-              y = 0.6666666666666666;
-            };
+            # transform, not scale: autorandr's scale path cancels itself on
+            # re-apply when a transform is already active (see Work_Cellar)
+            transform = [
+              [
+                0.6666666666666666
+                0.0
+                0.0
+              ]
+              [
+                0.0
+                0.6666666666666666
+                0.0
+              ]
+              [
+                0.0
+                0.0
+                1.0
+              ]
+            ];
             position = "0x1200";
             rate = "90";
             rotate = "normal";
@@ -176,17 +206,23 @@ _: {
         };
       };
 
+      # Hisense TV via HDMI as the sole display
       "Gaming_1080p" = {
         fingerprint = {
-          "HDMI-0" = "00ffffffffffff001e6dfb76072103000b1c010380572578eaca95a6554ea1260f5054256b807140818081c0a9c0b300d1c08100d1cfd8a40020f140686030207a006a6e3100001a85cf0020f140746030207a006a6e3100001a000000fd00384b1e7d36000a202020202020000000fc004c4720554c545241574944450a01f5020326f1230907074b100403011f1359da1205148301000065030c00200067d85dc4016c800040510020f140506030207a006a6e3100001ae4a770b8d1a02450906084006a6e3100001ae77c70a0d0a0295030203a006a6e3100001a000000ff003831314e54475936313036330a0000000000000000000000000000000000a6";
+          "eDP-1" = "00ffffffffffff000e6f021400000000001e0104b51e137802ee95a3544c99260f505400000001010101010101010101010101010101b6c840a0b0084e70302036002ebc10000018000000000000000000000000000000000018000000fe0043534f542054330a2020202020000000fe004d4e453030375a41312d310a2000d3";
+          "HDMI-1" = "00ffffffffffff0020a32f00010000000c1a0103807341780acf74a3574cb02309484c21080081c0814081800101010101010101010104740030f2705a80b0588a00501d7400001e023a801871382d40582c4500501d7400001e000000fc00484953454e53450a2020202020000000fd00184b0f511e000a202020202020017f02034571525f5e5d01020405101113141f2021226263642909070715075055060083010000e200f9e305ff016e030c003000383c20008001020304e50e60616a6be3060d01011d8018711c1620582c2500c48e2100009e011d80d0721c1620102c2580c48e2100009e023a80d072382d40102c4580c48e2100001e00000000b5";
         };
         config = {
-          HDMI-0 = {
+          HDMI-1 = {
             enable = true;
             primary = true;
             mode = "1920x1080";
             position = "0x0";
-            rate = "60";
+            rate = "30";
+            rotate = "normal";
+          };
+          eDP-1 = {
+            enable = false;
           };
         };
       };
