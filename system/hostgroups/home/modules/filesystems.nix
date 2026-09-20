@@ -44,7 +44,15 @@
     # and the binaries go to `bin`, under sbin/ (configureFlags ROOTSBINDIR).
     MOUNT_CIFS="${pkgs.cifs-utils.bin}/sbin/mount.cifs"
     UMOUNT="${pkgs.util-linux}/bin/umount"
-    MOUNTPOINT="${pkgs.util-linux}/bin/mountpoint"
+    INSTALL="${pkgs.coreutils}/bin/install"
+
+    # Mount state is read from /proc, never probed with stat(): `mountpoint`
+    # and `findmnt` both stat the path, and a stat on a CIFS mount whose server
+    # has gone away blocks in D state for minutes.
+    is_mounted() {
+      ${pkgs.gawk}/bin/awk -v p="$1" '$2 == p { found = 1 } END { exit !found }' \
+        /proc/self/mounts
+    }
 
     # True iff the server at ${smbServer} is reachable AND advertises the
     # expected share — guards against foreign subnets reusing the same IP.
@@ -59,7 +67,10 @@
 
     if at_home; then
       ${lib.concatMapStrings (path: ''
-        if ! "$MOUNTPOINT" -q "${path}"; then
+        if ! is_mounted "${path}"; then
+          # The mount point itself is created here rather than by tmpfiles at
+          # runtime — see the tmpfiles rules below for why.
+          "$INSTALL" -d -m 0755 -o ${username} -g ${username} "${path}"
           # Failures are logged rather than discarded: a silent mount failure
           # is indistinguishable from being away from home.
           if "$MOUNT_CIFS" "//${smbServer}/${builtins.baseNameOf path}" "${path}" \
@@ -74,8 +85,14 @@
     else
       echo "SMB server ${smbServer} not reachable after $ATTEMPTS probes; unmounting shares" >&2
       ${lib.concatMapStrings (path: ''
-        if "$MOUNTPOINT" -q "${path}"; then
-          "$UMOUNT" "${path}" 2>/dev/null || true
+        if is_mounted "${path}"; then
+          # -f aborts in-flight requests to the now-unreachable server, -l
+          # detaches even when something still holds the mount open, and -c
+          # skips path canonicalisation (which stat()s the dead mount and hangs
+          # for minutes, taking the lock above with it). Without all three this
+          # unmount can block for minutes — the server is by definition
+          # unreachable at this point. The paths are already canonical.
+          "$UMOUNT" -f -l -c "${path}" 2>/dev/null || true
         fi
       '')
       config.home.cifs.mountPoints}
@@ -109,7 +126,17 @@ in {
     # smbclient for the identity probe (and ad-hoc debugging).
     environment.systemPackages = [pkgs.samba];
 
-    # Create mount point directories
+    # Create mount point directories.
+    #
+    # The mount points themselves are marked `!` (boot-only). A plain `d` rule
+    # is also replayed by systemd-tmpfiles-resetup during every activation, and
+    # that stat()s each mount point. Activation stops NetworkManager first, so
+    # by then the shares are mounted but the server is gone, and each stat
+    # blocks until the CIFS layer gives up (~200s per share). That stalls
+    # sysinit-reactivation.target — and therefore the restart of
+    # NetworkManager — for minutes, with no network to recover with.
+    # At boot nothing is mounted yet, so the boot-only pass is safe; the mount
+    # script recreates the directories when it remounts.
     systemd.tmpfiles.rules = let
       # Get unique parent directories that are not the home directory itself
       parentDirs = lib.unique (map (path: builtins.dirOf path) config.home.cifs.mountPoints);
@@ -117,7 +144,7 @@ in {
     in
       (map (path: "d ${path} 0755 ${username} ${username} -") filteredParentDirs)
       ++ (map
-        (path: "d ${path} 0755 ${username} ${username} -")
+        (path: "d! ${path} 0755 ${username} ${username} -")
         config.home.cifs.mountPoints);
 
     # Mount at boot, ordered after the network is genuinely routable.
