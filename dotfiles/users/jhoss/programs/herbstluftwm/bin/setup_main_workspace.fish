@@ -35,11 +35,21 @@ hc focus_monitor main
 hc use main_main
 hc and , \
     rule once class="Vivaldi-stable" tag="main_main" index=0 , \
-    rule once title="main_term" tag="main_main" index=1
+    rule once class="md.Obsidian" tag="main_main" index=1
 vivaldi &
 wait_for_client Vivaldi
-kitty --title="main_term" --working-directory ~/AI --hold --detach fish -c yesterday &
-wait_for_client main_term
+# Open yesterday's daily note (same weekend-aware offset as the `yesterday`
+# fish function in dotfiles/usergroups/joachims/programs/markdown-oxide).
+set -l yesterday_offset 1
+switch (date +%u)
+    case 1 # Monday -> last Friday
+        set yesterday_offset 3
+    case 7 # Sunday (shouldn't occur, but just in case) -> Friday
+        set yesterday_offset 2
+end
+set -l yesterday_note "daily/"(date -d "-$yesterday_offset days" +%F)
+obsidian "obsidian://open?vault=notes&file=$yesterday_note" &
+wait_for_client Obsidian
 hc split explode 0.715
 
 # Right screen
