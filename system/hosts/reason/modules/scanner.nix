@@ -11,6 +11,11 @@
   # devices, so no hand-written udev rule is needed for this scanner.
   hardware.sane.enable = true;
 
+  # The v4l backend exposes the webcam as a "scanner". It sorts ahead of the
+  # real device, so frontends started without an explicit device argument grab
+  # the webcam and fail with SANE_STATUS_INVAL. Nothing here scans via v4l.
+  hardware.sane.disabledDefaultBackends = ["v4l"];
+
   # Graphical scanning frontend.
   environment.systemPackages = [pkgs.xsane];
 
