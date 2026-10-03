@@ -80,7 +80,9 @@ Checks:
 Rollback, in this order (otherwise the relay and the proxy collide with the hostNetwork pod on :67/:53):
 
 1. Put `traefik-config.yaml` back into the manifests directory (k3s re-creates the HelmChartConfig)
-2. `git checkout f55c1ab -- docs/wintermute/pihole`
+2. `git checkout d313edb -- docs/wintermute/pihole`. This repo is public, so wintermute's public IPv6 address is
+   replaced by `<wintermute-public-ipv6>` in the snapshot: drop the `ServerIPv6` env var from the Deployment and put
+   the current `eno2` address into the ipv6-proxy Corefile's `bind` line before applying.
 3. `kubectl replace` the Deployment from `pihole.yaml` and wait until the hostNetwork pod has terminated
 4. `kubectl apply -f pihole.yaml -f traefik-dns-routes.yaml -f shims.yaml` (not `traefik-helmchartconfig.yaml`,
    see above). The Services come back with new ClusterIPs while the ipv6-proxy ConfigMap still names the old
