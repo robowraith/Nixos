@@ -34,6 +34,10 @@ there and is the user's job.
 
 ## hostNetwork cutover (2026-10)
 
+**Done 2026-10-03, 16:30–16:32.** DNS was down ~50 s. All checks passed: DNS v4 and v6 (v6 had been dead
+since the last prefix rotation), blocking, web UI on :8080 via Traefik, DHCP on `eno2` (SV08 re-lease), no RA,
+real client IPs in the query log.
+
 FTL used to run in the pod network, reached via Traefik (IPv4 DNS), `pihole-ipv6-proxy` (IPv6 DNS) and
 `pihole-dhcp-relay` (DHCP), with `pihole-ip-watcher` patching the shims whenever the pod IP or the IPv6 prefix
 changed. With `hostNetwork: true` FTL binds wintermute's `eno2` directly and all of that goes away. Lighttpd
