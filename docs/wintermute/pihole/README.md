@@ -41,21 +41,43 @@ moves to :8080 because Traefik's ServiceLB owns :80 on the host.
 
 Prerequisites:
 
-1. Secret exists: `kubectl --context wintermute -n pihole get secret pihole-web-password`
-2. IPv6 DHCP/RA is off in the web UI (Settings → DHCP), so `DHCP_IPv6=false` in `setupVars.conf`. Otherwise FTL
-   would start sending Router Advertisements as soon as it sees `eno2`'s real prefix. RA is a separate step.
+1. Secret exists with the right key (never print the value):
+   `kubectl -n pihole get secret pihole-web-password -o jsonpath='{.data}' | yq 'keys'` → `[WEBPASSWORD]`.
+   A missing Secret leaves the new pod in `CreateContainerConfigError`, i.e. the outage does not end.
+2. IPv6 DHCP/RA is off in the web UI (Settings → DHCP → untick IPv6 support, save). Verify:
+   `kubectl -n pihole exec deploy/pihole-deployment -- grep -nE 'constructor|ra-|enable-ra' /etc/dnsmasq.d/02-pihole-dhcp.conf`
+   must print nothing. The generated `dhcp-range=::,constructor:<if>,ra-names,ra-stateless,64` line is what
+   makes dnsmasq send Router Advertisements; `#enable-ra` being commented out does not stop it. It was only
+   inert because the pod's `eth0` had no global prefix. `eno2` has one. The start script does not regenerate
+   this file (it only does when `DHCP_ACTIVE` is set as an env var), so the UI is the lever.
 
-Order (DNS + DHCP are down from step 2 until step 5):
+Order (DNS + DHCP are down from step 2 until step 4 finishes):
 
 1. On wintermute: `sudo mv /var/lib/rancher/k3s/server/manifests/traefik-config.yaml ~server/`
-2. `kubectl -n kube-system delete helmchartconfig traefik` (and `addon traefik-config` if it is still there);
-   wait for the svclb-traefik pod to come back without :53
+2. `kubectl -n kube-system delete helmchartconfig traefik` (and `addon traefik-config` if it is still there).
+   Wait until `kubectl -n kube-system get svc traefik` no longer lists port 53 and the svclb-traefik pod has
+   been recreated. Timeout 5 minutes, then roll back. Symptom if skipped: the new Pi-hole pod sits `Pending`
+   ("didn't have free ports"), because hostNetwork defaults each hostPort to its containerPort.
 3. `kubectl delete -f shims.yaml -f traefik-dns-routes.yaml`, plus the Services `pihole-dns-tcp`, `pihole-dns-udp`,
    `pihole-dns-headless`, `pihole-dhcp4`
 4. `kubectl replace` the Deployment from `pihole.yaml` (replace, not apply: apply would keep the old
    `rollingUpdate` block, which is invalid with `Recreate`), then `kubectl apply` the rest of the file
-5. Check: `dig @192.168.1.3`, `dig @<eno2 EUI-64 IPv6>`, FTL on `0.0.0.0:67`, a DHCP lease in
-   `pihole.log`, `http://pihole.meine2cent.home/admin`
 
-Rollback: put `traefik-config.yaml` back, `git checkout f55c1ab -- docs/wintermute/pihole`, `kubectl replace`
-the Deployment and `kubectl apply -f` all four files.
+Checks:
+
+- DNS v4: `dig @192.168.1.3 example.com`, plus a `*.meine2cent.home` name
+- DNS v6: `dig @<eno2 EUI-64 address, stable EUI-64 suffix> example.com`
+- No RA from Pi-hole: `rdisc6 enp7s0` on reason shows only the Speedport (`fe80::1`)
+- DHCP, actively: reconnect one device, then check `pihole.log` for its DHCPACK, and that the device got
+  `192.168.1.3` (not the secondary `.4` on `eno2`) as DNS server and gateway `.1`
+- Web: `http://pihole.meine2cent.home/admin` (502 means lighttpd is not on :8080)
+- Query log shows real client IPs instead of Traefik's
+
+Rollback, in this order (otherwise the relay and the proxy collide with the hostNetwork pod on :67/:53):
+
+1. Put `traefik-config.yaml` back into the manifests directory (k3s re-creates the HelmChartConfig)
+2. `git checkout f55c1ab -- docs/wintermute/pihole`
+3. `kubectl replace` the Deployment from `pihole.yaml` and wait until the hostNetwork pod has terminated
+4. `kubectl apply -f pihole.yaml -f traefik-dns-routes.yaml -f shims.yaml` (not `traefik-helmchartconfig.yaml`,
+   see above). The Services come back with new ClusterIPs while the ipv6-proxy ConfigMap still names the old
+   ones, so patch the Corefile's `forward` line; IPv6 DNS was already broken before the cutover anyway.
