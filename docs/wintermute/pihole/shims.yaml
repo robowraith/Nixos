@@ -1,0 +1,255 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  name: pihole-dhcp-relay
+  namespace: pihole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole-dhcp-relay
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pihole-dhcp-relay
+    spec:
+      containers:
+        - args:
+            - --dhcp-relay=192.168.1.3,10.42.0.20
+            - --no-daemon
+            - --port=0
+            - --log-facility=-
+            - --user=root
+          command:
+            - /bin/dnsmasq
+          image: alpine:latest
+          imagePullPolicy: Always
+          name: dhcrelay
+          resources:
+            limits:
+              cpu: 50m
+              memory: 32Mi
+            requests:
+              cpu: 10m
+              memory: 16Mi
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /bin/dnsmasq
+              name: bin
+              subPath: dnsmasq
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - apk add --no-cache dnsmasq && cp /usr/sbin/dnsmasq /mnt/dnsmasq
+          image: alpine:latest
+          imagePullPolicy: Always
+          name: install
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /mnt
+              name: bin
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - emptyDir: {}
+          name: bin
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  name: pihole-ipv6-proxy
+  namespace: pihole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole-ipv6-proxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        app: pihole-ipv6-proxy
+    spec:
+      containers:
+        - args:
+            - -conf
+            - /etc/coredns/Corefile
+          image: coredns/coredns:latest
+          imagePullPolicy: Always
+          name: coredns
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 50m
+              memory: 32Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/coredns
+              name: config
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: pihole-ipv6-dns-config
+          name: config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  name: pihole-ip-watcher
+  namespace: pihole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole-ip-watcher
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: pihole-ip-watcher
+    spec:
+      containers:
+        - command:
+            - sh
+            - -c
+            - |
+              LAST_IP=""
+              LAST_IPV6=""
+              while true; do
+                IP=$(kubectl get pod -n pihole -l app=pihole     -o jsonpath='{.items[?(@.status.phase=="Running")].status.podIP}' 2>/dev/null     | awk '{print $1}')
+
+                # Prefer stable EUI-64 IPv6 address (fffe at hex positions 23-26 in /proc/net/if_inet6)
+                IPV6_HEX=$(awk 'NF==6 && $4=="00" && $6!="lo" && substr($1,23,4)=="fffe" {print $1; exit}' /proc/net/if_inet6 2>/dev/null)
+                if [ -n "$IPV6_HEX" ]; then
+                  IPV6=$(printf '%x:%x:%x:%x:%x:%x:%x:%x'       "0x${IPV6_HEX:0:4}" "0x${IPV6_HEX:4:4}" "0x${IPV6_HEX:8:4}" "0x${IPV6_HEX:12:4}"       "0x${IPV6_HEX:16:4}" "0x${IPV6_HEX:20:4}" "0x${IPV6_HEX:24:4}" "0x${IPV6_HEX:28:4}")
+                else
+                  IPV6="$LAST_IPV6"
+                fi
+
+                if [ -n "$IP" ] && { [ "$IP" != "$LAST_IP" ] || { [ -n "$IPV6" ] && [ "$IPV6" != "$LAST_IPV6" ]; }; }; then
+                  echo "$(date): Config changed: pod IP ${LAST_IP:-none} -> $IP, IPv6 ${LAST_IPV6:-none} -> $IPV6"
+                  LAST_IP="$IP"
+                  LAST_IPV6="$IPV6"
+                  kubectl patch configmap pihole-ipv6-dns-config -n pihole --type=merge       -p "$(printf '{"data":{"Corefile":".:53 {\n    bind 192.168.1.3 %s\n    forward . %s\n    cache 30\n    errors\n    reload\n}\n"}}' "$IPV6" "$IP")"
+                  kubectl patch deployment pihole-dhcp-relay -n pihole --type=json       -p "$(printf '[{"op":"replace","path":"/spec/template/spec/containers/0/args/0","value":"--dhcp-relay=192.168.1.3,%s"}]' "$IP")"
+                  echo "$(date): Done."
+                fi
+                sleep 15
+              done
+          image: bitnami/kubectl:latest
+          imagePullPolicy: Always
+          name: watcher
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: pihole-ip-watcher
+      serviceAccountName: pihole-ip-watcher
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+data:
+  Corefile: |
+    .:53 {
+        bind 192.168.1.3 <wintermute-public-ipv6>
+        forward . 10.43.69.54 10.43.129.181
+        cache 30
+        errors
+        reload
+    }
+kind: ConfigMap
+metadata:
+  annotations: {}
+  name: pihole-ipv6-dns-config
+  namespace: pihole
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations: {}
+  name: pihole-ip-watcher
+  namespace: pihole
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations: {}
+  name: pihole-ip-watcher
+  namespace: pihole
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - patch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - get
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations: {}
+  name: pihole-ip-watcher
+  namespace: pihole
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pihole-ip-watcher
+subjects:
+  - kind: ServiceAccount
+    name: pihole-ip-watcher
+    namespace: pihole

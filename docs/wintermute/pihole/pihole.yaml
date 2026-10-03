@@ -1,0 +1,229 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  name: pihole-deployment
+  namespace: pihole
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        app: pihole
+    spec:
+      containers:
+        - env:
+            - name: TZ
+              value: Europe/Berlin
+            - name: WEBPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pihole-web-password
+                  key: WEBPASSWORD
+            - name: ServerIPv6
+              value: <wintermute-public-ipv6>
+            - name: DNSMASQ_LISTENING
+              value: all
+          image: pihole/pihole:2024.07.0
+          imagePullPolicy: Always
+          name: pihole
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 53
+              protocol: TCP
+            - containerPort: 67
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+                - SYS_NICE
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/pihole
+              name: pihole-config
+            - mountPath: /etc/dnsmasq.d
+              name: pihole-dnsmasq
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - hostPath:
+            path: /etc/pihole/config
+            type: Directory
+          name: pihole-config
+        - hostPath:
+            path: /etc/pihole/dnsmasq.d
+            type: Directory
+          name: pihole-dnsmasq
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app: pihole
+  name: pihole-web
+  namespace: pihole
+spec:
+  ports:
+    - name: pihole-http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: pihole
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: pihole-dns-tcp
+  namespace: pihole
+spec:
+  ports:
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: 53
+  selector:
+    app: pihole
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: pihole-dns-udp
+  namespace: pihole
+spec:
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: 53
+  selector:
+    app: pihole
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: pihole-dhcp4
+  namespace: pihole
+spec:
+  ports:
+    - name: dhcp4
+      port: 67
+      protocol: UDP
+      targetPort: 67
+  selector:
+    app: pihole
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: pihole-dns-headless
+  namespace: pihole
+spec:
+  clusterIP: None
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: 53
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: 53
+  selector:
+    app: pihole
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: traefik
+  labels:
+    app: pihole
+  name: pihole-ingress
+  namespace: pihole
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: pihole.meine2cent.home
+      http:
+        paths:
+          - backend:
+              service:
+                name: pihole-web
+                port:
+                  name: pihole-http
+            path: /admin
+            pathType: Prefix
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  annotations: {}
+  name: pihole-root
+  namespace: pihole
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`pihole.meine2cent.home`) && Path(`/`)
+      middlewares:
+        - name: pihole-redirect-to-admin
+      services:
+        - name: pihole-web
+          port: 80
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  name: pihole-admin
+  namespace: pihole
+spec:
+  addPrefix:
+    prefix: /admin
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  annotations: {}
+  name: pihole-redirect-to-admin
+  namespace: pihole
+spec:
+  redirectRegex:
+    permanent: false
+    regex: ^http://pihole\.meine2cent\.home/?$
+    replacement: http://pihole.meine2cent.home/admin/
