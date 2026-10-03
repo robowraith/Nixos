@@ -11,3 +11,10 @@ creation_rules:
     key_groups:
       - age:
           - *shared
+  # Kubernetes Secret manifests for wintermute's k3s cluster; only the
+  # payload is encrypted so the manifest stays readable and diffable.
+  - path_regex: secrets/wintermute-[^/]+\.yaml$
+    encrypted_regex: ^(data|stringData)$
+    key_groups:
+      - age:
+          - *shared

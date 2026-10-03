@@ -10,10 +10,7 @@ spec:
     matchLabels:
       app: pihole
   strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       annotations: {}
@@ -29,19 +26,23 @@ spec:
                 secretKeyRef:
                   name: pihole-web-password
                   key: WEBPASSWORD
-            - name: ServerIPv6
-              value: <wintermute-public-ipv6>
+            - name: INTERFACE
+              value: eno2
             - name: DNSMASQ_LISTENING
-              value: all
+              value: local
+            - name: WEB_PORT
+              value: "8080"
           image: pihole/pihole:2024.07.0
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: pihole
           ports:
-            - containerPort: 80
-              protocol: TCP
+            - containerPort: 53
+              protocol: UDP
             - containerPort: 53
               protocol: TCP
             - containerPort: 67
+              protocol: UDP
+            - containerPort: 8080
               protocol: TCP
           resources:
             limits:
@@ -63,7 +64,7 @@ spec:
               name: pihole-config
             - mountPath: /etc/dnsmasq.d
               name: pihole-dnsmasq
-      dnsPolicy: ClusterFirst
+      dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
@@ -77,6 +78,7 @@ spec:
             path: /etc/pihole/dnsmasq.d
             type: Directory
           name: pihole-dnsmasq
+      hostNetwork: true
 ---
 apiVersion: v1
 kind: Service
@@ -91,76 +93,7 @@ spec:
     - name: pihole-http
       port: 80
       protocol: TCP
-      targetPort: 80
-  selector:
-    app: pihole
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations: {}
-  name: pihole-dns-tcp
-  namespace: pihole
-spec:
-  ports:
-    - name: dns-tcp
-      port: 53
-      protocol: TCP
-      targetPort: 53
-  selector:
-    app: pihole
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations: {}
-  name: pihole-dns-udp
-  namespace: pihole
-spec:
-  ports:
-    - name: dns-udp
-      port: 53
-      protocol: UDP
-      targetPort: 53
-  selector:
-    app: pihole
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations: {}
-  name: pihole-dhcp4
-  namespace: pihole
-spec:
-  ports:
-    - name: dhcp4
-      port: 67
-      protocol: UDP
-      targetPort: 67
-  selector:
-    app: pihole
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations: {}
-  name: pihole-dns-headless
-  namespace: pihole
-spec:
-  clusterIP: None
-  ports:
-    - name: dns-udp
-      port: 53
-      protocol: UDP
-      targetPort: 53
-    - name: dns-tcp
-      port: 53
-      protocol: TCP
-      targetPort: 53
+      targetPort: 8080
   selector:
     app: pihole
   type: ClusterIP
