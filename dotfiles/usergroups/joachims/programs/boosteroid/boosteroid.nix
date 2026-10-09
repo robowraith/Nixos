@@ -8,7 +8,7 @@
   # which can't self-install into the read-only store. Bump hash to update.
   binTar = pkgs.fetchurl {
     url = "https://boosteroid.com/linux/installer/boosteroid.tar";
-    hash = "sha256-n7mt7YrHgjWyVWqoL9njXTbyaTKVBZOSH7/IkPVJRxY=";
+    hash = "sha256-fzFZI+u1wyj08+skpwRN1vIR7wr/4d4JYZ1s58PRcqw=";
     # Cloudflare 403s the default curl User-Agent; pretend to be a browser.
     curlOptsList = [
       "-A"
@@ -18,7 +18,7 @@
 
   boosteroid = pkgs.stdenv.mkDerivation rec {
     pname = "boosteroid";
-    version = "1.10.23";
+    version = "1.10.24";
 
     src = ./boosteroid-install-x64.deb;
 
