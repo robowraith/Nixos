@@ -30,7 +30,29 @@ kubectl --context wintermute apply -f docs/wintermute/pihole/pihole.yaml
 ```
 
 Anything that has to happen on wintermute itself (addon files, `/etc/pihole/config/setupVars.conf`) needs sudo
-there and is the user's job.
+there and is the user's job. On wintermute there is no `wintermute` context: use `sudo k3s kubectl`.
+
+## Root KSK-2024 trust anchor (2026-10)
+
+On 2026-10-11 the root zone switched its signing key from KSK-2017 (id 20326) to KSK-2024 (id 38696). The image
+(`pihole/pihole:2024.07.0`, Pi-hole v5) only ships the KSK-2017 anchor, so with DNSSEC enabled every lookup
+returned SERVFAIL with `EDE: 6 (DNSSEC Bogus)`. Restarting the pod does not help. Diagnosis: the same query
+with `dig +cd` (checking disabled) answers fine.
+
+Fix, on wintermute (`/etc/pihole/dnsmasq.d` is the hostPath behind the pod's `/etc/dnsmasq.d`; Pi-hole v5 does
+not touch `99-*` files):
+
+```bash
+echo 'trust-anchor=.,38696,8,2,683D2D0ACB8C9B712A1948B27F741219298D0A450D612C483AF444A4C0FB2B16' \
+  | sudo tee /etc/pihole/dnsmasq.d/99-root-ksk-2024.conf
+sudo k3s kubectl -n pihole exec deploy/pihole-deployment -- pihole restartdns
+```
+
+Checks: `dig @192.168.1.3 example.com` → NOERROR, `dig @192.168.1.3 dnssec-failed.org` → SERVFAIL (validation
+still on).
+
+**TODO:** upgrade to Pi-hole v6, which ships both anchors. The upgrade is a migration (config moves to
+`pihole.toml`, env vars renamed), not a tag bump. Drop `99-root-ksk-2024.conf` afterwards.
 
 ## hostNetwork cutover (2026-10)
 
