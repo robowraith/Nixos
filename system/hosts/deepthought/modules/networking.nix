@@ -13,6 +13,7 @@
     # Interface management is delegated to NetworkManager.
     # The dispatcher script below automatically disables WiFi when a wired
     # connection is active, and re-enables it when the wired connection drops.
+    # WiFi is re-enabled at boot too, see the NetworkManager preStart below.
 
     # Firewall
     firewall.allowedTCPPorts = [];
@@ -68,4 +69,17 @@
       192.168.56.130 loki.ac1.local prometheus.ac1.local alertmanager.ac1.local
     '';
   };
+
+  # The dispatcher's `radio wifi off` is persisted by NetworkManager and may
+  # also soft-block the kernel rfkill switch, which systemd-rfkill restores at
+  # boot. Booting without ethernet would then leave WiFi off, with no `down`
+  # event to turn it back on. Always start with WiFi enabled; the dispatcher
+  # disables it again once ethernet comes up.
+  systemd.services.NetworkManager.preStart = ''
+    state=/var/lib/NetworkManager/NetworkManager.state
+    if [ -f "$state" ]; then
+      ${pkgs.gnused}/bin/sed -i 's/^WirelessEnabled=false$/WirelessEnabled=true/' "$state"
+    fi
+    ${pkgs.util-linux}/bin/rfkill unblock wlan || true
+  '';
 }
