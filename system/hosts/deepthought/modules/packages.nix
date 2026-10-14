@@ -5,6 +5,5 @@
     xrandr
 
     slack
-    unstable.openspec
   ];
 }
