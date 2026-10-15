@@ -1,5 +1,4 @@
 {
-  pkgs,
   stateVersion,
   lib,
   ...
@@ -51,17 +50,6 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-  # TODO: electron-39 is EOL; remove once bitwarden-desktop migrates to a newer electron version
-  nixpkgs.config.permittedInsecurePackages = ["electron-39.8.10"];
-  # Enable Stylix
-  stylix = {
-    enable = true;
-    enableReleaseChecks = false;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
-    # The gtksourceview target overlays the package, changing the hash of
-    # everything that depends on it (e.g. inkscape) and forcing source builds.
-    targets.gtksourceview.enable = false;
-  };
 
   # Better "command not found"
   programs = {

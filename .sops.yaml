@@ -5,6 +5,9 @@
 
 keys:
   - &shared age175q4v69wa6ud8kygctpazx8nxgs9r598ecdeq0rprdlkk5qt23hshjn8v3
+  # Host identities derived from SSH host keys (ssh-to-age); such a host can
+  # only read its own secrets/<host>.yaml
+  - &dumont age1dqyypgmqqgmgezp4rgkf2dn9xt6yas2uwmdl9m6wagve00cc6ytqt5drns
 
 creation_rules:
   - path_regex: secrets/shared\.yaml$
@@ -17,4 +20,11 @@ creation_rules:
     encrypted_regex: ^(data|stringData)$
     key_groups:
       - age:
+          - *shared
+  # dumont (Pi-hole appliance): its own host key plus the shared key, so the
+  # operator can still edit the file from a desktop
+  - path_regex: secrets/dumont\.yaml$
+    key_groups:
+      - age:
+          - *dumont
           - *shared

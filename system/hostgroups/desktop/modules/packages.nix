@@ -21,5 +21,13 @@
     # DRM-Playback
     (chromium.override {enableWideVine = true;})
     (vivaldi.override {enableWidevine = true;})
+
+    # Fonts
+    nerd-fonts.fira-code
   ];
+
+  programs.dconf.enable = true;
+
+  # TODO: electron-39 is EOL; remove once bitwarden-desktop migrates to a newer electron version
+  nixpkgs.config.permittedInsecurePackages = ["electron-39.8.10"];
 }

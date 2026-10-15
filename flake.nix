@@ -51,6 +51,12 @@
 
     nix-flatpak.url = "github:gmodena/nix-flatpak";
 
+    # Declarative disk layouts, used by nixos-anywhere for first installs
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Do NOT add `inputs.nixpkgs.follows = "nixpkgs"` here – it would break the Cachix cache
     vicinae.url = "github:vicinaehq/vicinae";
   };
@@ -77,6 +83,8 @@
       username,
       platform ? "x86_64-linux",
       stateVersion ? "25.11",
+      # Headless hosts (servers, appliances) get no Home Manager profile
+      homeManager ? true,
     }: let
       specialArgs = {
         inherit inputs hostname username platform stateVersion;
@@ -84,55 +92,45 @@
     in
       nixpkgs.lib.nixosSystem {
         inherit specialArgs;
-        modules = [
-          {nixpkgs.hostPlatform = platform;}
-          # Core System Configuration
-          ./system/hosts/${hostname}
-          ./system/shared
+        modules =
+          [
+            {nixpkgs.hostPlatform = platform;}
+            # Core System Configuration
+            ./system/hosts/${hostname}
+            ./system/shared
 
-          # Modules
-          sops-nix.nixosModules.sops
-          stylix.nixosModules.stylix
-          nix-index-database.nixosModules.nix-index
-          home-manager.nixosModules.home-manager
-          nix-flatpak.nixosModules.nix-flatpak
+            # Modules
+            sops-nix.nixosModules.sops
+            stylix.nixosModules.stylix
+            nix-index-database.nixosModules.nix-index
+          ]
+          ++ nixpkgs.lib.optional homeManager home-manager.nixosModules.home-manager
+          ++ [
+            nix-flatpak.nixosModules.nix-flatpak
 
-          # Overlays
-          {
-            nixpkgs.overlays = [
-              (_final: prev: {
-                unstable = import nixpkgs-unstable {
-                  inherit (prev.stdenv.hostPlatform) system;
-                  config.allowUnfree = true;
-                };
-              })
-              (_final: prev: {
-                herbstluftwm = prev.herbstluftwm.overrideAttrs (oldAttrs: {
-                  postPatch =
-                    (oldAttrs.postPatch or "")
-                    + ''
-                      sed -i '15i #include <cstdint>' src/xconnection.cpp
-                    '';
-                  doCheck = false;
-                });
-                freac = prev.freac.overrideAttrs (oldAttrs: {
-                  nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [prev.makeWrapper];
-                  buildInputs =
-                    (oldAttrs.buildInputs or [])
-                    ++ [
-                      prev.lame
-                      prev.flac
-                      prev.faac
-                      prev.faad2
-                      prev.libvorbis
-                      prev.libopus
-                      prev.mpg123
-                    ];
-                  postFixup =
-                    (oldAttrs.postFixup or "")
-                    + ''
-                      wrapProgram $out/bin/freac \
-                        --prefix LD_LIBRARY_PATH : "${prev.lib.makeLibraryPath [
+            # Overlays
+            {
+              nixpkgs.overlays = [
+                (_final: prev: {
+                  unstable = import nixpkgs-unstable {
+                    inherit (prev.stdenv.hostPlatform) system;
+                    config.allowUnfree = true;
+                  };
+                })
+                (_final: prev: {
+                  herbstluftwm = prev.herbstluftwm.overrideAttrs (oldAttrs: {
+                    postPatch =
+                      (oldAttrs.postPatch or "")
+                      + ''
+                        sed -i '15i #include <cstdint>' src/xconnection.cpp
+                      '';
+                    doCheck = false;
+                  });
+                  freac = prev.freac.overrideAttrs (oldAttrs: {
+                    nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [prev.makeWrapper];
+                    buildInputs =
+                      (oldAttrs.buildInputs or [])
+                      ++ [
                         prev.lame
                         prev.flac
                         prev.faac
@@ -140,15 +138,28 @@
                         prev.libvorbis
                         prev.libopus
                         prev.mpg123
-                      ]}"
-                    '';
-                });
-              })
-            ];
-          }
-
+                      ];
+                    postFixup =
+                      (oldAttrs.postFixup or "")
+                      + ''
+                        wrapProgram $out/bin/freac \
+                          --prefix LD_LIBRARY_PATH : "${prev.lib.makeLibraryPath [
+                          prev.lame
+                          prev.flac
+                          prev.faac
+                          prev.faad2
+                          prev.libvorbis
+                          prev.libopus
+                          prev.mpg123
+                        ]}"
+                      '';
+                  });
+                })
+              ];
+            }
+          ]
           # Home Manager Configuration
-          {
+          ++ nixpkgs.lib.optional homeManager {
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
@@ -178,8 +189,7 @@
               ];
               users.${username} = import ./dotfiles/users/${username};
             };
-          }
-        ];
+          };
       };
   in {
     nixosConfigurations = {
@@ -206,6 +216,13 @@
       #   hostname = "neuromancer";
       #   username = "case";
       # };
+      # Pi-hole appliance (Dell Wyse 3040)
+      dumont = mkHost {
+        hostname = "dumont";
+        username = "yori";
+        stateVersion = "26.05";
+        homeManager = false;
+      };
 
       # You can add other hosts here using the helper
       # "42he-Infinitybook" = mkHost { hostname = "42he-Infinitybook"; username = "joachim"; };

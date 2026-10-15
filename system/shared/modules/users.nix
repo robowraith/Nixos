@@ -27,7 +27,8 @@
     group = username;
     isNormalUser = true;
     createHome = true;
-    extraGroups = ["networkmanager" "wheel" "video" "input" "audio" "docker" "cdrom" "dialout"];
+    # Desktop hosts add their groups in hostgroups/desktop/modules/users.nix
+    extraGroups = ["wheel"];
     shell = pkgs.fish;
     # This points to the decrypted file containing the hashed password.
     # sops-nix provides this path.

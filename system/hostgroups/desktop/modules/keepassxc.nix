@@ -15,6 +15,6 @@
       builtins.replaceStrings
       ["@KEESHARE_OWN_KEY@"]
       [config.sops.placeholder.keepassxc_keeshare_own]
-      (builtins.readFile ../../../dotfiles/shared/programs/keepassxc/keepassxc.ini);
+      (builtins.readFile ../../../../dotfiles/shared/programs/keepassxc/keepassxc.ini);
   };
 }

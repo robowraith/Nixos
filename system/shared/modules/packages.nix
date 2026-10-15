@@ -14,16 +14,10 @@
     tldr
     wget
 
-    # Fonts
-    nerd-fonts.fira-code
-
     # Secrets management
     age
     sops
   ];
 
-  programs = {
-    fish.enable = true;
-    dconf.enable = true;
-  };
+  programs.fish.enable = true;
 }

@@ -1,0 +1,4 @@
+# Domains Pi-hole must never block, one per line (loaded via file:// into
+# gravity as an allow list). The list is only added to gravity while this
+# file has at least one domain.
+# TODO(task 4.2): add the two allowlist entries from wintermute's gravity.db

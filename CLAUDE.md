@@ -81,10 +81,12 @@ Each level's `default.nix` auto-discovers and imports all `.nix` files in its `m
 
 `flake.nix` defines a `mkHost` function that wires together:
 - `system/hosts/<hostname>` + `system/shared` for NixOS config
-- `dotfiles/users/<username>` for Home Manager config (via `home-manager.nixosModules`)
+- `dotfiles/users/<username>` for Home Manager config (via `home-manager.nixosModules`), unless the host
+  passes `homeManager = false` (headless hosts get no Home Manager at all)
 - All external modules: `sops-nix`, `stylix`, `nix-index-database`, `home-manager`, `vicinae`
+- `stateVersion` is per host (`mkHost` default `"25.11"`); new hosts pass their install release
 
-Active hosts: `reason` (user: `joachim`, desktop), `deepthought` (user: `jhoss`, work laptop).
+Active hosts: `reason` (user: `joachim`, desktop), `deepthought` (user: `jhoss`, work laptop), `dumont` (user: `yori`, headless Pi-hole appliance, Dell Wyse 3040; no Home Manager, per-host sops key, deployed remotely from a desktop).
 
 `specialArgs`/`extraSpecialArgs` pass `{inputs, hostname, username, platform, stateVersion}` through all layers.
 
@@ -93,7 +95,14 @@ Active hosts: `reason` (user: `joachim`, desktop), `deepthought` (user: `jhoss`,
 - **`_uninstalled/`**: Programs kept in git but not currently active. Place program folders here to disable without losing config.
 - **Auto-discovery**: Host `default.nix` files use `builtins.readDir` to import all `.nix` files in `./modules/` automatically — no manual import list needed.
 - **Secrets**: SOPS with age encryption. Rules defined in `.sops.yaml`. Per-host secrets go in `secrets/<hostname>.yaml`.
-- **Hostgroups**: `system/hostgroups/` groups machines by shared traits (e.g., `desktop`, `home`, `mine`). A host opts in by importing the group in its `default.nix`.
+  Desktops decrypt `secrets/shared.yaml` with the shared age key. A host that sets `fleet.sops.perHostKey = true`
+  instead decrypts only `secrets/<hostname>.yaml` with an age identity derived from its SSH host key, and must never
+  receive the shared key.
+- **Shared vs. hostgroups**: `system/shared` holds only what every machine needs (nix settings/GC, sops, ssh, users,
+  locale, base CLI tools, firewall). Anything graphical or desktop-only (Docker, the desktop kernel (currently Zen) + scx, Plymouth,
+  Stylix, fonts, dconf, desktop user groups, the KeePassXC/KeeShare sops template) lives in `system/hostgroups/desktop`. Don't add desktop settings to
+  `shared`: they would land on servers.
+- **Hostgroups**: `system/hostgroups/` groups machines by shared traits (e.g., `desktop`, `home`, `mine`, `server`). `server` is the headless counterpart of `desktop`: systemd-networkd, no docs or nix-index, zram, small-disk GC/journald limits, no flake registry pin. Servers must not import `home` (NetworkManager + CIFS mounts). A host opts in by importing the group in its `default.nix`.
 - **Usergroups**: `dotfiles/usergroups/` groups users similarly (currently `joachims` for both `joachim` and `jhoss`).
 - **Overlays**: Defined inline in `flake.nix` (currently: `unstable` namespace, herbstluftwm patch, freac codec fix).
 - **Theming**: Stylix handles system-wide theming for both NixOS and Home Manager.
@@ -126,6 +135,6 @@ No manual import registration needed — the `default.nix` collector picks up `.
 
 - **Build errors**: Run `nix flake check` first; add `--show-trace` to any Nix command for a full evaluation trace.
 - **Import errors**: Check that new files are tracked with `git add`.
-- **Secrets**: Verify age key exists at `/var/lib/sops/age/keys.txt` and that `.sops.yaml` includes the host's public key.
+- **Secrets**: Verify age key exists at `/var/lib/sops/age/keys.txt` (per-host-key hosts: `/etc/ssh/ssh_host_ed25519_key`) and that `.sops.yaml` includes the host's public key.
 - **Rollback**: Use the boot menu, or `sudo nixos-rebuild switch --rollback`.
 - **Logs**: `journalctl -xe` for service failures.
