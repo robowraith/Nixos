@@ -195,6 +195,9 @@ hc keybind XF86AudioLowerVolume spawn pactl set-sink-volume @DEFAULT_SINK@ -10%
 hc keybind XF86AudioMute spawn pactl set-sink-mute @DEFAULT_SINK@ toggle
 hc keybind XF86AudioMicMute spawn pactl set-source-mute @DEFAULT_SOURCE@ toggle
 
+# Toggle sound card between Analog Stereo Duplex and HDMI output + analog input
+hc keybind $Mod+Shift+a spawn ~/.config/herbstluftwm/bin/toggle_audio_profile.fish
+
 # Media player controls
 hc keybind XF86AudioPlay spawn playerctl play-pause
 hc keybind XF86AudioPause spawn playerctl play-pause
