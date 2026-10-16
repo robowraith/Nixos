@@ -12,7 +12,10 @@
     };
 
     # Kernel
-    kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto;
+    # Zen instead of CachyOS: xddxdd's nix-cachyos-kernel servers and binary
+    # cache were compromised (2026-10). Revisit once they are rebuilt, or
+    # once wintermute runs NixOS and can build the CachyOS kernel locally.
+    kernelPackages = pkgs.linuxPackages_zen;
     kernelParams = [
       "quiet"
       "splash"

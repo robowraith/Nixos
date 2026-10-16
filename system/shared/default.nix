@@ -29,11 +29,9 @@
       # flake-added substituters stay trusted.
       substituters = [
         "https://cache.nixos.org/"
-        "https://attic.xuyh0120.win/lantian"
         "https://vicinae.cachix.org"
       ];
       trusted-public-keys = [
-        "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
         # cache.garnix.io was dropped from `substituters` above: no flake input
         # declares it, and it served HTTP 502 for every query. Key kept so
         # re-adding the substituter stays a one-line change.

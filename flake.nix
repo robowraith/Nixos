@@ -4,10 +4,9 @@
   # Applied when evaluating the flake (i.e. during `nh os switch`),
   # so vicinae can be fetched from cache instead of built from source.
   nixConfig = {
-    extra-substituters = ["https://vicinae.cachix.org" "https://attic.xuyh0120.win/lantian"];
+    extra-substituters = ["https://vicinae.cachix.org"];
     extra-trusted-public-keys = [
       "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
-      "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
     ];
   };
 
@@ -23,10 +22,6 @@
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nix-cachyos-kernel = {
-      url = "github:xddxdd/nix-cachyos-kernel/release";
     };
 
     stylix = {
@@ -66,7 +61,6 @@
     nixpkgs-unstable,
     home-manager,
     sops-nix,
-    nix-cachyos-kernel,
     nix-flatpak,
     stylix,
     nix-index-database,
@@ -106,7 +100,6 @@
           # Overlays
           {
             nixpkgs.overlays = [
-              nix-cachyos-kernel.overlays.pinned
               (_final: prev: {
                 unstable = import nixpkgs-unstable {
                   inherit (prev.stdenv.hostPlatform) system;

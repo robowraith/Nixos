@@ -95,7 +95,7 @@ Active hosts: `reason` (user: `joachim`, desktop), `deepthought` (user: `jhoss`,
 - **Secrets**: SOPS with age encryption. Rules defined in `.sops.yaml`. Per-host secrets go in `secrets/<hostname>.yaml`.
 - **Hostgroups**: `system/hostgroups/` groups machines by shared traits (e.g., `desktop`, `home`, `mine`). A host opts in by importing the group in its `default.nix`.
 - **Usergroups**: `dotfiles/usergroups/` groups users similarly (currently `joachims` for both `joachim` and `jhoss`).
-- **Overlays**: Defined inline in `flake.nix` (currently: CachyOS kernel pin, `unstable` namespace, herbstluftwm patch, freac codec fix).
+- **Overlays**: Defined inline in `flake.nix` (currently: `unstable` namespace, herbstluftwm patch, freac codec fix).
 - **Theming**: Stylix handles system-wide theming for both NixOS and Home Manager.
 - **Flake inputs**: `nixpkgs` tracks `nixos-26.05`. A second input, `nixpkgs-unstable`, tracks `nixos-unstable` and is exposed via overlay as `pkgs.unstable.<package>` (allowUnfree enabled) for packages that need to be newer than the release channel. Do NOT add `inputs.nixpkgs.follows` to `vicinae` (breaks Cachix cache).
 - **Git tracking**: All files must be tracked in git for flakes to evaluate correctly. Run `git add` on new files before rebuilding.
