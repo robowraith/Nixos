@@ -19,7 +19,7 @@ migration.
   v5 container image. Settings, blocklists and the allowlist are declarative. The device inventory (DHCP reservations
   with MACs, local DNS records) is kept in sops so it stays out of this public repo. The web UI is no longer a way
   to change configuration.
-- **Flake refactor:** `system/shared` is reduced to what every machine needs. Docker, the CachyOS kernel/scx,
+- **Flake refactor:** `system/shared` is reduced to what every machine needs. Docker, the desktop kernel (CachyOS, Zen since `2e303f8`)/scx,
   Plymouth, Stylix and fonts move into the desktop layer, and a new `server` hostgroup is added. `mkHost` can build a
   host without Home Manager and with a per-host `stateVersion`. reason and deepthought **must not change** as a
   result.

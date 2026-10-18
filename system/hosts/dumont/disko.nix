@@ -1,6 +1,6 @@
 _: {
   # ============================================================================
-  # Disk layout: Dell Wyse 3040, 8 GB eMMC
+  # Disk layout: Dell Wyse 3040, eMMC
   # ============================================================================
   # GPT with an EFI system partition and ext4 on the rest. No swap partition
   # (zram from hostgroups/server). Applied by nixos-anywhere at install time;
@@ -8,8 +8,8 @@ _: {
 
   disko.devices.disk.main = {
     type = "disk";
-    # TODO(verify on hardware): the 3040's eMMC is expected to be mmcblk0
-    device = "/dev/mmcblk0";
+    # Verified on the installer: eMMC enumerates as mmcblk1 (14.7 GB); the by-path link is stable
+    device = "/dev/disk/by-path/platform-80860F14:00";
     content = {
       type = "gpt";
       partitions = {

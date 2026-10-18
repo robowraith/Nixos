@@ -6,25 +6,25 @@ command or steps and waits for the result. Everything else is repo work plus rea
 
 ## 1. Baseline for the shared split
 
-- [ ] 1.1 Record `nix eval --raw .#nixosConfigurations.{reason,deepthought}.config.system.build.toplevel.drvPath` into
+- [x] 1.1 Record `nix eval --raw .#nixosConfigurations.{reason,deepthought}.config.system.build.toplevel.drvPath` into
   the change directory (`baseline-drvpaths.txt`), and verify that both evaluate on a clean tree.
 
 ## 2. Split `system/shared` and extend `mkHost`
 
-- [ ] 2.1 Move Docker, the CachyOS kernel + `scx`, Plymouth/quiet boot, Stylix enablement/theme, nerd-fonts,
+- [x] 2.1 Move Docker, the desktop kernel (CachyOS, Zen since `2e303f8`) + `scx`, Plymouth/quiet boot, Stylix enablement/theme, nerd-fonts,
   `programs.dconf`, `permittedInsecurePackages` and the desktop user groups from `system/shared` into
   `system/hostgroups/desktop`. Verify that reason's and deepthought's drvPaths match `baseline-drvpaths.txt`. If they
   don't, explain the diff with `nix-diff` in design.md (D2) and show it has no package or service effect.
-- [ ] 2.2 Add `homeManager ? true` and per-host `stateVersion` handling to `mkHost`. Verify that both desktop
+- [x] 2.2 Add `homeManager ? true` and per-host `stateVersion` handling to `mkHost`. Verify that both desktop
   drvPaths are still unchanged and that `nix flake check` passes.
-- [ ] 2.3 Make `system/shared/modules/sops.nix` support a per-host key option (D4) without changing the default.
+- [x] 2.3 Make `system/shared/modules/sops.nix` support a per-host key option (D4) without changing the default.
   Verify that the desktop drvPaths are unchanged.
-- [ ] 2.4 Update CLAUDE.md's Architecture section (shared vs. desktop vs. server, `homeManager` flag, per-host sops),
+- [x] 2.4 Update CLAUDE.md's Architecture section (shared vs. desktop vs. server, `homeManager` flag, per-host sops),
   and verify that it matches the code.
 
 ## 3. `server` hostgroup and dumont host skeleton
 
-- [ ] 3.1 Create `system/hostgroups/server` with:
+- [x] 3.1 Create `system/hostgroups/server` with:
   - systemd-networkd
   - the LTS kernel
   - documentation off
@@ -34,7 +34,7 @@ command or steps and waits for the result. Everything else is repo work plus rea
   - `configurationLimit = 5`
 
   Verify by evaluating a throwaway host that imports it.
-- [ ] 3.2 Create `system/hosts/dumont/` with:
+- [x] 3.2 Create `system/hosts/dumont/` with:
   - the disko layout (ESP ~512 MB + ext4)
   - a `hardware-configuration.nix` placeholder generated for the Wyse 3040 (Atom/eMMC modules: `sdhci_acpi`,
     `mmc_block`, `xhci_pci`, `usb_storage`)
@@ -43,17 +43,16 @@ command or steps and waits for the result. Everything else is repo work plus rea
 
   Add the disko input to the flake, and register `dumont = mkHost {hostname = "dumont"; username = "yori";
   homeManager = false; stateVersion = "26.05";}`. Verify that `nix build .#nixosConfigurations.dumont.config.system.build.toplevel`
-  succeeds on reason.
-- [ ] 3.3 Verify the closure against host-profiles: `nix path-info -r` on dumont's toplevel contains no docker, no
-  home-manager generation, no Xorg/Wayland session and no CachyOS kernel. Record the closure size in design.md.
+  succeeds on reason. Until the secrets exist (4.x), verify with `sops.validateSopsFiles = false` via `extendModules`. The full build, including the sops manifest, is part of 4.3.
+- [x] 3.3 Verify the closure against host-profiles: `nix path-info -r` on dumont's toplevel contains no docker, no
+  home-manager generation, no Xorg/Wayland session and no desktop kernel. Record the closure size in design.md.
 
 ## 4. Per-host secrets for dumont
 
-- [ ] 4.1 Generate dumont's ed25519 host key on reason in the scratchpad, never in the repo tree. Derive its age
+- [x] 4.1 Generate dumont's ed25519 host key on reason in the scratchpad, never in the repo tree. Derive its age
   recipient with `ssh-to-age`, and add a `secrets/dumont\.yaml$` creation rule to `.sops.yaml` with dumont's and the
   shared recipients. Verify with `sops updatekeys --help` that the rule matches.
-- [ ] 4.2 **(user)** Create `secrets/dumont.yaml` with:
-  - the host private key
+- [x] 4.2 **(user)** Complete `secrets/dumont.yaml` (the assistant already encrypted the host private key into it during 4.1, so the key never passed through a terminal; verified that dumont's identity decrypts it and is refused on `shared.yaml`) by adding:
   - `users_yori_password_hash` (`mkpasswd -m yescrypt`)
   - the Pi-hole web password
   - the inventory (reservations as MAC/IP/name, and local records)
@@ -61,21 +60,21 @@ command or steps and waits for the result. Everything else is repo work plus rea
   The inventory is taken from wintermute's `04-pihole-static-dhcp.conf` and `custom.list`, deduplicated (e.g. the
   `sv08` A record that exists twice). Verify that `sops -d` works on reason, and that `git grep -E '([0-9a-f]{2}:){5}'`
   finds nothing new.
-- [ ] 4.3 Wire dumont to the per-host sops option and `users_yori_password_hash`. Verify that dumont's toplevel builds,
+- [x] 4.3 Wire dumont to the per-host sops option and `users_yori_password_hash`. Verify that dumont's toplevel builds,
   and that `secrets/shared.yaml` is not referenced by dumont's config (`nix eval` of `sops.defaultSopsFile`).
 
 ## 5. Pi-hole v6 configuration
 
-- [ ] 5.1 Look up the v6 `pihole.toml` keys for: interface, listening mode, upstreams, DNSSEC, domain, DHCP
+- [x] 5.1 Look up the v6 `pihole.toml` keys for: interface, listening mode, upstreams, DNSSEC, domain, DHCP
   range/router/lease time, authoritative mode, IPv6 DHCP/RA off and `database.maxDBdays`. Record the chosen keys in
   design.md (D7 / Open Questions).
-- [ ] 5.2 Configure `services.pihole-ftl` and `services.pihole-web` (port 80) with `dhcp.active = false`, and set
+- [x] 5.2 Configure `services.pihole-ftl` and `services.pihole-web` (port 80) with `dhcp.active = false`, and set
   `lists`: StevenBlack + HaGeZi Multi PRO, plus the allowlist file. Verify the build, and that the rendered
   `pihole.toml` in the store contains no MACs or passwords.
-- [ ] 5.3 Add the sops template `pihole-inventory.conf` (owner `pihole`, `restartUnits`) loaded via `conf-file=` in
+- [x] 5.3 Add the sops template `pihole-inventory.conf` (owner `pihole`, `restartUnits`) loaded via `conf-file=` in
   `misc.dnsmasq_lines`. Fallback: `/etc/dnsmasq.d` with `misc.etc_dnsmasq_d`. Verify the build. Behaviour is verified
   in 7.2.
-- [ ] 5.4 Provide the web password through an `EnvironmentFile` from sops (`FTLCONF_webserver_api_password`), and
+- [x] 5.4 Provide the web password through an `EnvironmentFile` from sops (`FTLCONF_webserver_api_password`), and
   verify the build. Login is verified in 7.2.
 
 ## 6. Guarded deploy command
@@ -89,7 +88,7 @@ command or steps and waits for the result. Everything else is repo work plus rea
 
 ## 7. Install and trial run (phases 1–2)
 
-- [ ] 7.1 Write `docs/runbooks/dumont-install.md`:
+- [x] 7.1 Write `docs/runbooks/dumont-install.md`:
   - BIOS settings / USB boot on the 3040
   - booting the minimal ISO and enabling SSH
   - the `nixos-anywhere --flake .#dumont --extra-files <dir> root@<installer-ip>` command, with how to stage the host

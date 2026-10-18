@@ -6,7 +6,7 @@ See proposal.md for the motivation. Constraints that shape the approach:
 
 - **Hardware:** Dell Wyse 3040: Atom x5-Z8350 (x86_64), 2 GB RAM, 8 GB eMMC, one wired NIC, UEFI, no BMC.
   Evaluating the flake on the box is impractical, and storage is the tightest resource.
-- **Flake today:** `mkHost` always imports `system/shared` (Docker, CachyOS LTO kernel + `scx`, Plymouth, Stylix,
+- **Flake today:** `mkHost` always imports `system/shared` (Docker, the CachyOS LTO kernel (Zen since `2e303f8`, 2026-10-16) + `scx`, Plymouth, Stylix,
   nerd-fonts) and wires Home Manager with the user's full dotfiles. `stateVersion` defaults to `"25.11"`.
   `system/shared/modules/sops.nix` hardcodes `secrets/shared.yaml` and the shared age key file. `users.nix` adds
   desktop groups (`docker`, `networkmanager`, `audio`, …).
@@ -55,7 +55,7 @@ See proposal.md for the motivation. Constraints that shape the approach:
 ### D2 — Split `system/shared`; add a `server` hostgroup; Home Manager optional
 - **`system/shared` keeps:** nix settings + GC, nix-index, sops, ssh, users (base groups only), localization, the
   base CLI packages, firewall.
-- **Moved to `system/hostgroups/desktop`:** Docker, `boot.nix`'s Plymouth/quiet-boot/CachyOS kernel, `scx`, Stylix
+- **Moved to `system/hostgroups/desktop`:** Docker, `boot.nix`'s Plymouth/quiet-boot/desktop kernel (Zen), `scx`, Stylix
   enablement and theme, nerd-fonts, `programs.dconf`, the electron `permittedInsecurePackages`, and the desktop user
   groups (appended via list merge in the desktop group).
 - **`mkHost` gains:**
@@ -72,6 +72,30 @@ See proposal.md for the motivation. Constraints that shape the approach:
   `nix-diff`/`nvd` to have no package or service effect, and written into this design.
 - **Alternative:** `mkForce`-overrides on dumont only. Rejected: every new desktop setting in `shared` would leak onto
   servers by default.
+- **Recorded result (task 2.1, 2026-10-15):** the drvPaths changed for both desktops. Cause: moving `docker-compose`
+  and `nerd-fonts.fira-code` from `shared` into `desktop` changes the order of `environment.systemPackages`. That
+  re-hashes `system-path` and its 15 dependants (`etc`, `dbus-1`, `man-paths`, `system-units`, `user-units`, the
+  polkit/dbus-broker/mandb units, fish completions, `activate`, toplevel). Evidence:
+  - **reason, built both toplevels:** `nvd diff` reports "No version or selection state changes", 3241 → 3241
+    paths. The `sw` and `etc` trees are entry-for-entry identical apart from those self-hashes, and `system-path`'s
+    references are identical.
+  - **deepthought, derivation level:** the same 16 derivations change. `system-path`'s input references are
+    identical (same set), and its derivation differs only in its own output path.
+  - **`extraGroups`:** the `wheel` + desktop groups split re-hashed nothing.
+
+  New baseline after 2.1: reason `7c5vhsjibvql5vn7pw75jmlg9g8xf569`, deepthought `zmnydrjmpg9bbwi27rb5pa1iq94l2pgm`.
+  Tasks 2.2 and 2.3 must keep these identical.
+- **Rebase onto `2e303f8` (2026-10-18):** `origin/main` switched the desktop kernel from CachyOS to Zen (xddxdd's
+  cache compromise) in `shared/boot.nix`. The rebase moved that Zen kernel, with its comment, into
+  `hostgroups/desktop/modules/boot.nix`. Re-verified against the new `origin/main` (`c04a34f`): for both desktops the
+  same 16 derivations change, `system-path`'s input set is identical, and the kernel is not among the changed
+  derivations, so the result is the same package-order-only difference as above. dumont still builds (LTS 6.18,
+  1.5 GiB) and `nix flake check` passes. The pushed result is `f90a5d3`. New baseline (the post-rebase entries in
+  `baseline-drvpaths.txt`): reason `vvavhvrhv42k0gd3lj028xxpv4as7mby`, deepthought `cjrjvw2sjfqm4528zczrwdmd46hi6yny`.
+  - **Operational note:** reason's *running* `nix.conf` still lists `attic.xuyh0120.win`, which now resolves to a
+    black-hole address, so nix hangs in SYN-SENT. Until reason is rebuilt, pass
+    `--option substituters "https://cache.nixos.org/ https://vicinae.cachix.org" --option connect-timeout 5` to nix
+    commands there.
 
 ### D3 — Install with nixos-anywhere + disko against the live installer
 - Boot the NixOS minimal ISO from USB (monitor and keyboard needed once), then run `nixos-anywhere --flake .#dumont`
@@ -164,7 +188,17 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
 - `zramSwap.enable = true`.
 - journald `SystemMaxUse=200M`.
 - Pi-hole query-log retention capped through FTL settings (`database.maxDBdays`).
-- Stock `linuxPackages` (LTS) rather than CachyOS, to stay on the binary cache.
+- Stock `linuxPackages` (LTS) rather than the desktop kernel (CachyOS, now Zen), to stay on the default binary cache.
+- **Added during task 3.3 (2026-10-15):** the first build was 2.5 GiB. 809 MiB of that was `linux-firmware` (from
+  `enableRedistributableFirmware`) and 197 MiB was the nixpkgs source pinned by the flake registry/NIX_PATH.
+  - dumont now ships only `rtl_nic` + `i915` firmware (9.8 MiB). Verify on the hardware with `dmesg` on the
+    installer.
+  - The server group sets `nixpkgs.flake.setFlakeRegistry/setNixPath = false`.
+
+  Result: **1.5 GiB closure, 693 paths (was 703)**, with no docker, home-manager, X/Wayland, CachyOS, Plymouth,
+  Stylix, fonts, pipewire, mesa, GTK/Qt or nix-index. The largest remaining items are kernel modules (144 MiB),
+  helix grammars (185 MiB, from the shared CLI tools) and Python (128 MiB, needed by `nixos-rebuild` for local
+  rollback). Kernel: linux 6.18 (NixOS default).
 
 ### D10 — Boot on the Wyse firmware
 - systemd-boot, which also installs the removable fallback `EFI/BOOT/BOOTX64.EFI`. The 3040 firmware is reported to
@@ -172,6 +206,26 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
   misbehave.
 - The BIOS setup password on ex-fleet units is often Dell's default, which may be needed to enable USB boot. Verify on
   the unit, and record whatever is needed in the install runbook, not in the repo.
+
+- **Resolved during tasks 5.1–5.4 (2026-10-15)**, from FTL 6.7.1's source (`src/config/dnsmasq_config.c`,
+  `env.c`) and the 26.05 module:
+  - **Keys used:** `dns.upstreams`, `dns.dnssec`, `dns.listeningMode = "LOCAL"`, `dns.domain.{name,local}`,
+    `dns.expandHosts`/`domainNeeded`/`bogusPriv`, `dhcp.{active,start,end,router,netmask,leaseTime,ipv6}`,
+    `database.maxDBdays`, `misc.{readOnly,dnsmasq_lines}`.
+  - **No separate authoritative key:** `dhcp.active = true` writes `dhcp-authoritative` itself.
+  - **No RA:** `dhcp.ipv6 = false` writes no `ra-*` range, so no Router Advertisements.
+  - **DNS option:** without `dhcp.multiDNS`, dnsmasq hands out its own interface address (`.2`).
+  - **`misc.dnsmasq_lines`** is copied verbatim into the generated config, so `conf-file=` works. The
+    `/etc/dnsmasq.d` fallback isn't needed.
+  - **Inventory:** a plain `sops.secrets.pihole_inventory` (raw dnsmasq lines, owner `pihole`, `restartUnits`) instead
+    of a template. There's nothing to interpolate, so a template would add nothing.
+  - **Web password:** `FTLCONF_*` env vars are applied at startup. `misc.readOnly` only blocks the API/CLI and
+    writing the TOML, so `FTLCONF_webserver_api_password` from a sops-rendered `EnvironmentFile` works.
+  - **`file://` lists:** supported by `gravity.sh` 6.4.2.
+  - **Known limitation:** the module's `pihole-ftl-setup` only *adds* lists via the API. Removing a list from
+    `services.pihole-ftl.lists` leaves it in `gravity.db`, so it has to be deleted in the UI or with `pihole` too.
+    Changed URLs count as a removal plus an addition.
+  - **Upstreams are a placeholder:** Quad9 (v4 + v6). Compare with wintermute's `PIHOLE_DNS_*` in task 8.1.
 
 ## Risks / Trade-offs
 

@@ -9,7 +9,7 @@ their full environment, and limits which secrets each host can decrypt.
 
 ### Requirement: Server hosts are minimal
 A host in the `server` hostgroup SHALL NOT include a desktop session, Docker, Home Manager, Stylix theming,
-Plymouth, fonts for graphical use, or the CachyOS kernel. It SHALL include SSH, sops, Nix garbage collection and the
+Plymouth, fonts for graphical use, or the desktop kernel (CachyOS, currently Zen). It SHALL include SSH, sops, Nix garbage collection and the
 shared base CLI tools.
 
 #### Scenario: Inspecting dumont's system

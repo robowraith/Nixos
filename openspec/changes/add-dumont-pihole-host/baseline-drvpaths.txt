@@ -1,0 +1,9 @@
+# Desktop toplevel drvPaths before the system/shared split (base commit d723d8b)
+reason /nix/store/aj6l1zngj8v9sm8bmy2758wwzx0s02js-nixos-system-reason-26.05.20261012.7993f34.drv
+deepthought /nix/store/s1nrzq30ywsqvq5mnniyc78s5z5259vn-nixos-system-deepthought-26.05.20261012.7993f34.drv
+# After task 2.1 (shared split; package-order-only change, see design.md D2). Tasks 2.2/2.3 compare against these.
+reason /nix/store/7c5vhsjibvql5vn7pw75jmlg9g8xf569-nixos-system-reason-26.05.20261012.7993f34.drv
+deepthought /nix/store/zmnydrjmpg9bbwi27rb5pa1iq94l2pgm-nixos-system-deepthought-26.05.20261012.7993f34.drv
+# After rebasing the split onto origin/main c04a34f (Zen kernel, 2026-10-18; package-order-only vs. c04a34f, see design.md D2). Current baseline.
+reason /nix/store/vvavhvrhv42k0gd3lj028xxpv4as7mby-nixos-system-reason-26.05.20261012.7993f34.drv
+deepthought /nix/store/cjrjvw2sjfqm4528zczrwdmd46hi6yny-nixos-system-deepthought-26.05.20261012.7993f34.drv
