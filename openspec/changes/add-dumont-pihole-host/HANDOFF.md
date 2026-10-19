@@ -21,10 +21,18 @@ then `/opsx:apply add-dumont-pihole-host`. No files outside git are needed any m
   unstable's setup script (TODO 26.11), setup `RemainAfterExit`, `--no-check-sigs` + `@wheel` trusted, DNS check
   needs a real address. eMMC flips mmcblk0/1 -> disko by-path. Remote shell is fish (wrap in `sh -c`).
 
+- **Dead CMOS battery (2026-10-19):** every cold boot starts in 2018 -> DNSSEC fails -> all DNS SERVFAIL until NTP
+  syncs. Fixed by NTP via PTB IPs (`networking.nix`). If ever stuck: set the clock from a desktop,
+  `ssh -t yori@192.168.1.2 sudo date -s @(date +%s)` (fish; NOT inside a dumont shell, there `date` is 2018). A deploy
+  while dumont's DNS is down fails (substituters unresolvable, daemon disconnects), so fix the clock first.
+  Replacement: CR2032 with 2-pin 1.0 mm lead (same as HP EliteBook CMOS battery); check polarity against the old one.
+  Case opens by clips from the rear corner slot by the power socket; battery taped at the board's upper left.
+  Sources: Dell 3040 manual (coin battery removal), parkytowers.me.uk/thin/wyse/3040/, mcgarrah.org.
+
 **Next:**
 1. **7.4 (user) trial run:** reason/deepthought DNS -> `192.168.1.2` in NetworkManager for a few days; note IPv6
    differences in design.md Risks.
-2. **BIOS (user, needs screen+keyboard once):** AC Recovery -> Power On, so a power cut does not leave the LAN without
+2. **Hardware (user):** replace CMOS battery; verify a cold boot self-corrects the clock. BIOS: AC Recovery -> Power On, so a power cut does not leave the LAN without
    DNS/DHCP. Headless boot not yet observed.
 3. **8.2–8.4 (user) cutover** per `docs/runbooks/dumont-cutover.md` (8.1 + 8.5 done).
 4. **9.x cleanup** after ~2 weeks stable.
