@@ -28,6 +28,12 @@ _: {
               Port          6543
               Hostname      192.168.1.3
 
+      # Pi-hole appliance; by IP so it works while LAN DNS is down
+      Host  dumont
+              User          yori
+              Port          22
+              Hostname      192.168.1.2
+
       Host  vdr vdr_zellij
               User          joachim
               Port          22
