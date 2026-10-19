@@ -124,6 +124,11 @@ in {
       # only signals FTL on the very first run (empty database). Gravity swaps in
       # a new gravity.db and FTL keeps serving the old one until SIGRTMIN, so
       # blocking stayed off after install. Same user as FTL, so kill is allowed.
+      # Stay "active (exited)" after a successful run. switch-to-configuration
+      # only restarts changed units that are active, so without this a deploy
+      # that changes the lists never re-runs the setup.
+      serviceConfig.RemainAfterExit = true;
+
       serviceConfig.ExecStartPost = pkgs.writeShellScript "pihole-reload-lists" ''
         ${lib.getExe' pkgs.procps "kill"} -s SIGRTMIN \
           "$(${lib.getExe' config.systemd.package "systemctl"} show --property MainPID --value pihole-ftl.service)"
