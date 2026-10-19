@@ -2,6 +2,10 @@
 # gravity as an allow list). The list is only added to gravity while this
 # file has at least one domain. Add domains here, not in the dashboard:
 # dashboard entries live only in gravity.db and are lost on a reinstall.
+# Removing a domain here does NOT un-allow it on dumont: the NixOS setup only
+# ever adds lists, and every edit adds this file again under a new store
+# path. Also delete the old "Local allowlist (repo)" list in the dashboard
+# (Lists), or reinstall.
 # Taken over from wintermute's gravity.db (2026-10-19).
 opendistrocommunity.dev
 c-and-a.com
