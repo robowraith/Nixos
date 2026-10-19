@@ -1,4 +1,4 @@
-_: {
+{username, ...}: {
   # ============================================================================
   # Networking
   # ============================================================================
@@ -10,4 +10,7 @@ _: {
     useDHCP = false;
   };
   systemd.network.enable = true;
+
+  # Key-only, no root (system/shared); only the host's admin user may log in
+  services.openssh.settings.AllowUsers = [username];
 }

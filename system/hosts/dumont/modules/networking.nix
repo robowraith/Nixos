@@ -1,4 +1,8 @@
-{hostname, ...}: {
+{
+  hostname,
+  lib,
+  ...
+}: {
   # ============================================================================
   # Networking
   # ============================================================================
@@ -15,17 +19,28 @@
     # blocklists and updates while FTL is down.
     nameservers = ["127.0.0.1" "9.9.9.9"];
 
+    # Services answer the LAN only. dumont also has a global IPv6 address,
+    # so without source rules SSH and the web UI would be exposed as soon as
+    # the Speedport's inbound IPv6 filter were ever off. The ULA range is
+    # written generically (fc00::/7) to keep the real prefix out of the repo.
+    nftables.enable = true;
     firewall = {
-      allowedTCPPorts = [
-        53 # DNS
-        80 # Pi-hole web UI
-      ];
-      allowedUDPPorts = [
-        53 # DNS
-        67 # DHCP
-      ];
+      # system/shared opens 22 to everyone; here every TCP port goes
+      # through the source rules below
+      allowedTCPPorts = lib.mkForce [];
+      # DHCP requests come from 0.0.0.0 (broadcast), so no source filter
+      allowedUDPPorts = [67];
+      extraInputRules = ''
+        ip saddr 192.168.1.0/24 tcp dport { 22, 53, 80 } accept
+        ip saddr 192.168.1.0/24 udp dport 53 accept
+        ip6 saddr { fe80::/10, fc00::/7 } tcp dport { 22, 53, 80 } accept
+        ip6 saddr { fe80::/10, fc00::/7 } udp dport 53 accept
+      '';
     };
   };
+
+  # Port 22 is opened above for LAN sources only
+  services.openssh.openFirewall = false;
 
   services.resolved.enable = false;
 
