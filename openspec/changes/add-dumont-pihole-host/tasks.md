@@ -104,9 +104,13 @@ command or steps and waits for the result. Everything else is repo work plus rea
   - `sops` secrets present under `/run/secrets`
   - no `/var/lib/sops/age/keys.txt` on dumont
   - `df -h /` and the ESP usage
-- [ ] 7.3 **(user)** Run `nix run .#deploy-dumont` once with a harmless change, then once with a deliberately broken
+- [x] 7.3 **(user)** Run `nix run .#deploy-dumont` once with a harmless change, then once with a deliberately broken
   inventory line on a throwaway branch. Verify that the first one switches, and that the second one reverts and exits
   non-zero with DNS answering throughout.
+  - Done 2026-10-19. The broken-inventory variant was replaced by an unreachable upstream (`192.0.2.1`): FTL v6 is
+    expected to test-load dnsmasq config and keep the old one on errors (not verified), so a bad line might not fail
+    any check. DNS was down for the ~30 s of checks, which is inherent to this test. The first run
+    exposed a check bug (`dig +short` prints timeouts to stdout), fixed in `37dc400`; the rerun reverted and exited 1.
 - [ ] 7.4 **(user)** Trial run: point reason (and optionally deepthought) at `192.168.1.2` in NetworkManager for a few
   days. Note any v6 differences in design.md under Risks, and fix or decide on each before phase 3.
 

@@ -1,17 +1,16 @@
 # Handoff — add-dumont-pihole-host
 
 ## Session 2026-10-19 (deepthought) — READ FIRST
-**Progress 19/30. dumont is installed and serving DNS at 192.168.1.2 (DHCP still off).** Verified: DNS v4+ULA,
-blocking, local names + CNAMEs, DNSSEC SERVFAIL, web login, sudo, secrets, no shared key, 1.8G/14G used.
-- Fixes found during install (commit `ee477f2`): password hash `neededForUsers` (else fresh install = no password;
-  changes desktop drvPaths, baseline stale), SIGRTMIN to FTL after `pihole-ftl-setup` (else gravity not used),
-  generated `hardware-configuration.nix`. eMMC enumerates as mmcblk0 or mmcblk1 between boots -> disko uses by-path.
-- 6.1/6.2 done: `nix run .#deploy-dumont` (`system/hosts/dumont/deploy.nix`), runbook `docs/runbooks/dumont-deploy.md`,
-  server hostgroup `remote-deploy.nix` trusts `@wheel`. `nix flake check` passes.
-- **Next: 7.3 (user).** First deploy must bootstrap trust: runbook bootstrap section (`--build-host`, untested;
-  fallback = reinstall). Then the harmless + broken-inventory deploy tests. Then 7.4 trial run, 8.x cutover, 8.5 runbook.
-- 8.1 values known (wintermute: DHCP `.12-.254`, 24h, Quad9, DNSSEC on); `pihole.nix` placeholder range still `.100-.250`.
-- Allowlist domains still unknown/missing in `pihole-allowlist.txt`.
+**Progress 21/30 (7.3 + 8.1 done). dumont runs at 192.168.1.2, DNS + blocking live, DHCP off (range .12-.254 ready).**
+- Deploy: `nix run .#deploy-dumont` from the flake root; asks yori's sudo password first. Verified: healthy deploy
+  switches; a broken one (unreachable upstream) reverts and exits 1.
+- Fixed along the way (all pushed): `neededForUsers` for the password hash, server `users.mutableUsers = false`
+  (hash changes apply), SIGRTMIN to FTL after setup, unstable's setup script (26.05's fails on reruns, TODO 26.11),
+  `--no-check-sigs` copy (server trusts `@wheel`), DNS check needs a real address (dig prints timeouts to stdout).
+- eMMC flips mmcblk0/1 between boots -> disko by-path. `nix fmt` with no args hangs (pass files). Remote shell is fish.
+- **Next: 7.4 (user) trial run** — point reason/deepthought DNS at `.2` in NetworkManager for a few days, note v6
+  differences in design.md Risks. Then 8.5 (cutover runbook, assistant, before 8.2), then 8.2-8.4 (user), 9.x cleanup.
+- Allowlist domains still unknown/missing in `pihole-allowlist.txt` (1 exact allowed domain shows in gravity: check).
 
 ## Session 2026-10-18 evening (deepthought) — READ FIRST
 **Progress 16/30** (4.2, 4.3, 7.1 done). **Install NOT yet run.** State:
