@@ -97,6 +97,11 @@ See proposal.md for the motivation. Constraints that shape the approach:
     `--option substituters "https://cache.nixos.org/ https://vicinae.cachix.org" --option connect-timeout 5` to nix
     commands there.
 
+- **Changed on purpose during task 7.2 (2026-10-19):** `system/shared/modules/users.nix` now sets
+  `neededForUsers = true` on the password hash. Without it, a fresh install creates the user before sops decrypts the
+  secret, so the user has no password (found on dumont). This moves the file to `/run/secrets-for-users/` and changes
+  both desktop drvPaths, so `baseline-drvpaths.txt` is stale from here on.
+
 ### D3 — Install with nixos-anywhere + disko against the live installer
 - Boot the NixOS minimal ISO from USB (monitor and keyboard needed once), then run `nixos-anywhere --flake .#dumont`
   from reason.
@@ -179,6 +184,18 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
 - The boot default only changes after the checks pass, so a power cycle always returns to the last good generation.
 - **Alternative:** deploy-rs's magic rollback. It only protects SSH reachability, not DNS health, and adds a tool.
 - **Alternative:** plain `nh os switch --target-host`. No guard at all.
+- **Implemented (task 6.1, 2026-10-19), deviating from steps 2/4:**
+  - The app does not call `nixos-rebuild` twice. dumont's toplevel is a build input of the app, so one evaluation and
+    build produce exactly the generation that is tested and later made default. It is copied with
+    `nix copy --substitute-on-destination` (26.05's `nixos-rebuild-ng` equivalent: `--use-substitutes`).
+  - Activation runs `switch-to-configuration test|boot` in a transient `systemd-run` unit (as `nixos-rebuild-ng` does),
+    so a networkd restart that drops SSH does not abort it. "Boot default" is `nix-env -p …/system --set` + `boot`.
+  - The sudo password is read once and fed to `sudo -S`. (`nixos-rebuild-ng` 26.05 has `--sudo` and
+    `--ask-sudo-password`; `--use-remote-sudo` is gone. It would prompt once per invocation.)
+  - The host key is pinned via `UserKnownHostsFile` + `StrictHostKeyChecking=yes`.
+  - Copying unsigned paths as `yori` needs `nix.settings.trusted-users = ["@wheel"]` (server hostgroup,
+    `remote-deploy.nix`). wheel already has sudo, so this grants nothing new. The first deploy after the install
+    lacks it and uses `--build-host` (runbook `dumont-deploy.md`, bootstrap section).
 
 ### D9 — Small-disk housekeeping
 - `nix.gc` daily with `--delete-older-than 7d` (shared already does this), plus

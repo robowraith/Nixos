@@ -230,6 +230,15 @@
 
     formatter.${system} = pkgs.alejandra;
 
+    # Guarded remote deploy for dumont (see docs/runbooks/dumont-deploy.md)
+    apps.${system}.deploy-dumont = {
+      type = "app";
+      program = pkgs.lib.getExe (import ./system/hosts/dumont/deploy.nix {
+        inherit pkgs;
+        inherit (self.nixosConfigurations.dumont.config.system.build) toplevel;
+      });
+    };
+
     # Pre-commit checks
     checks.${system}.pre-commit-check = pre-commit-hooks.lib.${system}.run {
       src = ./.;

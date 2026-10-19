@@ -79,11 +79,11 @@ command or steps and waits for the result. Everything else is repo work plus rea
 
 ## 6. Guarded deploy command
 
-- [ ] 6.1 Implement `apps.x86_64-linux.deploy-dumont` (`writeShellApplication`) as specified in D8: test →
+- [x] 6.1 Implement `apps.x86_64-linux.deploy-dumont` (`writeShellApplication`) as specified in D8: test →
   health checks with retry → switch, or revert to the recorded generation and exit 1. It uses only
   `yori@192.168.1.2`. Verify with `nix run .#deploy-dumont -- --help`, and with `shellcheck` passing through
   `writeShellApplication`.
-- [ ] 6.2 Write `docs/runbooks/dumont-deploy.md`: usage, what each check means, manual rollback by IP, and
+- [x] 6.2 Write `docs/runbooks/dumont-deploy.md`: usage, what each check means, manual rollback by IP, and
   power-cycle as last resort. Verify that every command in it matches the app's actual flags.
 
 ## 7. Install and trial run (phases 1–2)

@@ -1,5 +1,18 @@
 # Handoff — add-dumont-pihole-host
 
+## Session 2026-10-19 (deepthought) — READ FIRST
+**Progress 19/30. dumont is installed and serving DNS at 192.168.1.2 (DHCP still off).** Verified: DNS v4+ULA,
+blocking, local names + CNAMEs, DNSSEC SERVFAIL, web login, sudo, secrets, no shared key, 1.8G/14G used.
+- Fixes found during install (commit `ee477f2`): password hash `neededForUsers` (else fresh install = no password;
+  changes desktop drvPaths, baseline stale), SIGRTMIN to FTL after `pihole-ftl-setup` (else gravity not used),
+  generated `hardware-configuration.nix`. eMMC enumerates as mmcblk0 or mmcblk1 between boots -> disko uses by-path.
+- 6.1/6.2 done: `nix run .#deploy-dumont` (`system/hosts/dumont/deploy.nix`), runbook `docs/runbooks/dumont-deploy.md`,
+  server hostgroup `remote-deploy.nix` trusts `@wheel`. `nix flake check` passes.
+- **Next: 7.3 (user).** First deploy must bootstrap trust: runbook bootstrap section (`--build-host`, untested;
+  fallback = reinstall). Then the harmless + broken-inventory deploy tests. Then 7.4 trial run, 8.x cutover, 8.5 runbook.
+- 8.1 values known (wintermute: DHCP `.12-.254`, 24h, Quad9, DNSSEC on); `pihole.nix` placeholder range still `.100-.250`.
+- Allowlist domains still unknown/missing in `pihole-allowlist.txt`.
+
 ## Session 2026-10-18 evening (deepthought) — READ FIRST
 **Progress 16/30** (4.2, 4.3, 7.1 done). **Install NOT yet run.** State:
 - `secrets/dumont.yaml` complete (host key, `users_yori_password_hash`, `pihole_web_password`, `pihole_inventory`).
