@@ -108,7 +108,9 @@ in
 
       check() {
         failed=""
-        [[ -n "$(dig +short +time=2 +tries=1 @${host} example.com A)" ]] || failed+=" dns"
+        # dig +short prints errors such as timeouts to stdout as well, so
+        # require an actual address
+        [[ "$(dig +short +time=2 +tries=1 @${host} example.com A)" =~ (^|$'\n')[0-9]+(\.[0-9]+){3}($|$'\n') ]] || failed+=" dns"
         [[ "$(dig +short +time=2 +tries=1 @${host} doubleclick.net A)" == "0.0.0.0" ]] || failed+=" blocking"
         rssh true 2>/dev/null || failed+=" ssh"
         rssh systemctl is-active --quiet pihole-ftl.service 2>/dev/null || failed+=" pihole-ftl"
