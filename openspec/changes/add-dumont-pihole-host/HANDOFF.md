@@ -1,16 +1,33 @@
 # Handoff — add-dumont-pihole-host
 
-## Session 2026-10-19 (deepthought) — READ FIRST
-**Progress 21/30 (7.3 + 8.1 done). dumont runs at 192.168.1.2, DNS + blocking live, DHCP off (range .12-.254 ready).**
-- Deploy: `nix run .#deploy-dumont` from the flake root; asks yori's sudo password first. Verified: healthy deploy
-  switches; a broken one (unreachable upstream) reverts and exits 1.
-- Fixed along the way (all pushed): `neededForUsers` for the password hash, server `users.mutableUsers = false`
-  (hash changes apply), SIGRTMIN to FTL after setup, unstable's setup script (26.05's fails on reruns, TODO 26.11),
-  `--no-check-sigs` copy (server trusts `@wheel`), DNS check needs a real address (dig prints timeouts to stdout).
-- eMMC flips mmcblk0/1 between boots -> disko by-path. `nix fmt` with no args hangs (pass files). Remote shell is fish.
-- **Next: 7.4 (user) trial run** — point reason/deepthought DNS at `.2` in NetworkManager for a few days, note v6
-  differences in design.md Risks. Then 8.5 (cutover runbook, assistant, before 8.2), then 8.2-8.4 (user), 9.x cleanup.
-- Allowlist domains still unknown/missing in `pihole-allowlist.txt` (1 exact allowed domain shows in gravity: check).
+## Current state (2026-10-19 evening) — READ FIRST
+
+**Pick up on reason or deepthought:** everything is committed and pushed (main `952bf91`). `git pull` in `~/nixos`,
+then `/opsx:apply add-dumont-pihole-host`. No files outside git are needed any more (the `~/Privat/…` /
+`~/Dokumente/…` copies are obsolete). Both desktops can deploy dumont: the deploy app pins dumont's host key itself.
+- **reason:** not rebuilt since 2026-10-18. Until it is, nix may hang on the dead `attic.xuyh0120.win` cache; add
+  `--option substituters "https://cache.nixos.org/" --option connect-timeout 5`. Its rebuild picks up the
+  `neededForUsers` change (password file moves to `/run/secrets-for-users/`) and the `ssh dumont` entry.
+- If the pre-commit hook points at a missing store path, run `nix develop -c true` once.
+
+**Progress 22/30.** dumont (Wyse 3040) runs at 192.168.1.2: DNS + blocking + local names, DHCP configured but OFF.
+- Deploy: `nix run .#deploy-dumont` (asks yori's sudo password first). Verified: healthy deploy switches; broken one
+  (unreachable upstream) reverts and exits 1. `ssh dumont` works after a desktop rebuild.
+- Hardened: nftables, SSH/DNS/web only from 192.168.1.0/24, fe80::/10, fc00::/7 (public IPv6 blocked, tested);
+  `AllowUsers yori`; key-only SSH. fail2ban deliberately skipped (key-only, LAN-only, RAM).
+- Allowlist in `pihole-allowlist.txt` (3 domains from wintermute). Lists are only ever added, never removed:
+  dropping a domain needs the dashboard (Lists) or a reinstall. Dashboard = view + quick tests; settings come from Nix.
+- Fixes found on the way (all pushed): `neededForUsers`, server `mutableUsers = false`, SIGRTMIN after setup,
+  unstable's setup script (TODO 26.11), setup `RemainAfterExit`, `--no-check-sigs` + `@wheel` trusted, DNS check
+  needs a real address. eMMC flips mmcblk0/1 -> disko by-path. Remote shell is fish (wrap in `sh -c`).
+
+**Next:**
+1. **7.4 (user) trial run:** reason/deepthought DNS -> `192.168.1.2` in NetworkManager for a few days; note IPv6
+   differences in design.md Risks.
+2. **BIOS (user, needs screen+keyboard once):** AC Recovery -> Power On, so a power cut does not leave the LAN without
+   DNS/DHCP. Headless boot not yet observed.
+3. **8.2–8.4 (user) cutover** per `docs/runbooks/dumont-cutover.md` (8.1 + 8.5 done).
+4. **9.x cleanup** after ~2 weeks stable.
 
 ## Session 2026-10-18 evening (deepthought) — READ FIRST
 **Progress 16/30** (4.2, 4.3, 7.1 done). **Install NOT yet run.** State:
