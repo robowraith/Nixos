@@ -131,7 +131,7 @@ command or steps and waits for the result. Everything else is repo work plus rea
   - client IPs in the query log are real
 - [ ] 8.4 **(user)** Once wintermute's query log has been quiet for a lease period, scale `pihole-deployment` to 0,
   and verify that LAN DNS still works from a non-desktop device.
-- [ ] 8.5 Write `docs/runbooks/dumont-cutover.md` with the phase 3 steps and the rollback order from the design.
+- [x] 8.5 Write `docs/runbooks/dumont-cutover.md` with the phase 3 steps and the rollback order from the design.
   Verify it is complete against design.md's Migration Plan *before* 8.2 starts.
 
 ## 9. Cleanup and docs (phase 4, after ~2 weeks stable)
