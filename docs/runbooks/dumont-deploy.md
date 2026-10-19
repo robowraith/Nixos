@@ -20,6 +20,7 @@ nix run .#deploy-dumont
    | `blocking` | `doubleclick.net` is not `0.0.0.0`: gravity not loaded (see the SIGRTMIN note in `pihole.nix`) |
    | `ssh` | dumont lost its network or sshd |
    | `pihole-ftl` | the unit is not active, e.g. a bad inventory line |
+| `pihole-ftl-setup` | adding lists or running gravity failed (list URL down, API login) |
 
 5. All pass: the generation becomes the boot default (`nix-env --set` + `switch-to-configuration boot`).
    Any fail: the previous generation is re-activated with `test`, the failing checks are printed, exit 1.
@@ -52,7 +53,8 @@ dumont instead:
 nixos-rebuild switch --flake .#dumont --target-host yori@192.168.1.2 --build-host yori@192.168.1.2 \
   --sudo --ask-sudo-password --use-substitutes
 ```
-Untested: whether an untrusted user may push the derivations for `--build-host`. If this fails at the copy step,
-reinstall instead (`dumont-install.md`, ~5 min); the fresh install already contains `remote-deploy.nix`.
+Verified 2026-10-19: this works (dumont builds the few non-cached paths itself). `--ask-sudo-password` feeds
+sudo via `--stdin`, so a mistyped password fails at the final `nix-env --set` step without activating anything; just
+rerun, the build is already on dumont. Fallback if the copy ever fails: reinstall (`dumont-install.md`).
 
 Afterwards use `nix run .#deploy-dumont`.

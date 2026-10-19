@@ -112,7 +112,7 @@ command or steps and waits for the result. Everything else is repo work plus rea
 
 ## 8. Cutover (phase 3)
 
-- [ ] 8.1 **(user)** Read wintermute's current `DHCP_*` values (lease time, range) and confirm that `.2` is outside
+- [x] 8.1 **(user)** Read wintermute's current `DHCP_*` values (lease time, range) and confirm that `.2` is outside
   the range and not reserved. Copy the range into dumont's settings. Verify that dumont's config matches.
 - [ ] 8.2 **(user)** Shorten wintermute's lease time to 1 h (UI → Save), then wait at least one *old* lease period.
 - [ ] 8.3 **(user)** Run the handover:

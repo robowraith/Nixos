@@ -17,4 +17,9 @@
   };
 
   zramSwap.enable = true;
+
+  # Accounts come only from the config: a changed password hash in sops is
+  # applied on the next deploy. With mutable users it is only used when the
+  # account is first created (found when fixing yori's password on dumont).
+  users.mutableUsers = false;
 }

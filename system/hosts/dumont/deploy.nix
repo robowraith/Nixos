@@ -33,10 +33,11 @@ in
              dig @${host} doubleclick.net returns 0.0.0.0
              ssh ${user}@${host} true
              pihole-ftl.service is active
+             pihole-ftl-setup.service has not failed
         4. all pass: make it the boot default
            any fail: re-activate the previous generation, exit 1
 
-      Asks once for ${user}'s sudo password. Run it from the flake root:
+      Asks for ${user}'s sudo password first and checks it. Run it from the flake root:
         nix run .#deploy-dumont
       USAGE
       }
@@ -54,9 +55,11 @@ in
 
       # Arguments are meant to expand here and run as one remote command line
       # shellcheck disable=SC2029
-      rssh() { ssh "''${sshOpts[@]}" "$target" "$@"; }
+      # -n: never let ssh read the terminal (it would swallow typed input)
+      rssh() { ssh -n "''${sshOpts[@]}" "$target" "$@"; }
       # Run as root on dumont, feeding the password read below to sudo
-      rsudo() { rssh "sudo -S -p ''' $*" <<<"$password"; }
+      # shellcheck disable=SC2029
+      rsudo() { ssh "''${sshOpts[@]}" "$target" "sudo -S -p ''' $*" <<<"$password"; }
       # Activation restarts networkd and may drop the SSH session; run it as a
       # transient unit so it finishes regardless (as nixos-rebuild does)
       activate() {
@@ -64,22 +67,33 @@ in
           --unit="deploy-dumont-$2-$RANDOM" "$1/bin/switch-to-configuration" "$2"
       }
 
+      # Ask first, before anything slow, and check it right away
+      for attempt in 1 2 3; do
+        IFS= read -rsp "[sudo] password for ${user}@${host}: " password </dev/tty
+        echo
+        rsudo -k true 2>/dev/null && break
+        echo "sudo refused the password (''${#password} characters read)" >&2
+        [[ $attempt -lt 3 ]] || exit 1
+      done
+
       prev=$(rssh readlink -f /run/current-system)
       echo "current: $prev"
       echo "new:     $new"
 
       echo "==> copying closure"
-      nix copy --substitute-on-destination --to "ssh-ng://$target" "$new"
-
-      read -rsp "[sudo] password for ${user}@${host}: " password
-      echo
-      rsudo true
+      # Locally built paths are unsigned; nix copy still asks the remote to check
+      # signatures unless told not to. Only honoured because yori is trusted
+      # (server hostgroup, remote-deploy.nix).
+      nix copy --no-check-sigs --substitute-on-destination --to "ssh-ng://$target" "$new"
 
       revert() {
         echo "==> FAILED: $1; re-activating $prev" >&2
         activate "$prev" test || echo "revert failed: run '$prev/bin/switch-to-configuration test' on dumont" >&2
         exit 1
       }
+
+      # Only failures caused by this activation should count in the checks
+      rsudo systemctl reset-failed pihole-ftl-setup.service || true
 
       echo "==> activating (test)"
       rc=0
@@ -98,6 +112,7 @@ in
         [[ "$(dig +short +time=2 +tries=1 @${host} doubleclick.net A)" == "0.0.0.0" ]] || failed+=" blocking"
         rssh true 2>/dev/null || failed+=" ssh"
         rssh systemctl is-active --quiet pihole-ftl.service 2>/dev/null || failed+=" pihole-ftl"
+        ! rssh systemctl is-failed --quiet pihole-ftl-setup.service 2>/dev/null || failed+=" pihole-ftl-setup"
         [[ -z "$failed" ]]
       }
 

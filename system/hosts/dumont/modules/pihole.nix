@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }: let
   # Public domains that must never be blocked, one per line. Not secret, so
@@ -27,7 +28,7 @@ in {
 
     settings = {
       dns = {
-        # TODO(task 8.1): compare with wintermute's PIHOLE_DNS_* upstreams
+        # Quad9, same as wintermute's PIHOLE_DNS_1..4
         upstreams = ["9.9.9.9" "149.112.112.112" "2620:fe::fe" "2620:fe::9"];
         dnssec = true;
         # Answer only clients on directly attached subnets (LAN, ULA, GUA)
@@ -46,10 +47,10 @@ in {
         # Off until the cutover (Migration Plan, phase 3); flipping this is
         # the DHCP handover. When on, FTL also writes dhcp-authoritative.
         active = false;
-        # TODO(task 8.1): take start/end/leaseTime from wintermute's DHCP_*
-        # settings; .2 must stay outside the range
-        start = "192.168.1.100";
-        end = "192.168.1.250";
+        # Same range as wintermute's DHCP_START/DHCP_END (read 2026-10-18);
+        # .2 (dumont) and .3 (wintermute) stay outside it
+        start = "192.168.1.12";
+        end = "192.168.1.254";
         router = "192.168.1.1";
         netmask = "255.255.255.0";
         leaseTime = "24h";
@@ -112,17 +113,32 @@ in {
     };
   };
 
-  # FTL hashes the password into its in-memory config at startup; the
-  # plaintext only exists in the sops-rendered file under /run
-  systemd.services.pihole-ftl.serviceConfig.EnvironmentFile =
-    config.sops.templates."pihole-web.env".path;
+  systemd.services = {
+    # FTL hashes the password into its in-memory config at startup; the
+    # plaintext only exists in the sops-rendered file under /run
+    pihole-ftl.serviceConfig.EnvironmentFile =
+      config.sops.templates."pihole-web.env".path;
 
-  # The module's setup service runs `pihole -g` after adding the lists, but
-  # only signals FTL on the very first run (empty database). Gravity swaps in
-  # a new gravity.db and FTL keeps serving the old one until SIGRTMIN, so
-  # blocking stayed off after install. Same user as FTL, so kill is allowed.
-  systemd.services.pihole-ftl-setup.serviceConfig.ExecStartPost = pkgs.writeShellScript "pihole-reload-lists" ''
-    ${lib.getExe' pkgs.procps "kill"} -s SIGRTMIN \
-      "$(${lib.getExe' config.systemd.package "systemctl"} show --property MainPID --value pihole-ftl.service)"
-  '';
+    pihole-ftl-setup = {
+      # The module's setup service runs `pihole -g` after adding the lists, but
+      # only signals FTL on the very first run (empty database). Gravity swaps in
+      # a new gravity.db and FTL keeps serving the old one until SIGRTMIN, so
+      # blocking stayed off after install. Same user as FTL, so kill is allowed.
+      serviceConfig.ExecStartPost = pkgs.writeShellScript "pihole-reload-lists" ''
+        ${lib.getExe' pkgs.procps "kill"} -s SIGRTMIN \
+          "$(${lib.getExe' config.systemd.package "systemctl"} show --property MainPID --value pihole-ftl.service)"
+      '';
+
+      # 26.05's setup script exits 1 on every run after the first: re-adding a
+      # list that is already in gravity.db is a database_error. nixos-unstable
+      # treats "already present" as success; use its script until 26.05 has it.
+      # TODO(26.11): drop this override.
+      script = lib.mkForce (
+        import "${inputs.nixpkgs-unstable}/nixos/modules/services/networking/pihole-ftl-setup-script.nix" {
+          cfg = config.services.pihole-ftl;
+          inherit config lib pkgs;
+        }
+      );
+    };
+  };
 }

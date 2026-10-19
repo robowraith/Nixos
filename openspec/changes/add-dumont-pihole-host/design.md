@@ -102,6 +102,9 @@ See proposal.md for the motivation. Constraints that shape the approach:
   secret, so the user has no password (found on dumont). This moves the file to `/run/secrets-for-users/` and changes
   both desktop drvPaths, so `baseline-drvpaths.txt` is stale from here on.
 
+- **Also during task 7.3 (2026-10-19):** the server hostgroup sets `users.mutableUsers = false`. With mutable users a
+  changed password hash in sops is ignored for an existing account; dumont needed a hash fix after install.
+
 ### D3 — Install with nixos-anywhere + disko against the live installer
 - Boot the NixOS minimal ISO from USB (monitor and keyboard needed once), then run `nixos-anywhere --flake .#dumont`
   from reason.
