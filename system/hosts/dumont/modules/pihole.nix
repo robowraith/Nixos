@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
   # Public domains that must never be blocked, one per line. Not secret, so
@@ -115,4 +116,13 @@ in {
   # plaintext only exists in the sops-rendered file under /run
   systemd.services.pihole-ftl.serviceConfig.EnvironmentFile =
     config.sops.templates."pihole-web.env".path;
+
+  # The module's setup service runs `pihole -g` after adding the lists, but
+  # only signals FTL on the very first run (empty database). Gravity swaps in
+  # a new gravity.db and FTL keeps serving the old one until SIGRTMIN, so
+  # blocking stayed off after install. Same user as FTL, so kill is allowed.
+  systemd.services.pihole-ftl-setup.serviceConfig.ExecStartPost = pkgs.writeShellScript "pihole-reload-lists" ''
+    ${lib.getExe' pkgs.procps "kill"} -s SIGRTMIN \
+      "$(${lib.getExe' config.systemd.package "systemctl"} show --property MainPID --value pihole-ftl.service)"
+  '';
 }

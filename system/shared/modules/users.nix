@@ -11,7 +11,9 @@
   # from your secrets.yml file. We use the `username` variable to keep
   # this module generic. Make sure your secret is named e.g. "joachim_password_hash".
   sops.secrets."users_${username}_password_hash" = {
-    # No extra options needed for this, sops-nix just extracts the value.
+    # Decrypt before the users are created; otherwise a fresh install finds
+    # no password file and the user ends up without a password (dumont).
+    neededForUsers = true;
   };
 
   # ============================================================================

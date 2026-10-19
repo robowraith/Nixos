@@ -2,10 +2,10 @@
   # ============================================================================
   # Firmware
   # ============================================================================
-  # The full linux-firmware package is ~800 MiB, a tenth of the 8 GB eMMC.
+  # The full linux-firmware package is ~800 MiB, too much for the small eMMC.
   # The Wyse 3040 only needs firmware for its Realtek NIC and Intel graphics.
-  # TODO(verify on hardware): `dmesg | grep -i firmware` on the installer ISO
-  # (which ships everything) lists what the box actually loads.
+  # Verified on the installer ISO (2026-10-19): only r8169 (RTL8168h) and
+  # i915 (Cherryview) bind, no missing-firmware messages.
 
   hardware = {
     enableRedistributableFirmware = false;

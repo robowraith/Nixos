@@ -96,7 +96,7 @@ command or steps and waits for the result. Everything else is repo work plus rea
   - first-boot checks
 
   Verify the command against `nixos-anywhere --help`.
-- [ ] 7.2 **(user)** Install dumont per the runbook. Then verify from reason, with the assistant running read-only
+- [x] 7.2 **(user)** Install dumont per the runbook. Then verify from reason, with the assistant running read-only
   checks:
   - `dig @192.168.1.2` example.com / doubleclick.net / an inventory name / `dnssec-failed.org` (SERVFAIL)
   - the same over `<ula-prefix>::2`
