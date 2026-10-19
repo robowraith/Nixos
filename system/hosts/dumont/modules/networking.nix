@@ -44,6 +44,18 @@
 
   services.resolved.enable = false;
 
+  # The Wyse's CMOS battery is dead, so every boot starts with the RTC in
+  # 2018. With that clock Pi-hole's DNSSEC validation fails (signatures "not
+  # yet valid"), so NTP servers given by name can never be resolved. Use PTB's
+  # stratum-1 servers by IP first (ptbtime1-3.ptb.de, stable for years; the
+  # Speedport does not answer NTP), names only as a fallback.
+  networking.timeServers = [
+    "192.53.103.108" # ptbtime1.ptb.de
+    "192.53.103.104" # ptbtime2.ptb.de
+    "192.53.103.103" # ptbtime3.ptb.de
+    "de.pool.ntp.org"
+  ];
+
   systemd.network.networks."10-lan" = {
     # The 3040 has a single wired NIC; match it by type, not by name
     matchConfig.Type = "ether";
