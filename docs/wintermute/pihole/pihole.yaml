@@ -64,6 +64,12 @@ spec:
               name: pihole-config
             - mountPath: /etc/dnsmasq.d
               name: pihole-dnsmasq
+            - mountPath: /etc/lighttpd/conf-enabled/20-admin-allowlist.conf
+              name: pihole-php-cve-2026
+              subPath: 20-admin-allowlist.conf
+            - mountPath: /etc/php/7.4/cgi/conf.d/99-cve-2026-109619.ini
+              name: pihole-php-cve-2026
+              subPath: 99-cve-2026-109619.ini
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -78,7 +84,29 @@ spec:
             path: /etc/pihole/dnsmasq.d
             type: Directory
           name: pihole-dnsmasq
+        - configMap:
+            name: pihole-php-cve-2026
+          name: pihole-php-cve-2026
       hostNetwork: true
+---
+# Stopgap for CVE-2026-109618/-109619 (PHP RCE, 2026-10-21). The v5 image ships PHP 7.4 on Debian 11, which
+# will never get a fix; only the move to Pi-hole v6 (no PHP) removes it. Until then lighttpd refuses /admin
+# for everyone except reason before the request reaches php-cgi, and the confirmed session path is disabled.
+# Requests through Traefik arrive SNATed from 10.42.x.x and are refused too: use http://192.168.1.3:8080/admin/
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-php-cve-2026
+  namespace: pihole
+data:
+  20-admin-allowlist.conf: |
+    $HTTP["url"] =~ "^/admin" {
+      $HTTP["remoteip"] != "192.168.1.111" {
+        url.access-deny = ("")
+      }
+    }
+  99-cve-2026-109619.ini: |
+    session.upload_progress.enabled = 0
 ---
 apiVersion: v1
 kind: Service

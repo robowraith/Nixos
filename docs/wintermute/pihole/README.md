@@ -32,6 +32,21 @@ kubectl --context wintermute apply -f docs/wintermute/pihole/pihole.yaml
 Anything that has to happen on wintermute itself (addon files, `/etc/pihole/config/setupVars.conf`) needs sudo
 there and is the user's job. On wintermute there is no `wintermute` context: use `sudo k3s kubectl`.
 
+## PHP RCE stopgap (CVE-2026-109618/-109619, 2026-10-22)
+
+The v5 web UI runs PHP 7.4.33 (Debian 11) as persistent php-cgi workers. Neither PHP nor Debian will fix that
+version; only Pi-hole v6 (no PHP) does. Until then the ConfigMap `pihole-php-cve-2026` in `pihole.yaml`:
+
+- makes lighttpd refuse `/admin` to everyone except reason (`192.168.1.111`) before php-cgi sees the request.
+  Traefik SNATs, so `pihole.meine2cent.home` now answers 403: use `http://192.168.1.3:8080/admin/` from reason.
+  deepthought has no DHCP reservation and is locked out too.
+- sets `session.upload_progress.enabled = 0` (blocks the confirmed CVE-2026-109619 path, not all variants).
+
+Applied live on 2026-10-22 without restarting FTL: ConfigMap applied on its own, both files copied into the
+running container, then `/command/s6-svc -r /run/service/lighttpd`. The Deployment's mounts take over on the
+next pod restart. Checks: from reason `curl -so /dev/null -w '%{http_code}' http://192.168.1.3:8080/admin/` → 302;
+inside the pod the same against `127.0.0.1` → 403. Drop the ConfigMap and mounts when moving to v6.
+
 ## Root KSK-2024 trust anchor (2026-10)
 
 On 2026-10-11 the root zone switched its signing key from KSK-2017 (id 20326) to KSK-2024 (id 38696). The image
