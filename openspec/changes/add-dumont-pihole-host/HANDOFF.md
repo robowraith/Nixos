@@ -1,8 +1,29 @@
 # Handoff — add-dumont-pihole-host
 
+## Live state verified 2026-10-25 (deepthought)
+
+dumont: up 2d21h (last boot 2026-10-22 ~18:15), `running`, no failed units, `pihole-ftl` active, clock correct and
+NTP synced, 0 FTL errors/warnings this boot, RAM 1.9 GB (1.2 free), `/` 17% used, generation `system-9` (26.05.20261018).
+DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial still active (`Desire`, resolv.conf
+= .2). Not checked: whether the CMOS battery was replaced (the 10-22 boot synced fine either way), DHCP state
+(`/etc/pihole` not readable as yori; config says off), reason's DNS.
+
+## Update 2026-10-22 (deepthought)
+
+- **Pi-hole tested from deepthought (all pass):** ping 0% loss ~4 ms; resolve (A+AAAA); blocking (doubleclick.net,
+  ads.google.com -> 0.0.0.0); DNSSEC `ad` flag set, dnssec-failed.org -> SERVFAIL; TCP DNS; local names (pi.hole,
+  dumont/wintermute.meine2cent.home, reverse of .3); allowlist domains resolve (opendistrocommunity.dev has no
+  records, same at Quad9, not blocked); web `/admin/` 302; dnsmasq-pi-hole-v2.93; cached 3 ms, uncached ~200 ms.
+  **Not tested:** DHCP (off), non-LAN source refusal (`listeningMode = LOCAL`).
+- **7.4 trial started on deepthought:** NM profile `Desire` (wifi): `ipv4.dns 192.168.1.2`,
+  `ipv4.ignore-auto-dns yes`, `ipv6.ignore-auto-dns yes` (so the Speedport RA DNS `fe80::1` can't bypass blocking).
+  Imperative nmcli, not in Nix, deliberately. Undo: `nmcli con mod Desire ipv4.dns "" ipv4.ignore-auto-dns no
+  ipv6.ignore-auto-dns no && nmcli con up Desire`. Other profiles (wired, work networks) untouched.
+  Note IPv6/other differences in design.md Risks as they show up.
+
 ## Current state (2026-10-19 evening) — READ FIRST
 
-**Pick up on reason or deepthought:** everything is committed and pushed (main `952bf91`). `git pull` in `~/nixos`,
+**Pick up on reason or deepthought:** everything is committed and pushed except this file (last main commit before 10-25: `242aa80`). `git pull` in `~/nixos`,
 then `/opsx:apply add-dumont-pihole-host`. No files outside git are needed any more (the `~/Privat/…` /
 `~/Dokumente/…` copies are obsolete). Both desktops can deploy dumont: the deploy app pins dumont's host key itself.
 - **reason:** not rebuilt since 2026-10-18. Until it is, nix may hang on the dead `attic.xuyh0120.win` cache; add
@@ -30,8 +51,8 @@ then `/opsx:apply add-dumont-pihole-host`. No files outside git are needed any m
   Sources: Dell 3040 manual (coin battery removal), parkytowers.me.uk/thin/wyse/3040/, mcgarrah.org.
 
 **Next:**
-1. **7.4 (user) trial run:** reason/deepthought DNS -> `192.168.1.2` in NetworkManager for a few days; note IPv6
-   differences in design.md Risks.
+1. **7.4 (user) trial run:** deepthought running since 2026-10-22 (see above, no issues so far). reason still to do:
+   DNS -> `192.168.1.2` in NetworkManager. Note IPv6 differences in design.md Risks.
 2. **Hardware (user):** replace CMOS battery; verify a cold boot self-corrects the clock. BIOS: AC Recovery -> Power On, so a power cut does not leave the LAN without
    DNS/DHCP. Headless boot not yet observed.
 3. **8.2–8.4 (user) cutover** per `docs/runbooks/dumont-cutover.md` (8.1 + 8.5 done).
@@ -176,11 +197,13 @@ form, plus the reasoning that isn't obvious from the design.
 
 These are listed in design.md → Open Questions. The ones most likely to force a fallback:
 
-- whether `conf-file=<sops path>` is accepted in `misc.dnsmasq_lines` (fallback: `/etc/dnsmasq.d` +
-  `misc.etc_dnsmasq_d`)
-- whether `FTLCONF_webserver_api_password` from an `EnvironmentFile` works with `readOnly`
-- whether `file://` lists are accepted for the allowlist
-- the remote-sudo flags of `nixos-rebuild` in 26.05
+- [x] `conf-file=<sops path>` accepted in `misc.dnsmasq_lines` (2026-10-24: FTL loads it, local names resolve
+  via dumont)
+- [x] `FTLCONF_webserver_api_password` from an `EnvironmentFile` with `readOnly` (2026-10-24: dashboard login works)
+- [x] `file://` allowlist (2026-10-24: dashboard shows it enabled, type Allow, "unchanged upstream"; every edit of
+  the file adds a new store-path entry, delete the stale one in the dashboard)
+- [x] remote-sudo flags of `nixos-rebuild` in 26.05 (`deploy-dumont` works, verified 2026-10-18)
+- [ ] authoritative DHCP key: only testable once `dhcp.active = true` (cutover)
 
 ## Things that tripped up the planning session
 
