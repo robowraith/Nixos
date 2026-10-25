@@ -8,6 +8,17 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
 = .2). Not checked: whether the CMOS battery was replaced (the 10-22 boot synced fine either way), DHCP state
 (`/etc/pihole` not readable as yori; config says off), reason's DNS.
 
+## Cutover started 2026-10-25 15:15 (deepthought)
+
+- **8.2 done:** wintermute lease time set to 1 h at 15:15 (via `kubectl --context home_cluster -n pihole exec
+  deploy/pihole-deployment -- pihole -a enabledhcp 192.168.1.12 192.168.1.254 192.168.1.1 1 meine2cent.home`).
+  setupVars + `02-pihole-dhcp.conf` show 1/`1h`; DNS up. The command blanked `DHCP_IPv6`/`DHCP_rapid_commit`;
+  restored to `false`. **Earliest handover (step 2): 2026-10-26 ~15:20.** Remember to set the lease back (runbook
+  Rollback step 4) only if rolling back.
+- wintermute's `/admin` is deliberately limited to `192.168.1.111` (reason): ConfigMap `pihole-php-cve-2026`,
+  PHP CVE mitigation; others get 403. Use reason for the UI. kubectl context for wintermute is `home_cluster`.
+- Trial on reason skipped by decision. CMOS battery replaced (user, 2026-10-25).
+
 ## Update 2026-10-22 (deepthought)
 
 - **Pi-hole tested from deepthought (all pass):** ping 0% loss ~4 ms; resolve (A+AAAA); blocking (doubleclick.net,
