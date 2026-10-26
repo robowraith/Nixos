@@ -21,6 +21,12 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
   phone, 8.4: scale wintermute Pi-hole to 0 once its query log has been quiet 1 h (only Speedport), then 7.4
   trial override removal on deepthought (`nmcli con mod Desire ipv4.dns "" ipv4.ignore-auto-dns no
   ipv6.ignore-auto-dns no`) so it takes `.2` via DHCP. dumont leases are 24 h again.
+- **Open: Speedport DNS and `.meine2cent.home` (found 2026-10-26).** `dig A emby.meine2cent.home @fe80::1` (and
+  `wintermute.meine2cent.home`) returns an authoritative (`aa`) NOERROR with 0 answers; AAAA returns only the
+  CNAME; public names are fine. The same names resolve correctly from dumont (`.2`, ULA) and wintermute. A client
+  that sends its DNS queries to the Speedport (IPv6 RDNSS from the RA) gets no A for local names. Unknown whether
+  this predates the cutover. Phone: emby worked in Chrome, failed in Firefox (suspect `network.trr.mode`, left to
+  the user). Fix idea: hand out DNS only via DHCP, or check the Speedport's own domain handling.
 - **Plan updated 2026-10-26** (tasks.md, design.md, runbook): 8.4 dropped (wintermute stays up as secondary), new 8.6
   (remove deepthought override, verify reason), new 8.7 (v6 reinstall), 9.1 waits for 8.7. Kubectl context is `home_cluster`.
 
