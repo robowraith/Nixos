@@ -292,21 +292,22 @@ the user. The assistant prepares the commands and runs only read-only checks.
       dynamic range and not reserved.
    2. Turn off DHCP on wintermute (UI → Save). Its DNS keeps running.
    3. Deploy dumont with `dhcp.active = true`, using the same range and reservations.
-   4. Speedport: DNSv4 → `192.168.1.2`, DNSv6 → `<ula-prefix>::2`.
+   4. Speedport: DNSv4 → `192.168.1.2`, DNSv6 → `<ula-prefix>::2`. Secondary DNSv4/v6 → wintermute's Pi-hole
+      (DNS only), replacing Quad9 (decided 2026-10-26).
    5. **Checks:**
       - reconnect a reserved device: reserved IP, DNS `.2`, gateway `.1`
       - `rdisc6` shows only `fe80::1`
       - lookups via `fe80::1` arrive at dumont
       - real client IPs in dumont's query log
-   6. Once wintermute's query log shows no client queries (other than the Speedport, which has moved) for at least
-      one lease period: scale `pihole-deployment` to 0.
+   6. ~~Scale wintermute's `pihole-deployment` to 0.~~ Dropped: it stays up with DHCP off as the Speedport's
+      secondary DNS until it is reinstalled as v6.
 5. **Rollback (any time before phase 4):**
    1. Deploy dumont with `dhcp.active = false`.
-   2. Speedport back to `.3` / wintermute's ULA.
+   2. Speedport back to `.3` / wintermute's ULA as primary (and drop the secondary or point it at Quad9).
    3. Turn wintermute's DHCP back on, or scale it back to 1 first if it was already at 0.
    4. Restore its lease time.
 6. **Phase 4 – cleanup (after ~2 weeks stable):**
-   - On wintermute: delete the Pi-hole k3s objects, remove the `.4` secondary address and the `pi.hole` PTR, and remove
+   - On wintermute, once the v6 reinstall has replaced the v5 secondary: delete the v5 Pi-hole k3s objects, remove the `.4` secondary address and the `pi.hole` PTR, and remove
      `99-root-ksk-2024.conf`.
    - In the repo: mark `docs/wintermute/pihole/` as historical, and update `docs/hosts.md` (dumont added; wintermute's
      service list without Pi-hole).
@@ -344,7 +345,9 @@ change being archived.
   - **Extra checks:** whether to also check DHCP (`:67` listening) and gravity freshness.
 - **Secondary DNS for redundancy.** Once wintermute is on NixOS, a DNS-only Pi-hole there from the same module, fed
   the same lists and the sops inventory (local records only, no DHCP). DHCP would hand out both servers, and the
-  Speedport would get a secondary DNSv4/v6 if its UI allows. Until then, dumont is the single point of failure.
+  Speedport would get a secondary DNSv4/v6 if its UI allows. **Partly done 2026-10-26:** the Speedport's secondary
+  is already wintermute's v5 Pi-hole (DNS only, DHCP off), replacing Quad9. It lacks the dumont inventory (local names
+  only resolve if wintermute has them) and the same lists; the v6 reinstall (task 8.7) closes that gap.
 - **Deploying from wintermute.** It needs only the flake checkout plus the shared key once wintermute runs NixOS. The
   deploy app already addresses dumont by IP.
 - **HTTPS for the web UI.** v6 can serve TLS on :443 with its own cert. Consider it if the UI is ever reached from

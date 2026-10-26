@@ -111,33 +111,43 @@ command or steps and waits for the result. Everything else is repo work plus rea
     expected to test-load dnsmasq config and keep the old one on errors (not verified), so a bad line might not fail
     any check. DNS was down for the ~30 s of checks, which is inherent to this test. The first run
     exposed a check bug (`dig +short` prints timeouts to stdout), fixed in `37dc400`; the rerun reverted and exited 1.
-- [ ] 7.4 **(user)** Trial run: point reason (and optionally deepthought) at `192.168.1.2` in NetworkManager for a few
+- [x] 7.4 **(user)** Trial run: point reason (and optionally deepthought) at `192.168.1.2` in NetworkManager for a few
   days. Note any v6 differences in design.md under Risks, and fix or decide on each before phase 3.
+  - Done 2026-10-22..26 on deepthought only (reason skipped by decision). No issues.
 
 ## 8. Cutover (phase 3)
 
 - [x] 8.1 **(user)** Read wintermute's current `DHCP_*` values (lease time, range) and confirm that `.2` is outside
   the range and not reserved. Copy the range into dumont's settings. Verify that dumont's config matches.
-- [ ] 8.2 **(user)** Shorten wintermute's lease time to 1 h (UI → Save), then wait at least one *old* lease period.
-- [ ] 8.3 **(user)** Run the handover:
+- [x] 8.2 **(user)** Shorten wintermute's lease time to 1 h (UI → Save), then wait at least one *old* lease period.
+  - Done 2026-10-25 15:15 via `pihole -a enabledhcp ... 1 ...` in the pod (kubectl `home_cluster`).
+- [x] 8.3 **(user)** Run the handover (done 2026-10-26):
   1. Turn off wintermute's DHCP (UI → Save), leaving its DNS running.
   2. Deploy dumont with `dhcp.active = true`.
-  3. Repoint the Speedport (DNSv4 `.2`, DNSv6 `<ula-prefix>::2`).
+  3. Repoint the Speedport (DNSv4 `.2`, DNSv6 `<ula-prefix>::2`). **Secondary** DNSv4/v6: wintermute's v5 Pi-hole
+     (`.3` + its EUI-64 ULA), not Quad9, until it is reinstalled as v6 (new 8.6).
 
   Verify:
   - a reconnected reserved device gets its IP, DNS `.2` and gateway `.1`
   - `rdisc6 enp7s0` shows only `fe80::1`
   - queries via `fe80::1` appear on dumont
   - client IPs in the query log are real
-- [ ] 8.4 **(user)** Once wintermute's query log has been quiet for a lease period, scale `pihole-deployment` to 0,
-  and verify that LAN DNS still works from a non-desktop device.
+- [~] 8.4 **(user)** ~~Scale `pihole-deployment` to 0.~~ **Dropped 2026-10-26:** wintermute's Pi-hole stays up as the
+  Speedport's secondary DNS (DHCP off). Instead verify from a non-desktop device that LAN DNS and a
+  `.meine2cent.home` name resolve (phone `.140` holds a dumont lease; name check still open).
+- [ ] 8.6 **(user)** Remove the trial override on deepthought so it takes `.2` via DHCP:
+  `nmcli con mod Desire ipv4.dns "" ipv4.ignore-auto-dns no ipv6.ignore-auto-dns no && nmcli con up Desire`.
+  Also verify reason (reserved `.111`, DNS `.2`, gateway `.1`) after `nmcli device reapply enp7s0`.
+- [ ] 8.7 **(user)** Reinstall wintermute's Pi-hole as v6 (DNS only, no DHCP): same allowlist and local-record
+  inventory as dumont, ideally from the same module (needs wintermute on NixOS, or a v6 container with the same
+  config). Then check the Speedport secondary still answers and blocks like dumont.
 - [x] 8.5 Write `docs/runbooks/dumont-cutover.md` with the phase 3 steps and the rollback order from the design.
   Verify it is complete against design.md's Migration Plan *before* 8.2 starts.
 
 ## 9. Cleanup and docs (phase 4, after ~2 weeks stable)
 
-- [ ] 9.1 **(user)** On wintermute:
-  - delete the Pi-hole k3s objects
+- [ ] 9.1 **(user)** On wintermute (only once the v6 reinstall 8.7 has replaced the v5 secondary):
+  - delete the v5 Pi-hole k3s objects
   - remove the `.4` secondary address and the `pi.hole` PTR
   - remove `/etc/pihole/dnsmasq.d/99-root-ksk-2024.conf`
 

@@ -21,7 +21,8 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
   phone, 8.4: scale wintermute Pi-hole to 0 once its query log has been quiet 1 h (only Speedport), then 7.4
   trial override removal on deepthought (`nmcli con mod Desire ipv4.dns "" ipv4.ignore-auto-dns no
   ipv6.ignore-auto-dns no`) so it takes `.2` via DHCP. dumont leases are 24 h again.
-- Note: with wintermute as DNS secondary, do not scale it to 0 (8.4) unless you drop it from the Speedport first.
+- **Plan updated 2026-10-26** (tasks.md, design.md, runbook): 8.4 dropped (wintermute stays up as secondary), new 8.6
+  (remove deepthought override, verify reason), new 8.7 (v6 reinstall), 9.1 waits for 8.7. Kubectl context is `home_cluster`.
 
 ## Cutover started 2026-10-25 15:15 (deepthought)
 

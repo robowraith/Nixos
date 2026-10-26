@@ -39,7 +39,8 @@ from that lease until they renew. wintermute's DNS therefore keeps running until
    ```
    The health checks cover DNS, not DHCP; step 4 checks DHCP.
 3. **Speedport: DNS to dumont.** In its DNS settings (Heimnetz): DNSv4 `192.168.1.2`, DNSv6 `<ula-prefix>::2`. Its DHCP stays
-   off.
+   off. Secondary DNSv4/v6: wintermute's Pi-hole (`192.168.1.3` and its stable EUI-64 ULA, not the privacy
+   address), not Quad9.
 4. **Checks** (on reason; adjust the interface name elsewhere):
    - reserved device gets its address, DNS and gateway:
      ```
@@ -55,22 +56,24 @@ from that lease until they renew. wintermute's DNS therefore keeps running until
    - a phone or TV reconnected to the LAN gets an address in `.12`–`.254` and resolves names
 5. Remove the trial-run DNS override from the desktops' NetworkManager connections; they now get `.2` via DHCP.
 
-## 3. Retire wintermute's Pi-hole (≥ 1 h after step 2, once quiet)
-1. In wintermute's query log, wait until no client except the Speedport (which moved in 2.3) has queried for at least
-   one lease period (1 h).
-2. Scale it down: `kubectl --context wintermute -n pihole scale deploy/pihole-deployment --replicas=0`
-3. Check LAN DNS from a device that is neither a desktop nor dumont (phone): browsing works, a local name such as
+## 3. Keep wintermute's Pi-hole as secondary DNS (changed 2026-10-26)
+wintermute's v5 Pi-hole stays running with DHCP off: it is the Speedport's secondary DNS (2.3). Do **not** scale it
+to 0 while the Speedport points at it.
+1. Check LAN DNS from a device that is neither a desktop nor dumont (phone): browsing works, a local name such as
    `wintermute.meine2cent.home` resolves.
+2. Remove the trial-run override on deepthought (step 2.5).
+3. Reinstall it as a v6 DNS-only Pi-hole later (task 8.7); only then retire the v5 setup.
 
-Deleting the k3s objects, the `.4` address, the `pi.hole` PTR and `99-root-ksk-2024.conf` is phase 4 (task 9.1),
-after ~2 weeks stable.
+Deleting the v5 k3s objects, the `.4` address, the `pi.hole` PTR and `99-root-ksk-2024.conf` is phase 4 (task 9.1),
+after the v6 reinstall and ~2 weeks stable.
 
 ## Rollback (any time before phase 4)
 In this order, so the LAN never has two DHCP servers and never none for long:
 1. dumont: `dhcp.active = false`, commit, `nix run .#deploy-dumont`.
 2. Speedport: DNSv4 `192.168.1.3`, DNSv6 wintermute's ULA address.
-3. wintermute: if scaled to 0, `kubectl --context wintermute -n pihole scale deploy/pihole-deployment --replicas=1`
-   and wait until the pod is ready. Then UI → DHCP on → Save.
+3. wintermute: if scaled to 0, `kubectl --context home_cluster -n pihole scale deploy/pihole-deployment --replicas=1`
+   and wait until the pod is ready. Then DHCP on: UI from reason, or
+   `pihole -a enabledhcp 192.168.1.12 192.168.1.254 192.168.1.1 24 meine2cent.home` in the pod.
 4. wintermute: lease time back to 24 h → Save.
 5. Clients that got a lease from dumont keep `.2` as DNS until they renew (≤ 1 h if dumont handed out 1 h leases,
    else up to 24 h). dumont's DNS stays up during that time, so nothing breaks.
