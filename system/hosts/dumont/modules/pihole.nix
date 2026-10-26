@@ -46,7 +46,7 @@ in {
       dhcp = {
         # Off until the cutover (Migration Plan, phase 3); flipping this is
         # the DHCP handover. When on, FTL also writes dhcp-authoritative.
-        active = false;
+        active = true;
         # Same range as wintermute's DHCP_START/DHCP_END (read 2026-10-18);
         # .2 (dumont) and .3 (wintermute) stay outside it
         start = "192.168.1.12";
