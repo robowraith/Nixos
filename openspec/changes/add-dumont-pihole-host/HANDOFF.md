@@ -8,6 +8,21 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
 = .2). Not checked: whether the CMOS battery was replaced (the 10-22 boot synced fine either way), DHCP state
 (`/etc/pihole` not readable as yori; config says off), reason's DNS.
 
+## Handover done 2026-10-26 (deepthought) — READ FIRST
+
+- **8.3 done:** wintermute DHCP off 17:33 (`pihole -a disabledhcp` in the pod via kubectl, UI is limited to reason);
+  dumont `dhcp.active = true` deployed (`42da8b4`), listening on :67. Speedport DNS: primary dumont (v4 + ULA),
+  **secondary wintermute's Pi-hole** (`192.168.1.3` + its EUI-64 ULA) instead of Quad9. wintermute is still v5 and
+  will be reinstalled as v6; it must then get dumont's inventory + allowlist, no DHCP.
+- **Checks passed:** :53/:67 up; only the Speedport sends RAs (route table, `rdisc6` needs root); DNS via
+  `fe80::1` works and blocks; dumont dashboard shows real client IPs (deepthought `.50` top) and 3 active leases
+  (`.50`, `.140` = phone, `.158`).
+- **Open:** reason (reserved `.111` lease, DNS `.2`; `nmcli device reapply enp7s0`), local-name resolution on a
+  phone, 8.4: scale wintermute Pi-hole to 0 once its query log has been quiet 1 h (only Speedport), then 7.4
+  trial override removal on deepthought (`nmcli con mod Desire ipv4.dns "" ipv4.ignore-auto-dns no
+  ipv6.ignore-auto-dns no`) so it takes `.2` via DHCP. dumont leases are 24 h again.
+- Note: with wintermute as DNS secondary, do not scale it to 0 (8.4) unless you drop it from the Speedport first.
+
 ## Cutover started 2026-10-25 15:15 (deepthought)
 
 - **8.2 done:** wintermute lease time set to 1 h at 15:15 (via `kubectl --context home_cluster -n pihole exec
