@@ -12,7 +12,7 @@
     alejandra
     statix
     deadnix
-    unstable.mcp-nixos # stable 1.0.3 uses dead nixhub.io Remix endpoint; unstable uses search.devbox.sh
+    mcp-nixos # 2.4.3+ in stable uses search.devbox.sh, no unstable needed
 
     # Nix devenv (unstable for newer version)
     unstable.devenv
