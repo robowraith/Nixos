@@ -75,7 +75,7 @@ then `/opsx:apply add-dumont-pihole-host`. No files outside git are needed any m
   unstable's setup script (TODO 26.11), setup `RemainAfterExit`, `--no-check-sigs` + `@wheel` trusted, DNS check
   needs a real address. eMMC flips mmcblk0/1 -> disko by-path. Remote shell is fish (wrap in `sh -c`).
 
-- **Dead CMOS battery (2026-10-19):** every cold boot starts in 2018 -> DNSSEC fails -> all DNS SERVFAIL until NTP
+- **CMOS battery replaced (user, 2026-10-25).** Was dead (2026-10-19): every cold boot started in 2018 -> DNSSEC fails -> all DNS SERVFAIL until NTP
   syncs. Fixed by NTP via PTB IPs (`networking.nix`). If ever stuck: set the clock from a desktop,
   `ssh -t yori@192.168.1.2 sudo date -s @(date +%s)` (fish; NOT inside a dumont shell, there `date` is 2018). A deploy
   while dumont's DNS is down fails (substituters unresolvable, daemon disconnects), so fix the clock first.
@@ -86,7 +86,7 @@ then `/opsx:apply add-dumont-pihole-host`. No files outside git are needed any m
 **Next:**
 1. **7.4 (user) trial run:** deepthought running since 2026-10-22 (see above, no issues so far). reason still to do:
    DNS -> `192.168.1.2` in NetworkManager. Note IPv6 differences in design.md Risks.
-2. **Hardware (user):** replace CMOS battery; verify a cold boot self-corrects the clock. BIOS: AC Recovery -> Power On, so a power cut does not leave the LAN without
+2. **Hardware (user):** ~~replace CMOS battery~~ done (2026-10-25); verify a cold boot keeps the clock. BIOS: AC Recovery -> Power On, so a power cut does not leave the LAN without
    DNS/DHCP. Headless boot not yet observed.
 3. **8.2–8.4 (user) cutover** per `docs/runbooks/dumont-cutover.md` (8.1 + 8.5 done).
 4. **9.x cleanup** after ~2 weeks stable.

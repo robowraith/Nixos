@@ -44,11 +44,12 @@
 
   services.resolved.enable = false;
 
-  # The Wyse's CMOS battery is dead, so every boot starts with the RTC in
-  # 2018. With that clock Pi-hole's DNSSEC validation fails (signatures "not
-  # yet valid"), so NTP servers given by name can never be resolved. Use PTB's
-  # stratum-1 servers by IP first (ptbtime1-3.ptb.de, stable for years; the
-  # Speedport does not answer NTP), names only as a fallback.
+  # If the Wyse's CMOS battery dies (it did once; replaced 2026-10), every
+  # boot starts with the RTC in 2018. With that clock Pi-hole's DNSSEC
+  # validation fails (signatures "not yet valid"), so NTP servers given by name
+  # can never be resolved. Use PTB's stratum-1 servers by IP first
+  # (ptbtime1-3.ptb.de, stable for years; the Speedport does not answer NTP),
+  # names only as a fallback.
   networking.timeServers = [
     "192.53.103.108" # ptbtime1.ptb.de
     "192.53.103.104" # ptbtime2.ptb.de
