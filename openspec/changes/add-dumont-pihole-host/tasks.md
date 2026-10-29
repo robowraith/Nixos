@@ -151,6 +151,8 @@ command or steps and waits for the result. Everything else is repo work plus rea
   on), and the checks (a reconnected device gets its address from the expected server; `:67` listens on exactly one
   host). Verify it against D11 and the spec's standby requirement.
   - Done 2026-10-29. The check commands were run against the live state; the failover itself was not exercised.
+- [ ] 8.11 **(user)** Deploy dumont with `.3` as second DHCP DNS server (D11). Verify on a reconnected device:
+  `nmcli -f IP4.DNS device show <iface>` lists `192.168.1.2` and `192.168.1.3`.
 - [ ] 8.10 **(user)** Decide dumont's lease time: keep 24 h, or raise it to 3–7 d for a longer grace period (D11).
   Verify any change with a reconnected device's lease.
 - [x] 8.5 Write `docs/runbooks/dumont-cutover.md` with the phase 3 steps and the rollback order from the design.

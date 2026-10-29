@@ -33,6 +33,7 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
   wintermute", tasks 8.8–8.10). Not a live second server: DHCP stays off on wintermute, turned on by hand only while
   dumont is down. 8.9 runbook done (`docs/runbooks/dhcp-failover.md`); v5 standby verified (`:67` closed, range
   `.12`–`.254`, lease 1 h). Open: 8.8 with the v6 reinstall, 8.10 lease-time decision (user).
+  dumont now hands out `.2` + `.3` as DNS (`pihole.nix`, D11); deploy + check is 8.11 (user).
 
 ## Cutover started 2026-10-25 15:15 (deepthought)
 

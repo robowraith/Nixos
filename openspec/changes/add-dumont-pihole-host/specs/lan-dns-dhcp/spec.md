@@ -47,12 +47,12 @@ resolve each name to exactly one IPv4 address.
 ### Requirement: DHCP for the LAN
 Once cut over, dumont SHALL be the only DHCPv4 server on the LAN, except while DHCP has failed over to wintermute's
 cold standby. It SHALL hand out gateway `192.168.1.1` and DNS
-server `192.168.1.2`, assign reserved addresses to inventory devices by MAC, and answer requests for leases it has no
+servers `192.168.1.2` and `192.168.1.3` (wintermute's Pi-hole, so names still resolve while dumont is down), assign reserved addresses to inventory devices by MAC, and answer requests for leases it has no
 record of (authoritative mode). It SHALL NOT send IPv6 Router Advertisements.
 
 #### Scenario: Reserved device reconnects
 - **WHEN** a device with a reservation sends DHCPDISCOVER
-- **THEN** it receives its reserved IPv4 address, gateway `192.168.1.1` and DNS server `192.168.1.2`
+- **THEN** it receives its reserved IPv4 address, gateway `192.168.1.1` and DNS servers `192.168.1.2`, `192.168.1.3`
 
 #### Scenario: Client rebinds a lease issued by wintermute
 - **WHEN** a client holding a lease from wintermute sends DHCPREQUEST after wintermute's DHCP has been turned off

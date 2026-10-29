@@ -66,6 +66,10 @@ in {
         # Device inventory from sops (only its path is public)
         dnsmasq_lines = [
           "conf-file=${config.sops.secrets.pihole_inventory.path}"
+          # Hand out wintermute's Pi-hole as second DNS server, so clients
+          # keep resolving while dumont is down (design D11). FTL writes no
+          # dns-server option of its own unless dhcp.multiDNS is set.
+          "dhcp-option=option:dns-server,192.168.1.2,192.168.1.3"
         ];
       };
     };

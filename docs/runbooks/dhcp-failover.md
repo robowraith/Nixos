@@ -14,7 +14,7 @@ login shell is fish.
 
 | | dumont (`.2`) | wintermute (`.3`) |
 |---|---|---|
-| DHCP | on, `.12`–`.254`, 24 h, router `.1`, hands out DNS `.2` | **off**, same range and router, lease **1 h** |
+| DHCP | on, `.12`–`.254`, 24 h, router `.1`, hands out DNS `.2` + `.3` | **off**, same range and router, lease **1 h** |
 | Reservations | `secrets/dumont.yaml` inventory | v5: its own `04-pihole-static-dhcp.conf` (pre-cutover copy) |
 
 Check (verified 2026-10-29):
@@ -35,10 +35,10 @@ address for at least 12 h after dumont dies. New devices, guests and phones rejo
 2. Fail over only if dumont stays down and it will take longer than a few hours to fix, or a device needs to join
    now.
 
-DHCP failover does **not** restore DNS for clients holding a dumont lease: they keep DNS `.2` until they get a new
-lease. Clients that ask the Speedport (IPv6 RDNSS `fe80::1`) should still resolve through its secondary, wintermute
-(not tested). To move a device over right away, reconnect it (Wi-Fi off/on, `nmcli connection down/up <conn>`):
-wintermute, being authoritative, answers its request and hands it a lease with DNS `.3` (usually the same address).
+DNS keeps working without a failover: dumont hands out wintermute (`.3`) as second DNS server, and the Speedport's
+secondary is wintermute too. Some clients wait for a timeout on `.2` first, so lookups can be slow. To move a device
+over to a wintermute lease right away, reconnect it (Wi-Fi off/on, `nmcli connection down/up <conn>`): wintermute,
+being authoritative, answers its request (usually with the same address).
 
 ## Fail over: DHCP on at wintermute
 
