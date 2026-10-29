@@ -12,7 +12,7 @@
     alejandra
     statix
     deadnix
-    mcp-nixos # 2.4.3+ in stable uses search.devbox.sh, no unstable needed
+    unstable.mcp-nixos # stable 2.4.3 unbuildable: its fastmcp 3.2.3 fails tests with anyio 4.15 (NixOS/nixpkgs#580398); back to stable once #580411 lands
 
     # Nix devenv (unstable for newer version)
     unstable.devenv
