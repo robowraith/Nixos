@@ -236,6 +236,7 @@
       program = pkgs.lib.getExe (import ./system/hosts/dumont/deploy.nix {
         inherit pkgs;
         inherit (self.nixosConfigurations.dumont.config.system.build) toplevel;
+        rev = self.rev or null;
       });
     };
 

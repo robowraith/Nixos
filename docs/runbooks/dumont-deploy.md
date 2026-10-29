@@ -7,6 +7,10 @@ Run on a desktop (reason or deepthought), from the flake root. Everything addres
 ```
 nix run .#deploy-dumont
 ```
+0. Refuses (exit 1, before anything touches dumont) unless the flake was evaluated from a clean tree whose commit is
+   exactly `origin/main` on GitHub (checked with `git ls-remote`). Commit and push or pull first.
+   `nix run .#deploy-dumont -- --allow-unpushed` turns the refusal into a warning, for emergencies such as GitHub
+   being unreachable. The live commit is shown on dumont by `nixos-version --configuration-revision`.
 1. Builds dumont's system **here** (it is a build input of the app), then `nix copy`s it with
    `--substitute-on-destination`, so dumont fetches what it can from cache.nixos.org.
 2. Asks once for yori's sudo password.

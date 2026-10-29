@@ -1,7 +1,9 @@
 # Guarded deploy for dumont (design.md D8), exposed as `nix run .#deploy-dumont`.
 #
-# Builds dumont's system here, copies it over, activates it with `test`, and
-# health-checks DNS from this machine. Only if every check passes does the
+# Refuses to run unless the system was built from a clean tree at the commit
+# origin/main points to (--allow-unpushed overrides, e.g. while GitHub is
+# unreachable). Builds dumont's system here, copies it over, activates it with
+# `test`, and health-checks DNS from this machine. Only if every check passes does the
 # generation become the boot default; otherwise the previous generation is
 # re-activated and the command exits 1. A power cycle therefore always boots
 # the last good generation.
@@ -11,21 +13,26 @@
 {
   pkgs,
   toplevel,
+  # Commit the flake was evaluated from; null for a dirty tree
+  rev,
 }: let
   host = "192.168.1.2";
+  origin = "https://github.com/robowraith/Nixos.git";
   user = "yori";
   # Pin dumont's host key (the private half is in secrets/dumont.yaml)
   knownHosts = pkgs.writeText "dumont-known-hosts" "${host} ${builtins.readFile ./ssh_host_ed25519_key.pub}";
 in
   pkgs.writeShellApplication {
     name = "deploy-dumont";
-    runtimeInputs = with pkgs; [openssh dnsutils coreutils];
+    runtimeInputs = with pkgs; [openssh dnsutils coreutils git];
     text = ''
       usage() {
         cat <<USAGE
-      Usage: deploy-dumont [--help]
+      Usage: deploy-dumont [--help | --allow-unpushed]
 
       Deploy this flake's dumont configuration to ${user}@${host}:
+        0. refuse unless built from a clean tree at origin/main's commit
+           (--allow-unpushed: warn and continue instead)
         1. copy ${toplevel}
         2. activate it with switch-to-configuration test
         3. health checks from here, retried for ~30 s:
@@ -42,11 +49,40 @@ in
       USAGE
       }
 
+      allowUnpushed=""
+      [[ $# -le 1 ]] || { usage >&2; exit 2; }
       case "''${1:-}" in
         -h | --help) usage; exit 0 ;;
+        --allow-unpushed) allowUnpushed=1 ;;
         "") ;;
         *) usage >&2; exit 2 ;;
       esac
+
+      # Only deploy what is on origin/main, so dumont never runs a config that
+      # exists only on one desktop
+      rev=${
+        if rev == null
+        then ""
+        else rev
+      }
+      remote=$(timeout 15 git ls-remote ${origin} refs/heads/main | cut -f1) || remote=""
+      problem=""
+      if [[ -z "$rev" ]]; then
+        problem="built from a dirty tree"
+      elif [[ -z "$remote" ]]; then
+        problem="could not read origin/main from ${origin}"
+      elif [[ "$rev" != "$remote" ]]; then
+        problem="built from $rev, but origin/main is $remote"
+      fi
+      if [[ -n "$problem" ]]; then
+        if [[ -n "$allowUnpushed" ]]; then
+          echo "WARNING: $problem; deploying anyway (--allow-unpushed)" >&2
+        else
+          echo "refusing: $problem" >&2
+          echo "commit and push/pull first, or rerun with --allow-unpushed" >&2
+          exit 1
+        fi
+      fi
 
       new=${toplevel}
       target=${user}@${host}

@@ -26,4 +26,7 @@
       in
         lib.mapAttrsToList (name: _: modulesPath + "/${name}") nixFilesInDir
     );
+
+  # Shows which commit is live: `nixos-version --configuration-revision`
+  system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
 }
