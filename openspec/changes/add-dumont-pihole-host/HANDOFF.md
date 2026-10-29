@@ -1,5 +1,31 @@
 # Handoff — add-dumont-pihole-host
 
+## Current state 2026-10-29 (deepthought) — READ FIRST
+
+**Progress 27/35 done (+1 dropped).** dumont is the LAN's DHCP + primary DNS since 2026-10-26.
+
+- **dumont live:** rebooted 2026-10-29 ~17:05 after deploying `40406d0` (26.05.20261028, kernel 6.18.59);
+  booted = current system, `pihole-ftl` active, no failed units, only dumont listens on `:67`. CMOS battery was
+  replaced (`5cccaad`). `nixos-version --configuration-revision` on dumont shows the deployed commit.
+- **Deploy app changes (2026-10-29):** `nix run .#deploy-dumont` refuses unless built from a clean tree at exactly
+  origin/main (checked with `git ls-remote`; `-- --allow-unpushed` for emergencies), and after a successful deploy
+  says whether a reboot is advisable (kernel/initrd/modules vs `/run/booted-system`). Runbook `dumont-deploy.md`.
+- **DHCP hands out DNS `.2` + `.3`** (wintermute's v5 Pi-hole as second; D11). Verified on a phone and deepthought
+  (both also get `fe80::1` via RA). Trade-off: some queries go to wintermute's v5 (own lists, pre-cutover local
+  names, not in dumont's log) until the v6 reinstall.
+- **DHCP cold standby on wintermute** (D11, `docs/runbooks/dhcp-failover.md`): v5 DHCP off, range `.12`–`.254`,
+  router `.1`, lease 1 h, `:67` closed (verified). Never both DHCP servers on.
+- **deepthought trial override removed** (8.6 part 1): lease from `.2`, DNS `.2`, `.3`, `fe80::1`.
+
+**Open, in order:**
+1. 8.6 part 2 **(user, on reason):** `nmcli device reapply enp7s0`, check `.111`, gateway `.1`, DNS `.2` + `.3`.
+2. Speedport + `.meine2cent.home` issue (below, 2026-10-26): clients now also get `fe80::1`, so local names can
+   fail when a client asks the Speedport. Not yet investigated further.
+3. 8.10 **(user)** lease-time decision (24 h vs 3–7 d).
+4. 8.7 + 8.8 **(user)** wintermute v6 reinstall as DNS + cold DHCP standby; then update the v6 section of
+   `dhcp-failover.md`.
+5. Phase 4 (9.1–9.4) after ~2 weeks stable, i.e. not before ~2026-11-09, and 9.1 only after 8.7.
+
 ## Live state verified 2026-10-25 (deepthought)
 
 dumont: up 2d21h (last boot 2026-10-22 ~18:15), `running`, no failed units, `pihole-ftl` active, clock correct and
@@ -8,7 +34,7 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
 = .2). Not checked: whether the CMOS battery was replaced (the 10-22 boot synced fine either way), DHCP state
 (`/etc/pihole` not readable as yori; config says off), reason's DNS.
 
-## Handover done 2026-10-26 (deepthought) — READ FIRST
+## Handover done 2026-10-26 (deepthought)
 
 - **8.3 done:** wintermute DHCP off 17:33 (`pihole -a disabledhcp` in the pod via kubectl, UI is limited to reason);
   dumont `dhcp.active = true` deployed (`42da8b4`), listening on :67. Speedport DNS: primary dumont (v4 + ULA),
