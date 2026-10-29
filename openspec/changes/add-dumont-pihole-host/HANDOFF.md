@@ -19,8 +19,13 @@
 
 **Open, in order:**
 1. 8.6 part 2 **(user, on reason):** `nmcli device reapply enp7s0`, check `.111`, gateway `.1`, DNS `.2` + `.3`.
-2. Speedport + `.meine2cent.home` issue (below, 2026-10-26): clients now also get `fe80::1`, so local names can
-   fail when a client asks the Speedport. Not yet investigated further.
+2. Speedport + `.meine2cent.home` issue: **root cause found 2026-10-29: the Speedport's DNS rebind protection.** It
+   strips every upstream answer that points to a private address, for any name (`192.168.1.3.sslip.io`,
+   `10.1.2.3.sslip.io` empty; `8.8.8.8.sslip.io`, `localtest.me` = 127.0.0.1, `0.0.0.0` blocks pass), and keeps the
+   `aa` flag, CNAMEs and NXDOMAIN. Only clients that query `fe80::1` (RDNSS from the Speedport's RA) are affected.
+   deepthought lists it 3rd after `.2`/`.3`, so glibc only uses it if both fail; Android may use it any time.
+   Next **(user)**: look in the Speedport UI (Smart series, encrypted UI) for a rebind-protection exception for
+   `meine2cent.home`, or an option to stop announcing itself as IPv6 DNS. Otherwise accept it.
 3. 8.10 **(user)** lease-time decision (24 h vs 3–7 d).
 4. 8.7 + 8.8 **(user)** wintermute v6 reinstall as DNS + cold DHCP standby; then update the v6 section of
    `dhcp-failover.md`.
@@ -53,6 +58,7 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
   that sends its DNS queries to the Speedport (IPv6 RDNSS from the RA) gets no A for local names. Unknown whether
   this predates the cutover. Phone: emby worked in Chrome, failed in Firefox (suspect `network.trr.mode`, left to
   the user). Fix idea: hand out DNS only via DHCP, or check the Speedport's own domain handling.
+  **Cause (2026-10-29): Speedport DNS rebind protection**, see Current state.
 - **Plan updated 2026-10-26** (tasks.md, design.md, runbook): 8.4 dropped (wintermute stays up as secondary), new 8.6
   (remove deepthought override, verify reason), new 8.7 (v6 reinstall), 9.1 waits for 8.7. Kubectl context is `home_cluster`.
 - **Plan updated 2026-10-29:** DHCP cold standby on wintermute (design D11, spec requirement "Cold-standby DHCP on
