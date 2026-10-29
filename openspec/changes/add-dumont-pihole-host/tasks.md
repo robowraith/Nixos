@@ -146,10 +146,11 @@ command or steps and waits for the result. Everything else is repo work plus rea
   (DHCP off since 2026-10-26, settings and reservations still in place; check its lease time, set to 1 h in 8.2).
   Verify that nothing listens on wintermute's UDP `:67` and that its DHCP settings differ from dumont's only in
   `active` and `leaseTime`.
-- [ ] 8.9 Write `docs/runbooks/dhcp-failover.md`: when to fail over, turning DHCP on at wintermute (v5 now, v6 after
+- [x] 8.9 Write `docs/runbooks/dhcp-failover.md`: when to fail over, turning DHCP on at wintermute (v5 now, v6 after
   8.7), failback (wintermute off before dumont comes back, or right after if it comes back by itself; never both
   on), and the checks (a reconnected device gets its address from the expected server; `:67` listens on exactly one
   host). Verify it against D11 and the spec's standby requirement.
+  - Done 2026-10-29. The check commands were run against the live state; the failover itself was not exercised.
 - [ ] 8.10 **(user)** Decide dumont's lease time: keep 24 h, or raise it to 3–7 d for a longer grace period (D11).
   Verify any change with a reconnected device's lease.
 - [x] 8.5 Write `docs/runbooks/dumont-cutover.md` with the phase 3 steps and the rollback order from the design.
