@@ -24,8 +24,9 @@
    `10.1.2.3.sslip.io` empty; `8.8.8.8.sslip.io`, `localtest.me` = 127.0.0.1, `0.0.0.0` blocks pass), and keeps the
    `aa` flag, CNAMEs and NXDOMAIN. Only clients that query `fe80::1` (RDNSS from the Speedport's RA) are affected.
    deepthought lists it 3rd after `.2`/`.3`, so glibc only uses it if both fail; Android may use it any time.
-   Next **(user)**: look in the Speedport UI (Smart series, encrypted UI) for a rebind-protection exception for
-   `meine2cent.home`, or an option to stop announcing itself as IPv6 DNS. Otherwise accept it.
+   **Fixed 2026-10-29:** the user added a rebind-protection exception for `meine2cent.home` in the Speedport UI.
+   Via `fe80::1` local names now resolve like on dumont (A, AAAA, CNAME); other private answers
+   (`192.168.1.3.sslip.io`) are still stripped, so the protection stays on for everything else.
 3. 8.10 **(user)** lease-time decision (24 h vs 3–7 d).
 4. 8.7 + 8.8 **(user)** wintermute v6 reinstall as DNS + cold DHCP standby; then update the v6 section of
    `dhcp-failover.md`.
