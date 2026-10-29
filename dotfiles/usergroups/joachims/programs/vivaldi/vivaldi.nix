@@ -4,6 +4,13 @@
   ...
 }: let
   vicinaePkg = inputs.vicinae.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  # Vivaldi's wrapper exports LD_LIBRARY_PATH (with stable's glibc) and
+  # LD_PRELOAD to its children. vicinae is built against a newer glibc, so
+  # inheriting them makes ld.so load a mismatched libc and abort at startup.
+  vicinaeBrowserLink = pkgs.writeShellScript "vicinae-browser-link" ''
+    unset LD_LIBRARY_PATH LD_PRELOAD
+    exec ${vicinaePkg}/libexec/vicinae/vicinae-browser-link "$@"
+  '';
 in {
   home.packages = with pkgs; [
     vivaldi
@@ -51,7 +58,7 @@ in {
         text = builtins.toJSON {
           name = "com.vicinae.vicinae";
           description = "Vicinae browser integration";
-          path = "${vicinaePkg}/libexec/vicinae/vicinae-browser-link";
+          path = "${vicinaeBrowserLink}";
           type = "stdio";
           allowed_origins = [
             "chrome-extension://kcmipingpfbohfjckomimmahknoddnke/"
