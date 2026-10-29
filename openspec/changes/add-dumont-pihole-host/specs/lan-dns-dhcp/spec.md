@@ -45,7 +45,8 @@ resolve each name to exactly one IPv4 address.
 - **THEN** dumont returns that device's single configured address
 
 ### Requirement: DHCP for the LAN
-Once cut over, dumont SHALL be the only DHCPv4 server on the LAN. It SHALL hand out gateway `192.168.1.1` and DNS
+Once cut over, dumont SHALL be the only DHCPv4 server on the LAN, except while DHCP has failed over to wintermute's
+cold standby. It SHALL hand out gateway `192.168.1.1` and DNS
 server `192.168.1.2`, assign reserved addresses to inventory devices by MAC, and answer requests for leases it has no
 record of (authoritative mode). It SHALL NOT send IPv6 Router Advertisements.
 
@@ -60,6 +61,23 @@ record of (authoritative mode). It SHALL NOT send IPv6 Router Advertisements.
 #### Scenario: No router advertisements
 - **WHEN** `rdisc6` is run on a LAN host
 - **THEN** only the Speedport (`fe80::1`) answers
+
+### Requirement: Cold-standby DHCP on wintermute
+wintermute SHALL keep a DHCP configuration matching dumont's (range, gateway, reservations) with DHCP turned off, so
+DHCP can be moved to it by hand while dumont is down. At most one of the two SHALL serve DHCP at any time.
+
+#### Scenario: Normal operation
+- **WHEN** dumont is up
+- **THEN** nothing listens on wintermute's UDP port 67
+
+#### Scenario: Failover
+- **WHEN** dumont is down and DHCP is turned on at wintermute
+- **THEN** a reconnecting reserved device receives its reserved address and gateway `192.168.1.1` from wintermute
+
+#### Scenario: Failback
+- **WHEN** dumont serves DHCP again
+- **THEN** wintermute's DHCP is already off, and a client holding a wintermute lease gets an ACK or NAK from dumont
+  when it rebinds
 
 ### Requirement: Configuration is reproducible from the repository
 All Pi-hole configuration — settings, blocklists, allowlist, DHCP reservations and local DNS records — SHALL come

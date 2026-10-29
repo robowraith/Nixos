@@ -247,6 +247,28 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
     Changed URLs count as a removal plus an addition.
   - **Upstreams are a placeholder:** Quad9 (v4 + v6). Compare with wintermute's `PIHOLE_DNS_*` in task 8.1.
 
+### D11 — DHCP redundancy: cold standby on wintermute
+- **Decided 2026-10-29.** wintermute's Pi-hole keeps dumont's DHCP settings (range, router, reservations from the
+  inventory) with DHCP turned off. If dumont is down and not quickly recoverable, DHCP is turned on there by hand
+  (`docs/runbooks/dhcp-failover.md`) and off again once dumont is back. Until the v6 reinstall (task 8.7), the v5
+  Pi-hole is the standby: its DHCP has been off since the handover, with settings and reservations still in place.
+- **Grace period:** with dumont's 24 h leases, clients that hold a lease try to renew after 12 h and only lose it after
+  24 h. An outage hits new devices and reconnecting phones first, so failover can usually wait until someone is at a
+  desktop.
+- **Standby lease time 1 h.** Clients renew with the server that issued their lease. After failback, a client holding
+  a wintermute lease keeps failing to renew until it rebinds by broadcast at 87.5% of the lease. A short standby lease
+  brings it back to dumont, and to DNS `.2`, within an hour. dumont answers that rebind because it is authoritative
+  (spec: rebind scenario), and dnsmasq pings an address before offering it, which covers dynamic addresses wintermute
+  handed out meanwhile.
+- **Never two active servers.** Both write `dhcp-authoritative`, so each would NAK the other's leases and clients would
+  bounce between them. Turn wintermute off before dumont comes back, or right after if dumont comes back by itself
+  (its DHCP is on at boot). A short gap is harmless; an overlap is not.
+- **Rejected: a live second server** (split ranges, `dhcp-reply-delay` on wintermute, both non-authoritative). It
+  needs the reservations kept in sync on two hosts, slows renewals after reboots without authoritative mode, and
+  splits the local names of dynamic clients between two dnsmasq instances. Not worth it for a home LAN.
+- **Open:** whether to raise dumont's lease time to 3–7 d for a longer grace period (task 8.10). The range
+  `.12–.254` has room for it.
+
 ## Risks / Trade-offs
 
 - **v6 regresses something the household relies on.** → Trial run with only reason/deepthought on dumont for a few
@@ -260,7 +282,7 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
 - **eMMC wear or failure.** → Low write load (no swap partition, capped journald and query DB). Recovery is a
   reinstall plus `secrets/dumont.yaml`, since all state is reproducible except history.
 - **Single point of failure stays.** dumont down means LAN DNS down, the same as today with wintermute. → Accepted for
-  now. Redundancy and monitoring are follow-ups.
+  now. Redundancy and monitoring are follow-ups. For DHCP, wintermute is a manual cold standby (D11).
 - **Cutover lease staleness.** Clients keep using `.3` as DNS until they renew. → wintermute's DNS keeps running
   through the handover (Migration Plan, phase 3).
 - **Queries via the Speedport show the Speedport as the client.** This is an existing trade-off, unchanged.
@@ -344,7 +366,7 @@ change being archived.
   - **External dead-man's switch:** whether to add one (healthchecks.io-style).
   - **Extra checks:** whether to also check DHCP (`:67` listening) and gravity freshness.
 - **Secondary DNS for redundancy.** Once wintermute is on NixOS, a DNS-only Pi-hole there from the same module, fed
-  the same lists and the sops inventory (local records only, no DHCP). DHCP would hand out both servers, and the
+  the same lists and the sops inventory (local records, plus DHCP configured but off as the D11 standby). DHCP would hand out both servers, and the
   Speedport would get a secondary DNSv4/v6 if its UI allows. **Partly done 2026-10-26:** the Speedport's secondary
   is already wintermute's v5 Pi-hole (DNS only, DHCP off), replacing Quad9. It lacks the dumont inventory (local names
   only resolve if wintermute has them) and the same lists; the v6 reinstall (task 8.7) closes that gap.

@@ -138,9 +138,20 @@ command or steps and waits for the result. Everything else is repo work plus rea
 - [ ] 8.6 **(user)** Remove the trial override on deepthought so it takes `.2` via DHCP:
   `nmcli con mod Desire ipv4.dns "" ipv4.ignore-auto-dns no ipv6.ignore-auto-dns no && nmcli con up Desire`.
   Also verify reason (reserved `.111`, DNS `.2`, gateway `.1`) after `nmcli device reapply enp7s0`.
-- [ ] 8.7 **(user)** Reinstall wintermute's Pi-hole as v6 (DNS only, no DHCP): same allowlist and local-record
-  inventory as dumont, ideally from the same module (needs wintermute on NixOS, or a v6 container with the same
+- [ ] 8.7 **(user)** Reinstall wintermute's Pi-hole as v6 (DNS only; DHCP configured but off, 8.8): same allowlist and
+  local-record inventory as dumont, ideally from the same module (needs wintermute on NixOS, or a v6 container with the same
   config). Then check the Speedport secondary still answers and blocks like dumont.
+- [ ] 8.8 **(user, with 8.7)** Make wintermute's v6 Pi-hole a cold DHCP standby (D11): dumont's range, router and
+  reservations (the inventory), lease time 1 h, `dhcp.active = false`. Until 8.7 the v5 Pi-hole is the standby
+  (DHCP off since 2026-10-26, settings and reservations still in place; check its lease time, set to 1 h in 8.2).
+  Verify that nothing listens on wintermute's UDP `:67` and that its DHCP settings differ from dumont's only in
+  `active` and `leaseTime`.
+- [ ] 8.9 Write `docs/runbooks/dhcp-failover.md`: when to fail over, turning DHCP on at wintermute (v5 now, v6 after
+  8.7), failback (wintermute off before dumont comes back, or right after if it comes back by itself; never both
+  on), and the checks (a reconnected device gets its address from the expected server; `:67` listens on exactly one
+  host). Verify it against D11 and the spec's standby requirement.
+- [ ] 8.10 **(user)** Decide dumont's lease time: keep 24 h, or raise it to 3–7 d for a longer grace period (D11).
+  Verify any change with a reconnected device's lease.
 - [x] 8.5 Write `docs/runbooks/dumont-cutover.md` with the phase 3 steps and the rollback order from the design.
   Verify it is complete against design.md's Migration Plan *before* 8.2 starts.
 

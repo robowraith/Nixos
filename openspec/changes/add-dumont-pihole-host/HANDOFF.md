@@ -29,6 +29,9 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
   the user). Fix idea: hand out DNS only via DHCP, or check the Speedport's own domain handling.
 - **Plan updated 2026-10-26** (tasks.md, design.md, runbook): 8.4 dropped (wintermute stays up as secondary), new 8.6
   (remove deepthought override, verify reason), new 8.7 (v6 reinstall), 9.1 waits for 8.7. Kubectl context is `home_cluster`.
+- **Plan updated 2026-10-29:** DHCP cold standby on wintermute (design D11, spec requirement "Cold-standby DHCP on
+  wintermute", tasks 8.8–8.10). Not a live second server: DHCP stays off on wintermute, turned on by hand only while
+  dumont is down. Next: 8.9 runbook; 8.10 lease-time decision is the user's.
 
 ## Cutover started 2026-10-25 15:15 (deepthought)
 
