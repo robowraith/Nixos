@@ -28,6 +28,10 @@ nix run .#deploy-dumont
 
 5. All pass: the generation becomes the boot default (`nix-env --set` + `switch-to-configuration boot`).
    Any fail: the previous generation is re-activated with `test`, the failing checks are printed, exit 1.
+6. After a successful deploy, prints `reboot advisable` if the kernel, initrd or kernel modules differ from the
+   booted system (`/run/booted-system`), since those only take effect on reboot. It also catches an earlier
+   deploy whose reboot is still pending. The boot default is already the new generation, so a plain
+   `sudo systemctl reboot` on dumont is enough.
 
 The host key is pinned to `system/hosts/dumont/ssh_host_ed25519_key.pub`; a mismatch aborts.
 

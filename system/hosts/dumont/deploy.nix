@@ -43,6 +43,8 @@ in
              pihole-ftl-setup.service has not failed
         4. all pass: make it the boot default
            any fail: re-activate the previous generation, exit 1
+        5. say whether a reboot is advisable (kernel, initrd or kernel
+           modules differ from the booted system)
 
       Asks for ${user}'s sudo password first and checks it. Run it from the flake root:
         nix run .#deploy-dumont
@@ -166,5 +168,18 @@ in
       rsudo nix-env -p /nix/var/nix/profiles/system --set "$new"
       activate "$new" boot
       echo "deployed $new"
+
+      # switch-to-configuration cannot swap these on a running system; they
+      # only take effect on the next boot
+      changed=""
+      for f in kernel initrd kernel-modules; do
+        [[ "$(rssh readlink -f "/run/booted-system/$f")" == "$(readlink -f "$new/$f")" ]] || changed+=" $f"
+      done
+      if [[ -n "$changed" ]]; then
+        echo "==> reboot advisable:$changed differ from the booted system"
+        echo "    ssh ${user}@${host} sudo systemctl reboot"
+      else
+        echo "==> no reboot needed"
+      fi
     '';
   }
