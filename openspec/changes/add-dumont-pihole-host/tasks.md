@@ -138,6 +138,8 @@ command or steps and waits for the result. Everything else is repo work plus rea
 - [ ] 8.6 **(user)** Remove the trial override on deepthought so it takes `.2` via DHCP:
   `nmcli con mod Desire ipv4.dns "" ipv4.ignore-auto-dns no ipv6.ignore-auto-dns no && nmcli con up Desire`.
   Also verify reason (reserved `.111`, DNS `.2`, gateway `.1`) after `nmcli device reapply enp7s0`.
+  - deepthought done 2026-10-29: override removed, lease from `.2` (24 h), DNS `.2`, `.3`, `fe80::1`; blocking and
+    local names resolve via the system resolver. reason still open.
 - [ ] 8.7 **(user)** Reinstall wintermute's Pi-hole as v6 (DNS only; DHCP configured but off, 8.8): same allowlist and
   local-record inventory as dumont, ideally from the same module (needs wintermute on NixOS, or a v6 container with the same
   config). Then check the Speedport secondary still answers and blocks like dumont.

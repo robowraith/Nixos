@@ -34,7 +34,7 @@ DNS/blocking/local names/web `/admin/` OK from deepthought. deepthought trial st
   dumont is down. 8.9 runbook done (`docs/runbooks/dhcp-failover.md`); v5 standby verified (`:67` closed, range
   `.12`–`.254`, lease 1 h). Open: 8.8 with the v6 reinstall, 8.10 lease-time decision (user).
   dumont now hands out `.2` + `.3` as DNS (`pihole.nix`, D11); 8.11 done (deployed `40406d0`, rebooted, phone gets
-  `.2`, `.3`, `fe80::1`). deepthought still has the trial override (8.6 open), so it only shows `.2`.
+  `.2`, `.3`, `fe80::1`). 8.6 deepthought part done (override removed, DNS `.2`, `.3`, `fe80::1`); reason still open.
 
 ## Cutover started 2026-10-25 15:15 (deepthought)
 
