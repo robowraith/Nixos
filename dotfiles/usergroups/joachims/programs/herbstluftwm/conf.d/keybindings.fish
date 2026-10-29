@@ -25,7 +25,7 @@ hc mousebind $Mod+Button3 resize
 
 # Genral Keybinds 
 hc keyunbind --all
-hc keybind $Mod+Ctrl+q quit
+hc keybind $Mod+Ctrl+Shift+q quit
 hc keybind $Mod+Ctrl+r reload
 hc keybind $Mod+Shift+q close
 hc keybind $Mod+Return spawn kitty
