@@ -5,7 +5,8 @@
 }: {
   programs.obsidian = {
     enable = true;
-    package = pkgs.obsidian;
+    # electron 43 (nixpkgs default) breaks the renderer: empty window, no input
+    package = pkgs.obsidian.override {electron = pkgs.electron_42;};
     vaults.notes = {
       target = "notes";
       # Stylix sets baseFontSize from the system font size; force it here
