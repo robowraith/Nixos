@@ -9,5 +9,7 @@
     ll = "eza -aghl --group-directories-first --icons";
     psg = "procs";
     sarpl = "serpl";
+    # age key stays root-only, so sops runs as root
+    sops = "sudo env SOPS_AGE_KEY_FILE=/var/lib/sops/age/keys.txt EDITOR=hx sops";
   };
 }
