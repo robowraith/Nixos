@@ -47,7 +47,7 @@ _: {
 
       Host sv08
              User biqu
-             Hostname sv08.meine2cent.home
+             Hostname sv08.meine2cent.internal
              ForwardAgent yes
 
       Host  detectorium_bitbucket
