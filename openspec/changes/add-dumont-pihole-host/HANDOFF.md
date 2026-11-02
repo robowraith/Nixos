@@ -31,15 +31,21 @@
 4. 8.7 + 8.8 **(user)** wintermute v6 reinstall as DNS + cold DHCP standby; then update the v6 section of
    `dhcp-failover.md`.
 5. Phase 4 (9.1–9.4) after ~2 weeks stable, i.e. not before ~2026-11-09, and 9.1 only after 8.7.
-6. **LAN domain `meine2cent.home` → `meine2cent.internal` (prepared 2026-11-02, branch `dumont-internal-domain`).**
-   Why: Vivaldi sends `x.meine2cent.home` to search but opens `x.meine2cent.internal` (tested). dumont keeps
-   `local=/meine2cent.home/` so old names are answered locally (NXDOMAIN) instead of going to Quad9; drop it later.
-   The domain is also the DHCP domain (option 15) and the suffix of `dhcp-host` names, so clients switch as leases
-   renew (24 h); until then unqualified names (`u1`) may resolve on some machines and not on others. Before the
-   deploy **(user)**: inventory names in `secrets/dumont.yaml`, Speedport rebind exception for
-   `meine2cent.internal` (keep the `.home` one for now). Not covered: wintermute's v5 Pi-hole (second DNS `.3`)
-   still has only `.home` local names, so `.internal` names fail for clients that fall back to it; fix in its
-   in-cluster config or with the v6 reinstall (8.7), and `kubectl apply` the edited `docs/wintermute/pihole/pihole.yaml`.
+6. **LAN domain `meine2cent.home` → `meine2cent.internal`: deployed 2026-11-02 (`e445fce`), verified from
+   deepthought.** Why: Vivaldi sends `x.meine2cent.home` to search but opens `x.meine2cent.internal` (tested).
+   - dumont: inventory names are `.internal` only; `local=/meine2cent.home/` answers old names locally (NXDOMAIN)
+     instead of forwarding them to Quad9. `.internal` A/CNAME resolve via `.2` and via `fe80::1` (Speedport rebind
+     exception for `meine2cent.internal` added; the `.home` one is still there). The domain is also the DHCP domain
+     (option 15), so clients pick it up as leases renew (24 h).
+   - wintermute k3s: the emby, duplicati, traefik and pihole Ingresses got an extra `.internal` host next to each
+     `.home` one (`kubectl patch`, in-cluster only: their manifests are not in this repo, except pihole's, so
+     re-applying the old manifests drops the `.internal` hosts). Duplicati 2.1 checks the Host header: added
+     `duplicati.meine2cent.internal` under Settings → Allowed hostnames, which only took effect after a pod restart.
+     `wintermute…/duplicati`, `traefik…/` (404) and `pihole…/admin/` (403) failed the same way under `.home` before.
+   - **Open:** deepthought + reason rebuild (ssh `sv08`); KeePass URLs/bookmarks; wintermute's v5 Pi-hole (second
+     DNS `.3`) has only `.home` local names, so fallback clients cannot resolve `.internal` (in-cluster config or
+     v6 reinstall, 8.7); `docs/wintermute/pihole/pihole.yaml` (`.internal` only) not applied, the cluster has both
+     hosts; later drop `local=/meine2cent.home/`, the `.home` Ingress hosts and the Speedport `.home` exception.
 
 ## Live state verified 2026-10-25 (deepthought)
 
