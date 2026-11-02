@@ -138,7 +138,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-    - host: pihole.meine2cent.home
+    - host: pihole.meine2cent.internal
       http:
         paths:
           - backend:
@@ -160,7 +160,7 @@ spec:
     - web
   routes:
     - kind: Rule
-      match: Host(`pihole.meine2cent.home`) && Path(`/`)
+      match: Host(`pihole.meine2cent.internal`) && Path(`/`)
       middlewares:
         - name: pihole-redirect-to-admin
       services:
@@ -186,5 +186,5 @@ metadata:
 spec:
   redirectRegex:
     permanent: false
-    regex: ^http://pihole\.meine2cent\.home/?$
-    replacement: http://pihole.meine2cent.home/admin/
+    regex: ^http://pihole\.meine2cent\.internal/?$
+    replacement: http://pihole.meine2cent.internal/admin/

@@ -48,7 +48,7 @@ being authoritative, answers its request (usually with the same address).
 2. Turn DHCP on, with a 1 h lease:
    ```
    kubectl --context home_cluster -n pihole exec deploy/pihole-deployment -- \
-     pihole -a enabledhcp 192.168.1.12 192.168.1.254 192.168.1.1 1 meine2cent.home
+     pihole -a enabledhcp 192.168.1.12 192.168.1.254 192.168.1.1 1 meine2cent.internal
    ```
    (Or the web UI from reason, the only client allowed on wintermute's `/admin`.)
 3. The command blanks `DHCP_IPv6` and `DHCP_rapid_commit` (seen 2026-10-25). Make sure no router advertisements

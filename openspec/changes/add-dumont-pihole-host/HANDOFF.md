@@ -31,6 +31,15 @@
 4. 8.7 + 8.8 **(user)** wintermute v6 reinstall as DNS + cold DHCP standby; then update the v6 section of
    `dhcp-failover.md`.
 5. Phase 4 (9.1–9.4) after ~2 weeks stable, i.e. not before ~2026-11-09, and 9.1 only after 8.7.
+6. **LAN domain `meine2cent.home` → `meine2cent.internal` (prepared 2026-11-02, branch `dumont-internal-domain`).**
+   Why: Vivaldi sends `x.meine2cent.home` to search but opens `x.meine2cent.internal` (tested). dumont keeps
+   `local=/meine2cent.home/` so old names are answered locally (NXDOMAIN) instead of going to Quad9; drop it later.
+   The domain is also the DHCP domain (option 15) and the suffix of `dhcp-host` names, so clients switch as leases
+   renew (24 h); until then unqualified names (`u1`) may resolve on some machines and not on others. Before the
+   deploy **(user)**: inventory names in `secrets/dumont.yaml`, Speedport rebind exception for
+   `meine2cent.internal` (keep the `.home` one for now). Not covered: wintermute's v5 Pi-hole (second DNS `.3`)
+   still has only `.home` local names, so `.internal` names fail for clients that fall back to it; fix in its
+   in-cluster config or with the v6 reinstall (8.7), and `kubectl apply` the edited `docs/wintermute/pihole/pihole.yaml`.
 
 ## Live state verified 2026-10-25 (deepthought)
 

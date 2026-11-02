@@ -37,11 +37,11 @@ rely on a hand-placed trust-anchor file.
 - **THEN** dumont answers SERVFAIL
 
 ### Requirement: Local names for LAN devices
-dumont SHALL resolve the `meine2cent.home` names of LAN devices as configured in the device inventory, and it SHALL
+dumont SHALL resolve the `meine2cent.internal` names of LAN devices as configured in the device inventory, and it SHALL
 resolve each name to exactly one IPv4 address.
 
 #### Scenario: Known device name
-- **WHEN** a client queries a device name from the inventory, e.g. `wintermute.meine2cent.home`
+- **WHEN** a client queries a device name from the inventory, e.g. `wintermute.meine2cent.internal`
 - **THEN** dumont returns that device's single configured address
 
 ### Requirement: DHCP for the LAN

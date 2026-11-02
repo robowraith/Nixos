@@ -38,7 +38,7 @@ The v5 web UI runs PHP 7.4.33 (Debian 11) as persistent php-cgi workers. Neither
 version; only Pi-hole v6 (no PHP) does. Until then the ConfigMap `pihole-php-cve-2026` in `pihole.yaml`:
 
 - makes lighttpd refuse `/admin` to everyone except reason (`192.168.1.111`) before php-cgi sees the request.
-  Traefik SNATs, so `pihole.meine2cent.home` now answers 403: use `http://192.168.1.3:8080/admin/` from reason.
+  Traefik SNATs, so `pihole.meine2cent.internal` now answers 403: use `http://192.168.1.3:8080/admin/` from reason.
   deepthought has no DHCP reservation and is locked out too.
 - sets `session.upload_progress.enabled = 0` (blocks the confirmed CVE-2026-109619 path, not all variants).
 
@@ -106,12 +106,12 @@ Order (DNS + DHCP are down from step 2 until step 4 finishes):
 
 Checks:
 
-- DNS v4: `dig @192.168.1.3 example.com`, plus a `*.meine2cent.home` name
+- DNS v4: `dig @192.168.1.3 example.com`, plus a `*.meine2cent.internal` name
 - DNS v6: `dig @<eno2 EUI-64 address, stable EUI-64 suffix> example.com`
 - No RA from Pi-hole: `rdisc6 enp7s0` on reason shows only the Speedport (`fe80::1`)
 - DHCP, actively: reconnect one device, then check `pihole.log` for its DHCPACK, and that the device got
   `192.168.1.3` (not the secondary `.4` on `eno2`) as DNS server and gateway `.1`
-- Web: `http://pihole.meine2cent.home/admin` (502 means lighttpd is not on :8080)
+- Web: `http://pihole.meine2cent.internal/admin` (502 means lighttpd is not on :8080)
 - Query log shows real client IPs instead of Traefik's
 
 Rollback, in this order (otherwise the relay and the proxy collide with the hostNetwork pod on :67/:53):

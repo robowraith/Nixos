@@ -12,7 +12,7 @@ See proposal.md for the motivation. Constraints that shape the approach:
   desktop groups (`docker`, `networkmanager`, `audio`, …).
 - **Network today:** wintermute (`192.168.1.3`, plus secondary `.4` = `pi.hole`) runs Pi-hole v5 (`2024.07.0`) on
   k3s with `hostNetwork`. DHCP hands out `.3` as DNS server. The Speedport forwards its own DNS (v4: `.3`, v6:
-  wintermute's ULA) to Pi-hole, and there is no fallback resolver. `.2` is unused. The domain is `meine2cent.home`.
+  wintermute's ULA) to Pi-hole, and there is no fallback resolver. `.2` is unused. The domain is `meine2cent.internal`.
 - **Repo is public on GitHub.** The domain and private IPv4 addresses are already in tracked files. MACs and the device
   inventory are not, and must stay that way. An EUI-64 IPv6 interface ID encodes a MAC.
 - **CLAUDE.md:** rebuilds need sudo and are always run by the user.
@@ -145,7 +145,7 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
 ### D7 — Pi-hole configuration split: public settings in Nix, inventory and password at runtime
 - **Public, in `services.pihole-ftl.settings`:**
   - interface, listening mode, upstreams
-  - DNSSEC on, domain `meine2cent.home`
+  - DNSSEC on, domain `meine2cent.internal`
   - DHCP range, router `.1`, lease time
   - `dhcp.ipv6 = false`, no RA, authoritative mode (verify the v6 key: dnsmasq's default is non-authoritative)
   - `misc.readOnly = true` (module default, kept explicit)
@@ -163,8 +163,8 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
 - **Web password:** the sops secret is exposed as `FTLCONF_webserver_api_password` through a systemd
   `EnvironmentFile` override on `pihole-ftl`. Verify that the env override works with `readOnly`. Fallback: set
   `webserver.api.pwhash` from a sops-rendered snippet. A public hash is not acceptable.
-- **Web UI:** `services.pihole-web` on port 80 at `http://dumont.meine2cent.home/admin`. It is read-only by design: a
-  UI change is reverted by the next deploy and refused by `readOnly` anyway.
+- **Web UI:** `services.pihole-web` on port 80 at `http://dumont.meine2cent.internal/admin`. It is read-only by design:
+  a UI change is reverted by the next deploy and refused by `readOnly` anyway.
 - **Alternatives:**
   - A Teleporter import from v5. Rejected: one-off imperative state, which is exactly the drift being removed.
   - Putting the reservations in Nix. Rejected: it would publish MACs.

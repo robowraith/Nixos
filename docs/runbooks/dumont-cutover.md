@@ -60,7 +60,7 @@ from that lease until they renew. wintermute's DNS therefore keeps running until
 wintermute's v5 Pi-hole stays running with DHCP off: it is the Speedport's secondary DNS (2.3). Do **not** scale it
 to 0 while the Speedport points at it.
 1. Check LAN DNS from a device that is neither a desktop nor dumont (phone): browsing works, a local name such as
-   `wintermute.meine2cent.home` resolves.
+   `wintermute.meine2cent.internal` resolves.
 2. Remove the trial-run override on deepthought (step 2.5).
 3. Reinstall it as a v6 DNS-only Pi-hole later (task 8.7); only then retire the v5 setup.
 
@@ -73,7 +73,7 @@ In this order, so the LAN never has two DHCP servers and never none for long:
 2. Speedport: DNSv4 `192.168.1.3`, DNSv6 wintermute's ULA address.
 3. wintermute: if scaled to 0, `kubectl --context home_cluster -n pihole scale deploy/pihole-deployment --replicas=1`
    and wait until the pod is ready. Then DHCP on: UI from reason, or
-   `pihole -a enabledhcp 192.168.1.12 192.168.1.254 192.168.1.1 24 meine2cent.home` in the pod.
+   `pihole -a enabledhcp 192.168.1.12 192.168.1.254 192.168.1.1 24 meine2cent.internal` in the pod.
 4. wintermute: lease time back to 24 h → Save.
 5. Clients that got a lease from dumont keep `.2` as DNS until they renew (≤ 1 h if dumont handed out 1 h leases,
    else up to 24 h). dumont's DNS stays up during that time, so nothing breaks.
