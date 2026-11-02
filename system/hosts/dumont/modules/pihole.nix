@@ -33,8 +33,12 @@ in {
         dnssec = true;
         # Answer only clients on directly attached subnets (LAN, ULA, GUA)
         listeningMode = "LOCAL";
+        # Also the DHCP domain (option 15) and what expandHosts appends to
+        # dhcp-host names, so clients move over as their leases renew.
+        # .home was ICANN-deferred, never reserved; .internal is ICANN's
+        # private-use TLD (2024).
         domain = {
-          name = "meine2cent.home";
+          name = "meine2cent.internal";
           # Never forward the LAN domain upstream
           local = true;
         };
@@ -70,6 +74,9 @@ in {
           # keep resolving while dumont is down (design D11). FTL writes no
           # dns-server option of its own unless dhcp.multiDNS is set.
           "dhcp-option=option:dns-server,192.168.1.2,192.168.1.3"
+          # Old LAN domain, still answered locally while inventory entries
+          # carry both names. TODO: drop once nothing uses .home any more.
+          "local=/meine2cent.home/"
         ];
       };
     };
@@ -96,7 +103,7 @@ in {
 
   services.pihole-web = {
     enable = true;
-    hostName = "dumont.meine2cent.home";
+    hostName = "dumont.meine2cent.internal";
     ports = ["80"];
   };
 
