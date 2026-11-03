@@ -28,6 +28,12 @@
 
   programs.dconf.enable = true;
 
-  # TODO: electron-39 is EOL; remove once bitwarden-desktop migrates to a newer electron version
-  nixpkgs.config.permittedInsecurePackages = ["electron-39.8.10"];
+  # Single definition: nixpkgs.config merges by recursiveUpdate, so a second list elsewhere replaces this one.
+  nixpkgs.config.permittedInsecurePackages = [
+    # TODO: electron-39 is EOL; remove once bitwarden-desktop migrates to a newer electron version
+    "electron-39.8.10"
+    # TODO: electron-42 is EOL; jhoss's obsidian is pinned to it because electron 43 breaks its
+    # renderer (dotfiles/users/jhoss/programs/obsidian). Remove together with that pin.
+    "electron-42.11.18"
+  ];
 }
