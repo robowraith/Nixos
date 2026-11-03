@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   # Sentry MCP (stdio) for the self-hosted sentry.42he.com. Claude Code is registered against this
-  # path (`claude mcp add sentry-42he -- ~/.local/bin/sentry-mcp-42he`). The token files in
-  # ~/.config/sentry-mcp stay out of Nix; `sentry-mode` (fish) switches the `token` symlink.
+  # path (`claude mcp add sentry-42he -- ~/.local/bin/sentry-mcp-42he`). The read-write personal
+  # token in ~/.config/sentry-mcp/token stays out of Nix (single RW token, ansible#1745).
   home.file.".local/bin/sentry-mcp-42he" = {
     force = true;
     source = pkgs.writeShellScript "sentry-mcp-42he" ''
