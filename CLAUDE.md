@@ -104,6 +104,12 @@ Active hosts: `reason` (user: `joachim`, desktop), `deepthought` (user: `jhoss`,
   `shared`: they would land on servers.
 - **Hostgroups**: `system/hostgroups/` groups machines by shared traits (e.g., `desktop`, `home`, `mine`, `server`). `server` is the headless counterpart of `desktop`: systemd-networkd, no docs or nix-index, zram, small-disk GC/journald limits, no flake registry pin. Servers must not import `home` (NetworkManager + CIFS mounts). A host opts in by importing the group in its `default.nix`.
 - **Usergroups**: `dotfiles/usergroups/` groups users similarly (currently `joachims` for both `joachim` and `jhoss`).
+- **Desktop startup order**: The herbstluftwm autostart (`dotfiles/users/<user>/programs/herbstluftwm/autostart`) owns
+  session startup: it spawns KeePassXC, waits until it is unlocked (secret service), then starts apps that need secrets
+  or the SSH agent. `xdg.autostart.readOnly = true` (joachims herbstluftwm module) makes `~/.config/autostart` a
+  read-only store symlink so apps (e.g. Nextcloud's "Launch on startup") can't install XDG autostart entries that would
+  run before the unlock. Add startup apps to the hlwm autostart, never via XDG autostart. A host whose
+  `~/.config/autostart` is still a real directory needs `rm -r ~/.config/autostart` before the rebuild.
 - **Overlays**: Defined inline in `flake.nix` (currently: `unstable` namespace, herbstluftwm patch, freac codec fix).
 - **Theming**: Stylix handles system-wide theming for both NixOS and Home Manager.
 - **Flake inputs**: `nixpkgs` tracks `nixos-26.05`. A second input, `nixpkgs-unstable`, tracks `nixos-unstable` and is exposed via overlay as `pkgs.unstable.<package>` (allowUnfree enabled) for packages that need to be newer than the release channel. Do NOT add `inputs.nixpkgs.follows` to `vicinae` (breaks Cachix cache).
