@@ -8,6 +8,12 @@
     windowManager.command = "${pkgs.herbstluftwm}/bin/herbstluftwm";
   };
 
+  # The hlwm autostart owns startup order: it waits for KeePassXC to be
+  # unlocked before starting apps that need the secret service. XDG autostart
+  # (pulled in by hm-graphical-session.target) would bypass that, so programs
+  # must not drop their own entries (e.g. Nextcloud's "Launch on startup").
+  xdg.autostart.readOnly = true;
+
   # Write the autostart config to XDG config
   xdg.configFile = {
     # Overwritten in user specific configs
