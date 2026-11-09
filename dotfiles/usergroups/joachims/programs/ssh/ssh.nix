@@ -134,6 +134,24 @@ _: {
             Hostname      gr1.42he.com
             #Hostname      95.216.147.168
 
+      ################
+      # Devbox hase1 #
+      ################
+
+      Host  hase1 hase1_zellij
+              Hostname      hase1.42he.com
+
+      # Own Incus container (ansible #1877): via WireGuard (deepthought only),
+      # elsewhere through hase1. No agent forwarding: root on hase1 reads it.
+      Host  hase1-joachim
+              Hostname      10.250.0.13
+              ForwardAgent  no
+
+      Host  hase1-joachim-jump
+              Hostname      10.250.0.13
+              ProxyJump     hase1
+              ForwardAgent  no
+
       ####################
       # Juniper Switches #
       ####################
