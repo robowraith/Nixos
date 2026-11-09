@@ -6,7 +6,7 @@
     cdi = "__zoxide_zi";
     grep = "rg -S";
     helix = "hx";
-    ll = "eza -aghl --group-directories-first --icons";
+    ll = "eza -aghl --group-directories-first --icons=auto";
     psg = "procs";
     sarpl = "serpl";
     # age key stays root-only, so sops runs as root
