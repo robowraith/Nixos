@@ -15,7 +15,7 @@
 
   config = {
     home.packages = with pkgs; [
-      orca-slicer
+      unstable.orca-slicer
     ];
 
     # Die User-Presets liegen auf dem Share statt lokal, damit reason und
