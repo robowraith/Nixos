@@ -16,6 +16,14 @@
         };
         indent-guides.render = true;
         whitespace.render = "all";
+        # Helix has no swap files: unsaved buffers are lost on a crash/power-off
+        auto-save = {
+          focus-lost = true;
+          after-delay = {
+            enable = true;
+            timeout = 3000; # ms
+          };
+        };
       };
       keys = {
         insert = {
