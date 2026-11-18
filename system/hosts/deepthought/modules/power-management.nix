@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   # ============================================================================
   # Power Management - Tuxedo InfinityBook 14 Gen 6
   # Intel Core i7-11370H (4 cores / 8 threads)
@@ -15,7 +19,25 @@
   # ---------------------------------------------------------------------------
   hardware.tuxedo-drivers.enable = true;
 
+  # TEMP (2026-11-16): stable's tuxedo-drivers 4.20.1 fails to build against
+  # zen 7.3 (struct acpi_driver removed). Build unstable's recipe (4.25.0)
+  # against the stable kernel. Drop once stable ships >= 4.25.0.
+  nixpkgs.overlays = [
+    (_final: prev: {
+      linuxPackages_zen = prev.linuxPackages_zen.extend (kfinal: _: {
+        tuxedo-drivers = kfinal.callPackage "${inputs.nixpkgs-unstable}/pkgs/os-specific/linux/tuxedo-drivers" {};
+      });
+    })
+  ];
+
   services = {
+    # -------------------------------------------------------------------------
+    # Power key: logind ignores a short press, so it reaches X as XF86PowerOff
+    # and herbstluftwm opens the rofi power menu instead of powering off.
+    # Holding the button still forces a hardware power-off.
+    # -------------------------------------------------------------------------
+    logind.settings.Login.HandlePowerKey = "ignore";
+
     # -------------------------------------------------------------------------
     # Intel Thermal Daemon
     # -------------------------------------------------------------------------

@@ -155,6 +155,8 @@ hc keybind $Mod+Shift+w spawn ~/.config/rofi/workspaces.fish
 hc keybind $Mod+s spawn rofi -modi ssh -show ssh -config ~/.config/rofi/jossh.rasi
 hc keybind $Mod+Shift+s spawn ~/.config/rofi/sshtunnel
 hc keybind $Mod+Shift+p spawn rofi -show p -modi p:rofi-power-menu -config ~/.config/rofi/jolauncher.rasi
+# Power button (deepthought: logind ignores it, so the menu replaces instant power-off)
+hc keybind XF86PowerOff spawn rofi -show p -modi p:rofi-power-menu -config ~/.config/rofi/jolauncher.rasi
 
 # resizing frames
 set resizestep 0.05
