@@ -44,6 +44,38 @@ platform decision:
 - Cluster objects used to exist only in the cluster. The Pi-hole ones are now
   in the repo; Emby and Duplicati are not yet.
 
+#### Planned: LAN binary cache (added after the NixOS reinstall)
+
+Once wintermute runs NixOS, it becomes the fleet's Nix cache, so each store
+path is downloaded from upstream once instead of once per host. Wintermute is
+the right place for it because it is always on, and reason usually is not.
+
+- **No full mirror.** cache.nixos.org holds hundreds of TB, and even a single
+  x86_64-linux channel snapshot is several TB that every channel bump largely
+  replaces. A git mirror of nixpkgs (~5 GB) would not help: the source tree is
+  not what gets downloaded repeatedly.
+- **Pull-through caching proxy instead.** Preferred: `ncps` (NixOS module, LRU
+  eviction with a size cap, re-signs with its own key that clients add to
+  `trusted-public-keys`). Fallback: nginx `proxy_cache` in front of
+  cache.nixos.org (needs no key because upstream signatures pass through, but
+  evicts less cleverly). Check the module options at implementation time.
+- **Size budget: 100–200 GB, capped.** The fleet only pulls its own system
+  closures (a few GB to a few tens of GB each, largely shared between reason
+  and deepthought), so a few generations of every host fit comfortably.
+- **Clients** (`system/shared`, or `home` for LAN-only hosts): list wintermute
+  first in `substituters` with cache.nixos.org as the fallback, and set a short
+  `connect-timeout`. deepthought leaves the LAN, so it must not stall on rebuilds
+  when wintermute can't be reached.
+- **Expected benefit is modest.** reason is mostly off, so the two desktops rarely
+  fetch the same update at the same time. dumont gets its closures pushed from a
+  desktop during remote deploys, so it gains almost nothing. Most hits will come
+  from deepthought.
+- **Possible follow-up: Attic or Harmonia for self-built paths.** Overlay
+  packages (herbstluftwm patch, freac fix) and anything else missing from
+  cache.nixos.org are currently compiled on each desktop. Building them once on
+  wintermute and serving them from the cache may save more than the proxy does.
+  Not part of the first step.
+
 ### neuromancer
 
 Hetzner VPS. Mailcow, Nextcloud, and Traefik run on Docker. Highest-stakes
