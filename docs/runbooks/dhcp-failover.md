@@ -59,8 +59,14 @@ being authoritative, answers its request (usually with the same address).
    ```
    Set both keys back to `false` (UI from reason → Settings → DHCP → Save with IPv6 unticked) once things are calm.
 
-**v6 (after task 8.7):** set `dhcp.active = true` on wintermute: in its Nix config and rebuild if wintermute runs
-NixOS, or `pihole-FTL --config dhcp.active true` in the container. Update this section when 8.7 is done.
+**v6 (after task 8.7):** the settings are `FTLCONF_*` env vars (`docs/wintermute/pihole/README.md` → Pi-hole v6),
+so `pihole-FTL --config` and the UI cannot change them. Set the env var instead; this restarts the pod, a few seconds
+without DNS on `.3`:
+```
+kubectl --context home_cluster -n pihole set env deploy/pihole-deployment FTLCONF_dhcp_active=true
+```
+No RA check needed: `dhcp.ipv6 = false` comes from the manifest. Reservations are dumont's inventory (Secret
+`pihole-inventory`), so reserved devices keep their addresses.
 
 **Check:**
 - `ssh server "ss -ulnH 'sport = :67'"` prints a listener
@@ -81,7 +87,8 @@ back, or right away if dumont comes back by itself (its DHCP starts at boot).
 
 1. wintermute DHCP off:
    - v5: `kubectl --context home_cluster -n pihole exec deploy/pihole-deployment -- pihole -a disabledhcp`
-   - v6: `dhcp.active = false` (Nix config or `pihole-FTL --config dhcp.active false`)
+   - v6: `kubectl --context home_cluster -n pihole set env deploy/pihole-deployment FTLCONF_dhcp_active=false`,
+     or re-apply the manifest (`nix build .#wintermute-pihole && kubectl apply -f result`)
 2. Check: `ssh server "ss -ulnH 'sport = :67'"` prints nothing.
 3. Bring dumont back (power on, or `nix run .#deploy-dumont`). Check: `ssh yori@192.168.1.2 "ss -ulnH 'sport = :67'"`
    prints one listener.

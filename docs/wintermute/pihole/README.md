@@ -9,7 +9,8 @@ kubectl access from reason: context `wintermute` (`~/.kube/wintermute.config`, m
 
 | File | Contents |
 |---|---|
-| `pihole.yaml` | Pi-hole Deployment, its Services, the web Ingress/IngressRoute and Middlewares |
+| `pihole.yaml` | **v5** (live until task 8.7): Pi-hole Deployment, its Services, the web Ingress/IngressRoute and Middlewares. After 8.7 it is the rollback |
+| `v6.nix` | **v6**: the replacement, rendered from dumont's Pi-hole config (`nix build .#wintermute-pihole`), see Pi-hole v6 below |
 | `shims.yaml` | dhcp-relay, ipv6-proxy, ip-watcher (+ RBAC, ConfigMap): workarounds for FTL running in the pod network |
 | `traefik-dns-routes.yaml` | Traefik IngressRouteUDP/TCP that carried LAN DNS (and an unused DHCP route) into the pod |
 | `traefik-helmchartconfig.yaml` | Copy of the Traefik HelmChartConfig exposing :53. **Not applied from here**: k3s owns it via the addon file `/var/lib/rancher/k3s/server/manifests/traefik-config.yaml` and re-applies that file on every start |
@@ -31,6 +32,102 @@ kubectl --context wintermute apply -f docs/wintermute/pihole/pihole.yaml
 
 Anything that has to happen on wintermute itself (addon files, `/etc/pihole/config/setupVars.conf`) needs sudo
 there and is the user's job. On wintermute there is no `wintermute` context: use `sudo k3s kubectl`.
+
+## Pi-hole v6 (tasks 8.7 + 8.8, prepared 2026-11-23, not applied)
+
+Replaces the v5 pod with `pihole/pihole:2026.11.0` (FTL 6.9, Core 6.6) as wintermute's DNS and the cold DHCP standby
+for dumont (design D11 in `openspec/changes/add-dumont-pihole-host`). `v6.nix` builds the manifest from
+`nixosConfigurations.dumont.config.services.pihole-ftl`, so wintermute gets dumont's upstreams, DNSSEC, domain,
+DHCP range/router, `dnsmasq_lines` and lists by construction. Intended differences only:
+
+| | dumont | wintermute v6 |
+|---|---|---|
+| `dhcp.active` | `true` | `false` (cold standby) |
+| `dhcp.leaseTime` | `72h` | `1h` (D11: clients come back to dumont within an hour after a failback) |
+| inventory | `/run/secrets/pihole_inventory` | Secret `pihole-inventory`, made from the same `secrets/dumont.yaml` key |
+| web | `:80`, `dumont.meine2cent.internal` | `:8080` behind Traefik, `pihole.meine2cent.internal` (+ old `.home` host) |
+| state | `/var/lib/pihole` | hostPath `/etc/pihole-v6` (new; v5's `/etc/pihole/config` stays untouched for the rollback) |
+
+All settings are `FTLCONF_*` env vars: FTL re-applies them on every start and the UI/`--config` cannot change
+them. Not carried over from v5: `/etc/dnsmasq.d` (v5 DHCP files, the KSK-2024 hack; v6 ships the anchor), the PHP
+CVE ConfigMap (no PHP in v6; `/admin` is open to the LAN again, as on dumont), `INTERFACE` (`dns.listeningMode =
+LOCAL` instead). DHCP hands out `.2, .3`, the same as dumont; in a failover clients try `.2` first and fall back.
+
+kubectl context: `wintermute` on reason, `home_cluster` on deepthought (examples: `wintermute`). Every step that
+changes the cluster or wintermute is the user's.
+
+### Preconditions
+
+- dumont is healthy and serves DNS + DHCP: wintermute's DNS (`.3`) is down for a few seconds during the switch,
+  which only affects clients falling back to it.
+- wintermute's DHCP is off: `ssh server "ss -ulnH 'sport = :67'"` prints nothing.
+- Clean tree at origin/main, so the manifest matches what dumont runs.
+
+### Steps
+
+1. Build and review the manifest (a Kubernetes `List` in JSON):
+   ```bash
+   nix build .#wintermute-pihole
+   jq -r '.items[] | select(.kind=="Deployment") | .spec.template.spec.containers[0].env[] | "\(.name)=\(.value // "<secret>")"' result
+   ```
+2. Pre-pull the image so the switch takes seconds: `ssh server sudo k3s crictl pull docker.io/pihole/pihole:2026.11.0`
+3. Inventory Secret from dumont's sops file (contains MACs: never write it to the repo):
+   ```bash
+   sudo SOPS_AGE_KEY_FILE=/var/lib/sops/age/keys.txt sops -d --extract '["pihole_inventory"]' secrets/dumont.yaml \
+     | kubectl --context wintermute -n pihole create secret generic pihole-inventory \
+         --from-file=inventory.conf=/dev/stdin --dry-run=client -o yaml \
+     | kubectl --context wintermute apply -f -
+   ```
+4. Switch. Delete first: an `apply` over the v5 Deployment would merge in its old env and volumes.
+   ```bash
+   kubectl --context wintermute -n pihole delete deployment pihole-deployment
+   kubectl --context wintermute apply -f result
+   kubectl --context wintermute -n pihole rollout status deploy/pihole-deployment
+   ```
+5. Seed the gravity lists (adlists are in `gravity.db`, not the config):
+   ```bash
+   kubectl --context wintermute -n pihole exec deploy/pihole-deployment -- sh /etc/pihole-lists/sync-lists.sh
+   ```
+6. After the checks pass: `kubectl --context wintermute -n pihole delete configmap pihole-php-cve-2026`
+
+### Checks
+
+```bash
+kubectl --context wintermute -n pihole exec deploy/pihole-deployment -- pihole -v          # FTL v6.9
+kubectl --context wintermute -n pihole exec deploy/pihole-deployment -- pihole-FTL --config dhcp.active     # false
+kubectl --context wintermute -n pihole exec deploy/pihole-deployment -- pihole-FTL --config dhcp.leaseTime  # 1h
+ssh server "ss -ulnH 'sport = :67'"                       # nothing: standby, never a second DHCP server
+dig @192.168.1.3 example.com                              # NOERROR
+dig +short @192.168.1.3 doubleclick.net                   # 0.0.0.0
+dig +short @192.168.1.3 dumont.meine2cent.internal        # 192.168.1.2 (inventory loaded)
+dig @192.168.1.3 dnssec-failed.org                        # SERVFAIL (validation on, no KSK file needed)
+ssh server "ip -6 addr show eno2 scope global"            # then: dig @<ULA> example.com
+rdisc6 enp7s0                                             # only fe80::1 (the Speedport)
+```
+
+- Same answers as dumont for a few blocked, allowed (`pihole-allowlist.txt`) and local names: `dig +short @192.168.1.2`
+  vs `@192.168.1.3`.
+- Web: `http://pihole.meine2cent.internal/admin/` loads and the login works (password from
+  `secrets/wintermute-pihole.yaml`). The query log shows real client IPs.
+
+### Rollback
+
+v5's state is untouched (`/etc/pihole/config`, `/etc/pihole/dnsmasq.d`), so:
+
+```bash
+kubectl --context wintermute -n pihole delete deployment pihole-deployment
+kubectl --context wintermute apply -f docs/wintermute/pihole/pihole.yaml
+```
+
+The v5 `pihole.yaml` has only the `.internal` Ingress host, so this drops the old `.home` host: acceptable.
+
+### Later changes
+
+- Settings or lists changed on dumont: `nix build .#wintermute-pihole && kubectl --context wintermute apply -f result`
+  (a changed env restarts the pod), then re-run `sync-lists.sh` if the lists changed. Like dumont, it only adds lists.
+- Inventory changed in `secrets/dumont.yaml`: re-run step 3, then
+  `kubectl --context wintermute -n pihole rollout restart deploy/pihole-deployment` (FTL reads `conf-file` at start).
+- New image: bump `image` in `v6.nix`.
 
 ## PHP RCE stopgap (CVE-2026-109618/-109619, 2026-10-22)
 

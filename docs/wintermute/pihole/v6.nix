@@ -103,7 +103,10 @@
 
   isFile = l: lib.hasPrefix "file://" l.url;
   # /nix/store/<hash>-name → name
-  fileKey = l: lib.removePrefix "${builtins.substring 0 33 (baseNameOf l.url)}" (baseNameOf l.url);
+  fileKey = l: let
+    base = builtins.unsafeDiscardStringContext (baseNameOf l.url);
+  in
+    builtins.substring 33 (-1) base;
   listUrl = l:
     if isFile l
     then "file://${listsDir}/${fileKey l}"
@@ -287,15 +290,14 @@
 
   ingressRule = host: {
     inherit host;
-    http.paths =
-      map (path: {
-        inherit path;
-        pathType = "Prefix";
-        backend.service = {
-          name = "pihole-web";
-          port.name = "pihole-http";
-        };
-      }) ["/admin" "/api"];
+    http.paths = map (path: {
+      inherit path;
+      pathType = "Prefix";
+      backend.service = {
+        name = "pihole-web";
+        port.name = "pihole-http";
+      };
+    }) ["/admin" "/api"];
   };
 
   ingress = {

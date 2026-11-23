@@ -240,6 +240,14 @@
       });
     };
 
+    # Pi-hole v6 manifest for wintermute's k3s, rendered from dumont's config
+    # (see docs/wintermute/pihole/README.md → Pi-hole v6)
+    packages.${system}.wintermute-pihole = import ./docs/wintermute/pihole/v6.nix {
+      inherit pkgs;
+      inherit (pkgs) lib;
+      dumont = self.nixosConfigurations.dumont.config;
+    };
+
     # Pre-commit checks
     checks.${system}.pre-commit-check = pre-commit-hooks.lib.${system}.run {
       src = ./.;
