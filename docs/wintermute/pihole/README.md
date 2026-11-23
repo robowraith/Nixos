@@ -105,8 +105,18 @@ ssh server "ip -6 addr show eno2 scope global"            # then: dig @<ULA> exa
 rdisc6 enp7s0                                             # only fe80::1 (the Speedport)
 ```
 
+- The lists loaded, including the `file://` allowlist from the ConfigMap (its files are `..data` symlinks, which
+  newer FTL/Core releases handle more strictly). Every row needs `status` 1 or 2 and a non-zero `number`:
+  ```bash
+  kubectl --context wintermute -n pihole exec deploy/pihole-deployment -- \
+    pihole-FTL sqlite3 /etc/pihole/gravity.db "select address, enabled, type, status, number from adlist"
+  ```
+  If the allowlist row fails, copy the file to a real path in the pod (or inline the domains) instead.
 - Same answers as dumont for a few blocked, allowed (`pihole-allowlist.txt`) and local names: `dig +short @192.168.1.2`
-  vs `@192.168.1.3`.
+  vs `@192.168.1.3`. Include a host-record name (`dumont.meine2cent.internal`) and reserved DHCP clients
+  (`reason.meine2cent.internal`, `deepthought.meine2cent.internal`). If the reserved names stay empty on `.3`, the
+  inventory only gives them a DNS name through an active lease (`dhcp-host`), which the standby has none of while
+  DHCP is off: a known standby limitation. Record it in task 8.7, or add `host-record` lines to the inventory.
 - Web: `http://pihole.meine2cent.internal/admin/` loads and the login works (password from
   `secrets/wintermute-pihole.yaml`). The query log shows real client IPs.
 
