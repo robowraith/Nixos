@@ -135,11 +135,12 @@ command or steps and waits for the result. Everything else is repo work plus rea
 - [~] 8.4 **(user)** ~~Scale `pihole-deployment` to 0.~~ **Dropped 2026-10-26:** wintermute's Pi-hole stays up as the
   Speedport's secondary DNS (DHCP off). Instead verify from a non-desktop device that LAN DNS and a
   `.meine2cent.home` name resolve (phone `.140` holds a dumont lease; name check still open).
-- [ ] 8.6 **(user)** Remove the trial override on deepthought so it takes `.2` via DHCP:
+- [x] 8.6 **(user)** Remove the trial override on deepthought so it takes `.2` via DHCP:
   `nmcli con mod Desire ipv4.dns "" ipv4.ignore-auto-dns no ipv6.ignore-auto-dns no && nmcli con up Desire`.
   Also verify reason (reserved `.111`, DNS `.2`, gateway `.1`) after `nmcli device reapply enp7s0`.
   - deepthought done 2026-10-29: override removed, lease from `.2` (24 h), DNS `.2`, `.3`, `fe80::1`; blocking and
-    local names resolve via the system resolver. reason still open.
+    local names resolve via the system resolver.
+  - reason done (checked 2026-11-23): `.111/24`, gateway `.1`, DNS `.2`, `.3`, `fe80::1`, lease from `.2` (86400 s).
 - [ ] 8.7 **(user)** Reinstall wintermute's Pi-hole as v6 (DNS only; DHCP configured but off, 8.8): same allowlist and
   local-record inventory as dumont, ideally from the same module (needs wintermute on NixOS, or a v6 container with the same
   config). Then check the Speedport secondary still answers and blocks like dumont.
@@ -157,8 +158,10 @@ command or steps and waits for the result. Everything else is repo work plus rea
   `nmcli -f IP4.DNS device show <iface>` lists `192.168.1.2` and `192.168.1.3`.
   - Done 2026-10-29: deployed `40406d0`, dumont rebooted (kernel 6.18.59). A reconnected phone shows DNS `.2`, `.3`
     and `fe80::1` (Speedport RDNSS).
-- [ ] 8.10 **(user)** Decide dumont's lease time: keep 24 h, or raise it to 3–7 d for a longer grace period (D11).
+- [x] 8.10 **(user)** Decide dumont's lease time: keep 24 h, or raise it to 3–7 d for a longer grace period (D11).
   Verify any change with a reconnected device's lease.
+  - Decided 2026-11-23: 3 d (`leaseTime = "72h"`). Verify after the deploy: a reconnected device shows
+    `dhcp_lease_time = 259200` and `dhcp_server_identifier = 192.168.1.2`.
 - [x] 8.5 Write `docs/runbooks/dumont-cutover.md` with the phase 3 steps and the rollback order from the design.
   Verify it is complete against design.md's Migration Plan *before* 8.2 starts.
 

@@ -57,7 +57,9 @@ in {
         end = "192.168.1.254";
         router = "192.168.1.1";
         netmask = "255.255.255.0";
-        leaseTime = "24h";
+        # 3 d (task 8.10): clients renew after 1.5 d and keep their address for
+        # 3 d while dumont is down, a longer grace period before a failover
+        leaseTime = "72h";
         # No DHCPv6 and no router advertisements: the Speedport sends RAs
         ipv6 = false;
       };

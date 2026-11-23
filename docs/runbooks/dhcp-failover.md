@@ -14,7 +14,7 @@ login shell is fish.
 
 | | dumont (`.2`) | wintermute (`.3`) |
 |---|---|---|
-| DHCP | on, `.12`–`.254`, 24 h, router `.1`, hands out DNS `.2` + `.3` | **off**, same range and router, lease **1 h** |
+| DHCP | on, `.12`–`.254`, 72 h, router `.1`, hands out DNS `.2` + `.3` | **off**, same range and router, lease **1 h** |
 | Reservations | `secrets/dumont.yaml` inventory | v5: its own `04-pihole-static-dhcp.conf` (pre-cutover copy) |
 
 Check (verified 2026-10-29):
@@ -27,8 +27,8 @@ ssh server "grep -E '^DHCP_' /etc/pihole/config/setupVars.conf"
 
 ## When to fail over
 
-dumont's leases last 24 h and clients first try to renew after 12 h, so devices that already have a lease keep their
-address for at least 12 h after dumont dies. New devices, guests and phones rejoining the Wi-Fi are hit first.
+dumont's leases last 72 h and clients first try to renew after 36 h, so devices that already have a lease keep their
+address for at least 36 h after dumont dies. New devices, guests and phones rejoining the Wi-Fi are hit first.
 
 1. Try to get dumont back first: power-cycle it. It always boots the last generation that passed the deploy checks
    (`dumont-deploy.md`, Last resort).
@@ -89,5 +89,5 @@ back, or right away if dumont comes back by itself (its DHCP starts at boot).
    lease. dumont answers them, since it is authoritative, so within an hour they are back on dumont with DNS `.2`.
    Reconnecting a device does it at once. dnsmasq pings an address before offering it, which covers dynamic
    addresses wintermute handed out meanwhile.
-5. Check on a reconnected device: `dhcp_server_identifier = 192.168.1.2`, `dhcp_lease_time = 86400`.
+5. Check on a reconnected device: `dhcp_server_identifier = 192.168.1.2`, `dhcp_lease_time = 259200`.
 6. Leave wintermute's lease time at 1 h; it only matters during the next failover.

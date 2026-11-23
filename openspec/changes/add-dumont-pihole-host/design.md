@@ -252,8 +252,8 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
   inventory) with DHCP turned off. If dumont is down and not quickly recoverable, DHCP is turned on there by hand
   (`docs/runbooks/dhcp-failover.md`) and off again once dumont is back. Until the v6 reinstall (task 8.7), the v5
   Pi-hole is the standby: its DHCP has been off since the handover, with settings and reservations still in place.
-- **Grace period:** with dumont's 24 h leases, clients that hold a lease try to renew after 12 h and only lose it after
-  24 h. An outage hits new devices and reconnecting phones first, so failover can usually wait until someone is at a
+- **Grace period:** with dumont's 3 d leases (72 h since 2026-11-23, task 8.10; 24 h before), clients that hold a
+  lease try to renew after 36 h and only lose it after 72 h. An outage hits new devices and reconnecting phones first, so failover can usually wait until someone is at a
   desktop.
 - **Standby lease time 1 h.** Clients renew with the server that issued their lease. After failback, a client holding
   a wintermute lease keeps failing to renew until it rebinds by broadcast at 87.5% of the lease. A short standby lease
@@ -272,8 +272,8 @@ existing SSH public keys, with no Home Manager profile. Its sudo password is the
   while dumont is up. Until the v6 reinstall (task 8.7), wintermute's v5 has its own lists and pre-cutover local
   names, so blocking and local names can differ there, and those queries are missing from dumont's log. The
   Speedport's secondary is already wintermute, so this was accepted.
-- **Open:** whether to raise dumont's lease time to 3–7 d for a longer grace period (task 8.10). The range
-  `.12–.254` has room for it.
+- **Lease time 3 d (decided 2026-11-23, task 8.10)** for a longer grace period. The range `.12–.254` has room for
+  it. The standby keeps 1 h.
 
 ## Risks / Trade-offs
 
