@@ -1,6 +1,40 @@
 # Handoff — add-dumont-pihole-host
 
-## Current state 2026-10-29 (deepthought) — READ FIRST
+## Current state 2026-11-23 (reason) — READ FIRST
+
+**Progress 29/35 done (+1 dropped).** Open: 8.7, 8.8 (prepared), 9.1–9.4.
+
+- **dumont healthy** at check time: booted `8cee669` (18:38 reboot, kernel 6.18.64), `running`, no failed units,
+  `pihole-ftl` active; `.2` resolves, blocks (`doubleclick.net` → `0.0.0.0`) and answers `.internal` names; also via
+  `fe80::1`. `/` 29 %, 1.5 GB RAM free.
+- **8.6 done:** reason `.111/24`, gw `.1`, DNS `.2`/`.3`/`fe80::1`, lease from `.2`.
+- **8.10 done: lease 72 h** (`bb723ef`). **Not deployed yet.** User runs `nix run .#deploy-dumont` (pihole-ftl
+  restarts, short DNS blip on `.2`); verify a reconnected device shows `dhcp_lease_time = 259200`.
+- **8.7/8.8 prepared, not applied** (`fdc4ab3`, `20639b8`): v6 container `pihole/pihole:2026.11.0` on k3s.
+  - `docs/wintermute/pihole/v6.nix` renders a k8s `List` from `nixosConfigurations.dumont.config.services.pihole-ftl`
+    (`nix build .#wintermute-pihole`, flake `packages`). All settings as `FTLCONF_*` env (locked); differs from
+    dumont only in `dhcp.active=false`, `leaseTime=1h`, web `:8080`/`pihole.meine2cent.internal`, no NixOS paths,
+    no `misc.readOnly`. Fresh hostPath `/etc/pihole-v6`; v5 state untouched → rollback = old `pihole.yaml`.
+  - Inventory: Secret `pihole-inventory` from `secrets/dumont.yaml` at apply time (sudo sops). Lists: ConfigMap
+    `pihole-lists` with generated `sync-lists.sh` (+ allowlist file), run once via `kubectl exec`.
+  - `kubectl --context wintermute diff` (server-side dry run) accepted everything on 2026-11-23. It showed that
+    `apply` over v5 would merge old env/CVE mounts → runbook deletes the Deployment first.
+  - Runbook, checks, rollback: `docs/wintermute/pihole/README.md` → "Pi-hole v6". Failover v6 commands
+    (`kubectl set env … FTLCONF_dhcp_active=true|false`) already in `docs/runbooks/dhcp-failover.md`.
+  - Risky checks: the `file://` allowlist through ConfigMap `..data` symlinks (check `adlist.number`), and
+    reserved names (`reason`, `deepthought`) may not resolve on `.3` if they exist only as `dhcp-host` lines (no
+    lease while standby DHCP is off). Today `.3` (v5) answers no `.internal` name at all.
+- **Decisions the user still owes:**
+  1. **Security:** dumont runs FTL 6.7.1 / Core 6.4.2 / web 6.6 (nixos-26.05). FTL 6.9 / Core 6.6 fix 11
+     advisories (High, incl. admin RCE). nixos-unstable has the matching set: pihole-ftl 6.9, pihole 6.6,
+     pihole-web 6.6.1. Offered pinning them from `pkgs.unstable` so it ships with the lease deploy; no answer yet.
+     Ideally decide before deploying.
+  2. Standby DHCP DNS order: `.2,.3` (same as dumont, as task 8.8 states) vs `.3,.2` (faster during a failover);
+     one-line override in `v6.nix`.
+  3. wintermute `/admin` is open to the LAN again under v6 (PHP stopgap no longer needed) — confirm.
+- **Next after 8.7:** tick 8.7/8.8, drop ConfigMap `pihole-php-cve-2026`; phase 4 (9.1 only after 8.7).
+
+## State 2026-10-29 (deepthought)
 
 **Progress 27/35 done (+1 dropped).** dumont is the LAN's DHCP + primary DNS since 2026-10-26.
 
