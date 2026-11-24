@@ -23,7 +23,7 @@ _: {
               Port          22
               Hostname      192.168.1.111
 
-      Host  server server_zellij
+      Host  server server_zellij wintermute wm
               User          server
               Port          6543
               Hostname      192.168.1.3
