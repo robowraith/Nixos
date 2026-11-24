@@ -1,7 +1,13 @@
 # Pi-hole on wintermute (k3s)
 
+> **Since 2026-10-26 the LAN's DHCP server and primary DNS is dumont** (`system/hosts/dumont`, runbooks
+> `docs/runbooks/dumont-*.md`). wintermute only runs Pi-hole v6 as the secondary DNS and dumont's cold DHCP standby
+> (`docs/runbooks/dhcp-failover.md`). **Current:** "Pi-hole v6" below. **Historical (v5, kept for the record and the
+> v5 rollback until wintermute's `/etc/pihole` is deleted):** `pihole.yaml`, `shims.yaml`, `traefik-*.yaml`,
+> "Applying", "PHP RCE stopgap", "Root KSK-2024 trust anchor" and "hostNetwork cutover".
+
 Source of truth for the Pi-hole objects in wintermute's k3s cluster. Before this directory existed they
-lived only in the cluster and drifted; see `pihole_wintermute_handoff.md` in the repo root for the history.
+lived only in the cluster and drifted; see [`history.md`](history.md) for the history.
 
 kubectl access from reason: context `wintermute` (`~/.kube/wintermute.config`, merged by `kmerge`).
 
@@ -9,15 +15,16 @@ kubectl access from reason: context `wintermute` (`~/.kube/wintermute.config`, m
 
 | File | Contents |
 |---|---|
-| `pihole.yaml` | **v5** (live until task 8.7): Pi-hole Deployment, its Services, the web Ingress/IngressRoute and Middlewares. After 8.7 it is the rollback |
-| `v6.nix` | **v6**: the replacement, rendered from dumont's Pi-hole config (`nix build .#wintermute-pihole`), see Pi-hole v6 below |
-| `shims.yaml` | dhcp-relay, ipv6-proxy, ip-watcher (+ RBAC, ConfigMap): workarounds for FTL running in the pod network |
-| `traefik-dns-routes.yaml` | Traefik IngressRouteUDP/TCP that carried LAN DNS (and an unused DHCP route) into the pod |
-| `traefik-helmchartconfig.yaml` | Copy of the Traefik HelmChartConfig exposing :53. **Not applied from here**: k3s owns it via the addon file `/var/lib/rancher/k3s/server/manifests/traefik-config.yaml` and re-applies that file on every start |
+| `pihole.yaml` | **v5, historical** (live until 2026-11-24): Pi-hole Deployment, its Services, the web Ingress/IngressRoute and Middlewares. Now only the v5 rollback |
+| `v6.nix` | **v6, live**: the standby, rendered from dumont's Pi-hole config (`nix build .#wintermute-pihole`), see Pi-hole v6 below |
+| `history.md` | How Pi-hole got from v5 on k3s to dumont (2024 – 2026-11) |
+| `shims.yaml` | **Historical** (deleted 2026-10-03): dhcp-relay, ipv6-proxy, ip-watcher (+ RBAC, ConfigMap): workarounds for FTL running in the pod network |
+| `traefik-dns-routes.yaml` | **Historical** (deleted 2026-10-03): Traefik IngressRouteUDP/TCP that carried LAN DNS (and an unused DHCP route) into the pod |
+| `traefik-helmchartconfig.yaml` | **Historical**: copy of the Traefik HelmChartConfig exposing :53. **Not applied from here**: k3s owns it via the addon file `/var/lib/rancher/k3s/server/manifests/traefik-config.yaml` and re-applies that file on every start |
 
 ## Admin password
 
-The Deployment reads `WEBPASSWORD` from the Secret `pihole-web-password`. The value lives SOPS-encrypted in
+Current for v5 and v6. The Deployment reads `WEBPASSWORD` from the Secret `pihole-web-password`. The value lives SOPS-encrypted in
 `secrets/wintermute-pihole.yaml` (a ready-made Secret manifest):
 
 ```bash
@@ -144,6 +151,8 @@ The v5 `pihole.yaml` has only the `.internal` Ingress host, so this drops the ol
 
 ## PHP RCE stopgap (CVE-2026-109618/-109619, 2026-10-22)
 
+*Historical (v5).*
+
 The v5 web UI runs PHP 7.4.33 (Debian 11) as persistent php-cgi workers. Neither PHP nor Debian will fix that
 version; only Pi-hole v6 (no PHP) does. Until then the ConfigMap `pihole-php-cve-2026` in `pihole.yaml`:
 
@@ -158,6 +167,8 @@ next pod restart. Checks: from reason `curl -so /dev/null -w '%{http_code}' http
 inside the pod the same against `127.0.0.1` → 403. Drop the ConfigMap and mounts when moving to v6.
 
 ## Root KSK-2024 trust anchor (2026-10)
+
+*Historical (v5).*
 
 On 2026-10-11 the root zone switched its signing key from KSK-2017 (id 20326) to KSK-2024 (id 38696). The image
 (`pihole/pihole:2024.07.0`, Pi-hole v5) only ships the KSK-2017 anchor, so with DNSSEC enabled every lookup
@@ -180,6 +191,8 @@ still on).
 `pihole.toml`, env vars renamed), not a tag bump. Drop `99-root-ksk-2024.conf` afterwards.
 
 ## hostNetwork cutover (2026-10)
+
+*Historical (v5).*
 
 **Done 2026-10-03, 16:30–16:32.** DNS was down ~50 s. All checks passed: DNS v4 and v6 (v6 had been dead
 since the last prefix rotation), blocking, web UI on :8080 via Traefik, DHCP on `eno2` (SV08 re-lease), no RA,

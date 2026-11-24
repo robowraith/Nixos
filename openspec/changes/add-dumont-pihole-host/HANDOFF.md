@@ -2,7 +2,17 @@
 
 ## Current state 2026-11-24 (reason) — READ FIRST
 
-**Progress 31/35 done (+1 dropped).** Open: 9.1–9.4 (phase 4).
+**Progress 34/35 done (+1 dropped).** Open: only 9.1 (user). Then archive the change.
+
+- **9.2–9.4 done 2026-11-24 (Claude):** `docs/hosts.md` has a dumont row and section, wintermute as "Pi-hole v6
+  standby", and a "Planned" section with the refreshed follow-ups (monitoring, NixOS-native secondary DNS, deploy
+  from wintermute, HTTPS, unattended updates). README marks only its v5 parts historical. The root handoff is folded
+  into `docs/wintermute/pihole/history.md` (no MACs/IIDs) and deleted; memory `pihole-wintermute-handoff` dropped.
+- **9.1 check 2026-11-24 (evening):** the `interface eno2` block is gone from `/etc/dhcpcd.conf`, but `.4` is
+  still on `eno2` (`ip addr del` not done yet, or not taken): `.4` answers ping from wintermute's MAC and
+  `dig -x 192.168.1.4 @192.168.1.3` still says `pi.hole.` (FTL names its own interface addresses). Next: step 3 of
+  the 9.1 list below, then re-run check 4. iLO not re-addressed/plugged yet (no second cable attached).
+- **At archive time:** drop the `dumont-pihole-host` memory (it is the resume pointer until then).
 
 - **8.7/8.8 done 2026-11-24:** wintermute runs Pi-hole v6 (`pihole/pihole:2026.11.0`, FTL 6.9) as DNS `.3` and cold
   DHCP standby (off, 1 h). All README checks passed; details in tasks.md. Fixed during the checks (`82191ae`): the
@@ -33,7 +43,7 @@
     `deploy-dumont`, v6 README step 3 (inventory Secret) + `rollout restart` on wintermute.
   - Remaining 9.1 item: `sudo rm -r /etc/pihole` (v5 state, 877 MB, incl. the KSK file), not before ~2026-12-01
     (it is the v5 rollback). Keep `/etc/pihole-v6`, namespace `pihole`, Secret `pihole-web-password`.
-- **Next:** finish 9.1, then 9.2–9.4 (docs, Claude).
+- **Next:** finish 9.1, then archive (`openspec archive`).
 - **Unrelated, done 2026-11-24:** ssh aliases `wintermute`, `wm`, `wintermute_zellij`, `wm_zellij` for `server`
   (`6b050b8`, `a892b2f`); active after a rebuild (`nh os switch .`).
 
@@ -383,5 +393,5 @@ These are listed in design.md → Open Questions. The ones most likely to force 
 ## Related
 
 - History of the current wintermute setup: `docs/wintermute/pihole/README.md` (hostNetwork cutover, KSK-2024 hack,
-  static-lease Save quirk) and the untracked `pihole_wintermute_handoff.md` at the repo root (reason only).
-- Fleet table: `docs/hosts.md`. dumont is added in task 9.2.
+  static-lease Save quirk) and `docs/wintermute/pihole/history.md` (folded in from the old root handoff, 9.4).
+- Fleet table: `docs/hosts.md` (dumont row + section, "Planned" follow-ups since 9.2/9.3).

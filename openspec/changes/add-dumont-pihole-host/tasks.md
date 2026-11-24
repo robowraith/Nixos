@@ -186,11 +186,20 @@ command or steps and waits for the result. Everything else is repo work plus rea
 
   Verify that LAN DNS is unaffected. (Changed 2026-11-24: the v6 standby lives in namespace `pihole`, so the
   namespace stays; the v5 Deployment itself was already replaced in 8.7.)
-- [ ] 9.2 Mark `docs/wintermute/pihole/README.md` as historical, with a pointer to dumont. Update `docs/hosts.md`:
+- [x] 9.2 Mark `docs/wintermute/pihole/README.md` as historical, with a pointer to dumont. Update `docs/hosts.md`:
   dumont row, wintermute's services without Pi-hole, and the Pi-hole notes moved to dumont. Verify that no IPv6
   interface IDs or MACs are added.
-- [ ] 9.3 Record the design's Follow-ups (monitoring with its open alert-channel question, secondary DNS, deploy from
+  Done 2026-11-24, changed: wintermute still runs Pi-hole v6 (secondary DNS, cold DHCP standby), so `hosts.md`
+  lists it as "Pi-hole v6 standby", not without Pi-hole, and the README marks only its v5 parts as historical (the
+  "Pi-hole v6" section stays the live standby runbook). Grep for MACs, IPv6 interface IDs, IPs and domains: clean.
+- [x] 9.3 Record the design's Follow-ups (monitoring with its open alert-channel question, secondary DNS, deploy from
   wintermute, HTTPS, unattended updates) in `docs/hosts.md` under a "Planned" section, so they survive archiving.
   Verify that each one has enough context to start from.
-- [ ] 9.4 Fold the root-level `pihole_wintermute_handoff.md` into `docs/` (history only, no MACs), and drop the
+  Done 2026-11-24: `docs/hosts.md` → "Planned". Refreshed rather than copied: secondary DNS is mostly done (v6 on
+  wintermute), only the NixOS-native version is left; the web-password item was dropped (sops + deploy covers it).
+  Pointers go to `docs/` paths that survive archiving.
+- [x] 9.4 Fold the root-level `pihole_wintermute_handoff.md` into `docs/` (history only, no MACs), and drop the
   Pi-hole items from the auto-memory index. Verify that `git status` shows no Pi-hole handoff left at the repo root.
+  Done 2026-11-24: `docs/wintermute/pihole/history.md` (no MACs, IPv6 interface IDs or ULA prefix); root file deleted;
+  memory `pihole-wintermute-handoff` dropped. Changed: the `dumont-pihole-host` memory stays as the resume pointer
+  while 9.1 is open, and goes at archive time.
