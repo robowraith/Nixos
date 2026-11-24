@@ -16,9 +16,9 @@
   restores it too). Checks after: `.4` no ping, `.3` ping/SSH/445/6443/8080 ok, DNS on `.3` UDP+TCP NOERROR and
   blocks, `.2`/`.1` fine, 4 global IPv6 on eno2, `:67` closed. dhcpcd also gives k3s interfaces `169.254` IPv4LL
   addresses and a `default dev flannel.1 metric 204` route (below the static default): leave for the reinstall.
-- **Left in 9.1 (user):** (a) `dig -x 192.168.1.4 @192.168.1.3` still says `pi.hole.` (TTL 0, FTL's cached
-  interface list): `kubectl --context wintermute -n pihole rollout restart deploy/pihole-deployment`, then expect
-  empty. (b) iLO: state unverified (`ipmitool` needs sudo); do not plug its cable in until `sudo ipmitool lan print
+- **Stale `.4` PTR done 2026-11-24:** after `rollout restart` of the v6 pod, `dig -x 192.168.1.4 @192.168.1.3` is
+  NXDOMAIN; `.3` DNS UDP/TCP, blocking, DNSSEC (`dnssec-failed.org` SERVFAIL) and `.internal` names ok, `:67` closed.
+- **Left in 9.1 (user):** (b) iLO: state unverified (`ipmitool` needs sudo); do not plug its cable in until `sudo ipmitool lan print
   2` shows `.4` (`.4` is now free). (c) `sudo rm -r /etc/pihole` not before ~2026-12-01.
 - **At archive time:** drop the `dumont-pihole-host` memory (it is the resume pointer until then).
 
