@@ -1,6 +1,6 @@
 # Handoff — add-dumont-pihole-host
 
-## Current state 2026-11-23 (reason) — READ FIRST
+## Current state 2026-11-24 (reason) — READ FIRST
 
 **Progress 29/35 done (+1 dropped).** Open: 8.7, 8.8 (prepared), 9.1–9.4.
 
@@ -24,14 +24,17 @@
   - Risky checks: the `file://` allowlist through ConfigMap `..data` symlinks (check `adlist.number`), and
     reserved names (`reason`, `deepthought`) may not resolve on `.3` if they exist only as `dhcp-host` lines (no
     lease while standby DHCP is off). Today `.3` (v5) answers no `.internal` name at all.
-- **Decisions the user still owes:**
-  1. **Security:** dumont runs FTL 6.7.1 / Core 6.4.2 / web 6.6 (nixos-26.05). FTL 6.9 / Core 6.6 fix 11
-     advisories (High, incl. admin RCE). nixos-unstable has the matching set: pihole-ftl 6.9, pihole 6.6,
-     pihole-web 6.6.1. Offered pinning them from `pkgs.unstable` so it ships with the lease deploy; no answer yet.
-     Ideally decide before deploying.
-  2. Standby DHCP DNS order: `.2,.3` (same as dumont, as task 8.8 states) vs `.3,.2` (faster during a failover);
-     one-line override in `v6.nix`.
-  3. wintermute `/admin` is open to the LAN again under v6 (PHP stopgap no longer needed) — confirm.
+- **Decisions taken 2026-11-24:**
+  1. **Security bump: yes.** dumont pins `pihole-ftl` 6.9, `pihole` 6.6, `pihole-web` 6.6.1 from `pkgs.unstable`
+     *and* imports unstable's `pihole-ftl` NixOS module (`disabledModules`): the 26.05 module reads
+     `piholePackage.src.src.tag`, which unstable's pihole no longer has. That made the old setup-script `mkForce`
+     redundant (removed, toplevel identical). Closure 1.5 → 1.7 GiB (unstable glibc/systemd/openssl for FTL),
+     dumont has 9.5 GB free. Only Pi-hole changes in `pihole.toml`/units are the store paths. Revert at 26.11
+     (comment in `pihole.nix`). **Not deployed yet**; ships together with the 72 h lease.
+  2. Standby DNS order stays `.2,.3` (as in 8.8; `v6.nix` unchanged).
+  3. wintermute `/admin` open to the LAN under v6: confirmed.
+- **Deploy (user):** `nix run .#deploy-dumont` from a clean tree at origin/main. After it: `pihole -v` on dumont
+  shows 6.9/6.6/6.6.1, `.2` resolves and blocks, a reconnected device gets `dhcp_lease_time = 259200`.
 - **Next after 8.7:** tick 8.7/8.8, drop ConfigMap `pihole-php-cve-2026`; phase 4 (9.1 only after 8.7).
 
 ## State 2026-10-29 (deepthought)

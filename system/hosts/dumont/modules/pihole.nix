@@ -23,8 +23,21 @@ in {
   # misc.readOnly (module default) keeps the web UI/API from changing the
   # configuration: a redeploy always restores what is declared here.
 
+  # Pinned to nixos-unstable (2026-11-24): FTL 6.9 / Core 6.6 / web 6.6.1 fix
+  # 11 advisories (High, incl. admin RCE) that nixos-26.05 (FTL 6.7.1 /
+  # Core 6.4.2 / web 6.6) still has. The 26.05 pihole-ftl module reads the
+  # Core tag from `piholePackage.src.src.tag`, which unstable's pihole no
+  # longer has, so the module comes from unstable too. Revert all of it
+  # (this block and the `package`/`piholePackage` lines here and in
+  # services.pihole-web) once the release branch catches up (compare
+  # `pkgs.pihole-ftl.version`).
+  disabledModules = ["services/networking/pihole-ftl.nix"];
+  imports = ["${inputs.nixpkgs-unstable}/nixos/modules/services/networking/pihole-ftl.nix"];
+
   services.pihole-ftl = {
     enable = true;
+    package = pkgs.unstable.pihole-ftl;
+    piholePackage = pkgs.unstable.pihole;
 
     settings = {
       dns = {
@@ -105,6 +118,7 @@ in {
 
   services.pihole-web = {
     enable = true;
+    package = pkgs.unstable.pihole-web;
     hostName = "dumont.meine2cent.internal";
     ports = ["80"];
   };
@@ -146,17 +160,10 @@ in {
         ${lib.getExe' pkgs.procps "kill"} -s SIGRTMIN \
           "$(${lib.getExe' config.systemd.package "systemctl"} show --property MainPID --value pihole-ftl.service)"
       '';
-
-      # 26.05's setup script exits 1 on every run after the first: re-adding a
-      # list that is already in gravity.db is a database_error. nixos-unstable
-      # treats "already present" as success; use its script until 26.05 has it.
-      # TODO(26.11): drop this override.
-      script = lib.mkForce (
-        import "${inputs.nixpkgs-unstable}/nixos/modules/services/networking/pihole-ftl-setup-script.nix" {
-          cfg = config.services.pihole-ftl;
-          inherit config lib pkgs;
-        }
-      );
+      # 26.05's setup script exits 1 on every run after the first (re-adding a
+      # list already in gravity.db is a database_error). The unstable module
+      # imported above ships the fixed script; if that module pin is ever
+      # dropped before 26.11, the setup script needs overriding from unstable.
     };
   };
 }
