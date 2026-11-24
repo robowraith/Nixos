@@ -50,7 +50,23 @@
       if l == dumontInventoryLine
       then "conf-file=${inventoryDir}/inventory.conf"
       else l)
-    ftl.settings.misc.dnsmasq_lines;
+    ftl.settings.misc.dnsmasq_lines
+    ++ [
+      # hostNetwork pods get the node's /etc/hosts, and wintermute's still
+      # lists old aliases (`deepthought`), which expand-hosts turned into
+      # deepthought.meine2cent.internal → .3 (seen 2026-11-24). Every LAN
+      # name comes from the inventory instead.
+      "no-hosts"
+      # dumont answers its own name from its hostname (not the inventory),
+      # so the standby needs it spelled out
+      "host-record=${dumont.networking.hostName}.${ftl.settings.dns.domain.name},${dumontAddress}"
+    ];
+  dumontAddress = let
+    addrs = dumont.systemd.network.networks."10-lan".address;
+  in
+    assert lib.assertMsg (builtins.length addrs == 1)
+    "wintermute-pihole: expected exactly one static address on dumont's 10-lan";
+      lib.head (lib.splitString "/" (lib.head addrs));
 
   settings =
     lib.recursiveUpdate
