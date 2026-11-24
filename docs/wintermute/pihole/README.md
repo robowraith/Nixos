@@ -33,7 +33,7 @@ kubectl --context wintermute apply -f docs/wintermute/pihole/pihole.yaml
 Anything that has to happen on wintermute itself (addon files, `/etc/pihole/config/setupVars.conf`) needs sudo
 there and is the user's job. On wintermute there is no `wintermute` context: use `sudo k3s kubectl`.
 
-## Pi-hole v6 (tasks 8.7 + 8.8, prepared 2026-11-23, not applied)
+## Pi-hole v6 (tasks 8.7 + 8.8, applied 2026-11-24)
 
 Replaces the v5 pod with `pihole/pihole:2026.11.0` (FTL 6.9, Core 6.6) as wintermute's DNS and the cold DHCP standby
 for dumont (design D11 in `openspec/changes/add-dumont-pihole-host`). `v6.nix` builds the manifest from
@@ -51,7 +51,9 @@ DHCP range/router, `dnsmasq_lines` and lists by construction. Intended differenc
 All settings are `FTLCONF_*` env vars: FTL re-applies them on every start and the UI/`--config` cannot change
 them. Not carried over from v5: `/etc/dnsmasq.d` (v5 DHCP files, the KSK-2024 hack; v6 ships the anchor), the PHP
 CVE ConfigMap (no PHP in v6; `/admin` is open to the LAN again, as on dumont), `INTERFACE` (`dns.listeningMode =
-LOCAL` instead). DHCP hands out `.2, .3`, the same as dumont; in a failover clients try `.2` first and fall back.
+LOCAL` instead), wintermute's `/etc/hosts` (the hostNetwork pod gets the node's copy, whose old `deepthought` alias
+made `deepthought.meine2cent.internal` answer `.3`; `v6.nix` adds `no-hosts` and a `host-record` for dumont,
+which answers its own name from its hostname). DHCP hands out `.2, .3`, the same as dumont; in a failover clients try `.2` first and fall back.
 
 kubectl context: `wintermute` on reason, `home_cluster` on deepthought (examples: `wintermute`). Every step that
 changes the cluster or wintermute is the user's.
@@ -116,7 +118,8 @@ rdisc6 enp7s0                                             # only fe80::1 (the Sp
   vs `@192.168.1.3`. Include a host-record name (`dumont.meine2cent.internal`) and reserved DHCP clients
   (`reason.meine2cent.internal`, `deepthought.meine2cent.internal`). If the reserved names stay empty on `.3`, the
   inventory only gives them a DNS name through an active lease (`dhcp-host`), which the standby has none of while
-  DHCP is off: a known standby limitation. Record it in task 8.7, or add `host-record` lines to the inventory.
+  DHCP is off. Result 2026-11-24: reserved names resolve (the inventory has `host-record`s for them); only
+  bare names (`reason`) and dynamic clients (`deepthought`, no reservation) stay empty on `.3`. Accepted.
 - Web: `http://pihole.meine2cent.internal/admin/` loads and the login works (password from
   `secrets/wintermute-pihole.yaml`). The query log shows real client IPs.
 

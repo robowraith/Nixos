@@ -2,7 +2,17 @@
 
 ## Current state 2026-11-24 (reason) — READ FIRST
 
-**Progress 29/35 done (+1 dropped).** Open: 8.7, 8.8 (prepared), 9.1–9.4.
+**Progress 31/35 done (+1 dropped).** Open: 9.1–9.4 (phase 4).
+
+- **8.7/8.8 done 2026-11-24:** wintermute runs Pi-hole v6 (`pihole/pihole:2026.11.0`, FTL 6.9) as DNS `.3` and cold
+  DHCP standby (off, 1 h). All README checks passed; details in tasks.md. Fixed during the checks (`82191ae`): the
+  hostNetwork pod read wintermute's `/etc/hosts` (old `deepthought` alias → `.3`), now `no-hosts`, plus a
+  `host-record` for dumont. `dhcp-failover.md` is v6-only now. **Still the user's:** step 6,
+  `kubectl --context wintermute -n pihole delete configmap pihole-php-cve-2026`; optionally tidy wintermute's
+  `/etc/hosts` (stale `deepthought` aliases, typo `meien2cent.de`). v5 state in `/etc/pihole/config` stays for the
+  rollback until phase 4.
+- **Next: phase 4.** 9.1 (user, on wintermute: v5 cleanup) is unblocked now; 9.2–9.4 are docs.
+
 
 - **dumont healthy** at check time: booted `8cee669` (18:38 reboot, kernel 6.18.64), `running`, no failed units,
   `pihole-ftl` active; `.2` resolves, blocks (`doubleclick.net` → `0.0.0.0`) and answers `.internal` names; also via

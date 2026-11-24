@@ -141,19 +141,26 @@ command or steps and waits for the result. Everything else is repo work plus rea
   - deepthought done 2026-10-29: override removed, lease from `.2` (24 h), DNS `.2`, `.3`, `fe80::1`; blocking and
     local names resolve via the system resolver.
   - reason done (checked 2026-11-23): `.111/24`, gateway `.1`, DNS `.2`, `.3`, `fe80::1`, lease from `.2` (86400 s).
-- [ ] 8.7 **(user)** Reinstall wintermute's Pi-hole as v6 (DNS only; DHCP configured but off, 8.8): same allowlist and
+- [x] 8.7 **(user)** Reinstall wintermute's Pi-hole as v6 (DNS only; DHCP configured but off, 8.8): same allowlist and
   local-record inventory as dumont, ideally from the same module (needs wintermute on NixOS, or a v6 container with the same
   config). Then check the Speedport secondary still answers and blocks like dumont.
   - Prepared 2026-11-23 (not applied): `pihole/pihole:2026.11.0` on k3s, manifest rendered from dumont's evaluated
     config by `docs/wintermute/pihole/v6.nix` (`nix build .#wintermute-pihole`), inventory Secret from
     `secrets/dumont.yaml`. Steps, checks and rollback: `docs/wintermute/pihole/README.md` → Pi-hole v6.
-- [ ] 8.8 **(user, with 8.7)** Make wintermute's v6 Pi-hole a cold DHCP standby (D11): dumont's range, router and
+  - Applied 2026-11-24 (`82191ae`): FTL 6.9 / Core 6.6 / web 6.6.1, lists loaded (incl. the `file://` allowlist).
+    `.3` answers blocked, allowed, upstream and `.internal` names like `.2`; DNSSEC validates; IPv6 DNS on GUA and
+    ULA; no RA from Pi-hole; `/admin` behind Traefik works, real client IPs in the log. Fixed on the way: the pod's
+    inherited `/etc/hosts` (`no-hosts`) and dumont's own name (`host-record`). Standby limitation: bare names and
+    dynamic clients have no name on `.3` while its DHCP is off.
+- [x] 8.8 **(user, with 8.7)** Make wintermute's v6 Pi-hole a cold DHCP standby (D11): dumont's range, router and
   reservations (the inventory), lease time 1 h, `dhcp.active = false`. Until 8.7 the v5 Pi-hole is the standby
   (DHCP off since 2026-10-26, settings and reservations still in place; check its lease time, set to 1 h in 8.2).
   Verify that nothing listens on wintermute's UDP `:67` and that its DHCP settings differ from dumont's only in
   `active` and `leaseTime`.
   - Covered by the 8.7 manifest: `dhcp.active = false`, `leaseTime = "1h"`, everything else from dumont. Once
     applied, the v6 lines in `docs/runbooks/dhcp-failover.md` (`kubectl set env … FTLCONF_dhcp_active`) apply.
+  - Verified 2026-11-24: `dhcp.active=false`, `leaseTime=1h`, range/router as dumont, nothing on wintermute's `:67`.
+    The failover runbook is now v6-only.
 - [x] 8.9 Write `docs/runbooks/dhcp-failover.md`: when to fail over, turning DHCP on at wintermute (v5 now, v6 after
   8.7), failback (wintermute off before dumont comes back, or right after if it comes back by itself; never both
   on), and the checks (a reconnected device gets its address from the expected server; `:67` listens on exactly one
@@ -173,11 +180,12 @@ command or steps and waits for the result. Everything else is repo work plus rea
 ## 9. Cleanup and docs (phase 4, after ~2 weeks stable)
 
 - [ ] 9.1 **(user)** On wintermute (only once the v6 reinstall 8.7 has replaced the v5 secondary):
-  - delete the v5 Pi-hole k3s objects
+  - delete the v5 Pi-hole leftovers: ConfigMap `pihole-php-cve-2026` and, once no rollback to v5 is wanted, its
+    state (`/etc/pihole/config`, `/etc/pihole/dnsmasq.d`) with `99-root-ksk-2024.conf`
   - remove the `.4` secondary address and the `pi.hole` PTR
-  - remove `/etc/pihole/dnsmasq.d/99-root-ksk-2024.conf`
 
-  Verify that `kubectl --context wintermute get ns pihole` is gone and that LAN DNS is unaffected.
+  Verify that LAN DNS is unaffected. (Changed 2026-11-24: the v6 standby lives in namespace `pihole`, so the
+  namespace stays; the v5 Deployment itself was already replaced in 8.7.)
 - [ ] 9.2 Mark `docs/wintermute/pihole/README.md` as historical, with a pointer to dumont. Update `docs/hosts.md`:
   dumont row, wintermute's services without Pi-hole, and the Pi-hole notes moved to dumont. Verify that no IPv6
   interface IDs or MACs are added.

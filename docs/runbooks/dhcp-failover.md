@@ -15,14 +15,19 @@ login shell is fish.
 | | dumont (`.2`) | wintermute (`.3`) |
 |---|---|---|
 | DHCP | on, `.12`–`.254`, 72 h, router `.1`, hands out DNS `.2` + `.3` | **off**, same range and router, lease **1 h** |
-| Reservations | `secrets/dumont.yaml` inventory | v5: its own `04-pihole-static-dhcp.conf` (pre-cutover copy) |
+| Reservations | `secrets/dumont.yaml` inventory | the same inventory (Secret `pihole-inventory`) |
 
-Check (verified 2026-10-29):
+wintermute runs Pi-hole v6 since 2026-11-24 (task 8.7); its settings are rendered from dumont's config
+(`docs/wintermute/pihole/README.md` → Pi-hole v6).
+
+Check (verified 2026-11-24):
 ```
 ssh yori@192.168.1.2 "ss -ulnH 'sport = :67'"     # one line: 0.0.0.0:67
 ssh server "ss -ulnH 'sport = :67'"               # nothing
-ssh server "grep -E '^DHCP_' /etc/pihole/config/setupVars.conf"
-# DHCP_ACTIVE=false, DHCP_START=192.168.1.12, DHCP_END=192.168.1.254, DHCP_ROUTER=192.168.1.1, DHCP_LEASETIME=1
+for k in dhcp.active dhcp.leaseTime dhcp.start dhcp.end dhcp.router; do
+  kubectl --context home_cluster -n pihole exec deploy/pihole-deployment -- pihole-FTL --config $k
+done
+# false, 1h, 192.168.1.12, 192.168.1.254, 192.168.1.1
 ```
 
 ## When to fail over
@@ -42,31 +47,16 @@ being authoritative, answers its request (usually with the same address).
 
 ## Fail over: DHCP on at wintermute
 
-**v5 (until task 8.7):**
 1. Make sure dumont is really not serving DHCP: `ssh yori@192.168.1.2 "ss -ulnH 'sport = :67'"` fails or prints
    nothing. If dumont is up but broken, stop its DHCP first (`dhcp.active = false` + deploy), or power it off.
-2. Turn DHCP on, with a 1 h lease:
+2. Turn DHCP on. The settings are `FTLCONF_*` env vars (`docs/wintermute/pihole/README.md` → Pi-hole v6), so
+   `pihole-FTL --config` and the UI cannot change them. Set the env var instead; this restarts the pod, a few
+   seconds without DNS on `.3`:
    ```
-   kubectl --context home_cluster -n pihole exec deploy/pihole-deployment -- \
-     pihole -a enabledhcp 192.168.1.12 192.168.1.254 192.168.1.1 1 meine2cent.internal
+   kubectl --context home_cluster -n pihole set env deploy/pihole-deployment FTLCONF_dhcp_active=true
    ```
-   (Or the web UI from reason, the only client allowed on wintermute's `/admin`.)
-3. The command blanks `DHCP_IPv6` and `DHCP_rapid_commit` (seen 2026-10-25). Make sure no router advertisements
-   are configured, since only the Speedport may send RAs:
-   ```
-   kubectl --context home_cluster -n pihole exec deploy/pihole-deployment -- \
-     grep -nE 'constructor|ra-|enable-ra' /etc/dnsmasq.d/02-pihole-dhcp.conf    # must print nothing
-   ```
-   Set both keys back to `false` (UI from reason → Settings → DHCP → Save with IPv6 unticked) once things are calm.
-
-**v6 (after task 8.7):** the settings are `FTLCONF_*` env vars (`docs/wintermute/pihole/README.md` → Pi-hole v6),
-so `pihole-FTL --config` and the UI cannot change them. Set the env var instead; this restarts the pod, a few seconds
-without DNS on `.3`:
-```
-kubectl --context home_cluster -n pihole set env deploy/pihole-deployment FTLCONF_dhcp_active=true
-```
-No RA check needed: `dhcp.ipv6 = false` comes from the manifest. Reservations are dumont's inventory (Secret
-`pihole-inventory`), so reserved devices keep their addresses.
+   No RA check needed: `dhcp.ipv6 = false` comes from the manifest. Reservations are dumont's inventory (Secret
+   `pihole-inventory`), so reserved devices keep their addresses.
 
 **Check:**
 - `ssh server "ss -ulnH 'sport = :67'"` prints a listener
@@ -77,8 +67,8 @@ No RA check needed: `dhcp.ipv6 = false` comes from the manifest. Reservations ar
   ```
 - `rdisc6 <iface>` (`, rdisc6`) still only answers from `fe80::1`
 
-Reservations come from wintermute's own pre-cutover list. A device reserved on dumont only after the cutover gets a
-dynamic address while failed over.
+Bare names (`reason` without the domain) only resolve for devices that have a lease from wintermute; the
+`.internal` names of reserved devices resolve throughout.
 
 ## Fail back: wintermute off, then dumont
 
@@ -86,9 +76,8 @@ Turn wintermute off **before** dumont serves DHCP again: before powering dumont 
 back, or right away if dumont comes back by itself (its DHCP starts at boot).
 
 1. wintermute DHCP off:
-   - v5: `kubectl --context home_cluster -n pihole exec deploy/pihole-deployment -- pihole -a disabledhcp`
-   - v6: `kubectl --context home_cluster -n pihole set env deploy/pihole-deployment FTLCONF_dhcp_active=false`,
-     or re-apply the manifest (`nix build .#wintermute-pihole && kubectl apply -f result`)
+   `kubectl --context home_cluster -n pihole set env deploy/pihole-deployment FTLCONF_dhcp_active=false`,
+   or re-apply the manifest (`nix build .#wintermute-pihole && kubectl apply -f result`)
 2. Check: `ssh server "ss -ulnH 'sport = :67'"` prints nothing.
 3. Bring dumont back (power on, or `nix run .#deploy-dumont`). Check: `ssh yori@192.168.1.2 "ss -ulnH 'sport = :67'"`
    prints one listener.

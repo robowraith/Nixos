@@ -35,8 +35,9 @@ platform decision:
   IPv6 on a rotating provider prefix). Running it in the pod network took
   three relay/proxy shims that drifted and broke; host networking removed all
   of them. Whatever the target platform, Pi-hole should be host-networked.
-- Pi-hole stays on the v5 image on purpose (a v6 upgrade attempt was rolled
-  back). Its gravity database had been left in the v6 schema and was rebuilt.
+- Pi-hole runs v6 since 2026-11-24 (`pihole/pihole:2026.11.0`), rendered from
+  dumont's config; an earlier v6 attempt (pre-dumont) had been rolled back.
+  It is now DNS `.3` and dumont's cold DHCP standby.
 - The router forwards its own DNS to Pi-hole, so Pi-hole is a single point of
   failure for LAN name resolution: migration downtime is a full DNS outage.
 - Traefik's ServiceLB owns :80/:443 on the host; Pi-hole's web UI sits on
