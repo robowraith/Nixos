@@ -7,12 +7,35 @@
 - **8.7/8.8 done 2026-11-24:** wintermute runs Pi-hole v6 (`pihole/pihole:2026.11.0`, FTL 6.9) as DNS `.3` and cold
   DHCP standby (off, 1 h). All README checks passed; details in tasks.md. Fixed during the checks (`82191ae`): the
   hostNetwork pod read wintermute's `/etc/hosts` (old `deepthought` alias → `.3`), now `no-hosts`, plus a
-  `host-record` for dumont. `dhcp-failover.md` is v6-only now. **Still the user's:** step 6,
-  `kubectl --context wintermute -n pihole delete configmap pihole-php-cve-2026`; optionally tidy wintermute's
-  `/etc/hosts` (stale `deepthought` aliases, typo `meien2cent.de`). v5 state in `/etc/pihole/config` stays for the
-  rollback until phase 4.
-- **Next: phase 4.** 9.1 (user, on wintermute: v5 cleanup) is unblocked now; 9.2–9.4 are docs.
-
+  `host-record` for dumont. `dhcp-failover.md` is v6-only now. Done by the user afterwards: ConfigMap
+  `pihole-php-cve-2026` deleted, wintermute's `/etc/hosts` cleaned up. Speedport DNS needs no change: its secondary
+  has been wintermute (`.3` + the MAC-based EUI-64 ULA, confirmed by the user) since 2026-10-26.
+- **9.1 in progress (user), `.4` + iLO, found 2026-11-24:**
+  - `.4` on `eno2` comes from **dhcpcd**: `/etc/dhcpcd.conf` has `interface eno2` + `static ip_address=192.168.1.4/24`
+    (+ routers, DNS 127.0.0.1) since 2019. Not netplan (`standard.yaml`), not `/etc/network/interfaces` (only
+    commented lines; `networking.service` failed). wintermute runs dhcpcd *and* netplan/networkd *and*
+    NetworkManager on one NIC; dhcpcd's `slaac private` makes the extra privacy IPv6 addresses. Leave that mess for
+    the reinstall, only remove `.4`.
+  - Traffic to `.4` (UFW blocks this boot): stellanb (`.158`) → `:631` (a CUPS printer configured at `.4`; already
+    blocked, so no change), `.33` Samsung / `.235` UDP to high ports (replies to discovery sent from `.4`). DNS to
+    `.4` is allowed by UFW, so it never shows as a block: needs `tcpdump` (below).
+  - **wintermute's iLO 4** (MicroServer Gen8; `ipmitool lan print 2`, channel 1 is invalid): **static `192.168.1.2`
+    = dumont's address.** No conflict today: its MAC is not seen on the LAN (iLO port probably unplugged). **Never
+    plug in the iLO cable before re-addressing it.** Plan agreed: iLO → `.4` once `.4` is off `eno2`. Its MAC is in
+    the session only; it does not go in the repo (static address, no DHCP reservation needed).
+  - Steps (user): (1) `ssh -t wm sudo tcpdump -ni eno2 dst host 192.168.1.4 and port 53`, silent for a while;
+    (2) delete the `interface eno2` block from `/etc/dhcpcd.conf`; (3) `sudo ip addr del 192.168.1.4/24 dev eno2`
+    (no dhcpcd restart); (4) check: `.4` no ping, `dig @192.168.1.3 example.com` NOERROR, `dig -x 192.168.1.4
+    @192.168.1.3` empty; (5) `sudo ipmitool lan set 2 ipaddr 192.168.1.4`, `netmask 255.255.255.0`,
+    `defgw ipaddr 192.168.1.1`, verify with `lan print 2`; (6) plug the iLO port, open `https://192.168.1.4`
+    (user `Administrator`, password on the front pull-out tag unless changed).
+  - Optional: `host-record=ilo.meine2cent.internal,192.168.1.4` in `secrets/dumont.yaml` (pihole_inventory), then
+    `deploy-dumont`, v6 README step 3 (inventory Secret) + `rollout restart` on wintermute.
+  - Remaining 9.1 item: `sudo rm -r /etc/pihole` (v5 state, 877 MB, incl. the KSK file), not before ~2026-12-01
+    (it is the v5 rollback). Keep `/etc/pihole-v6`, namespace `pihole`, Secret `pihole-web-password`.
+- **Next:** finish 9.1, then 9.2–9.4 (docs, Claude).
+- **Unrelated, done 2026-11-24:** ssh aliases `wintermute`, `wm`, `wintermute_zellij`, `wm_zellij` for `server`
+  (`6b050b8`, `a892b2f`); active after a rebuild (`nh os switch .`).
 
 - **dumont healthy** at check time: booted `8cee669` (18:38 reboot, kernel 6.18.64), `running`, no failed units,
   `pihole-ftl` active; `.2` resolves, blocks (`doubleclick.net` → `0.0.0.0`) and answers `.internal` names; also via
