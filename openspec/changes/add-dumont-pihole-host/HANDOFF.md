@@ -8,12 +8,18 @@
   standby", and a "Planned" section with the refreshed follow-ups (monitoring, NixOS-native secondary DNS, deploy
   from wintermute, HTTPS, unattended updates). README marks only its v5 parts historical. The root handoff is folded
   into `docs/wintermute/pihole/history.md` (no MACs/IIDs) and deleted; memory `pihole-wintermute-handoff` dropped.
-- **9.1 check 2026-11-24 (evening):** the `interface eno2` block is gone from `/etc/dhcpcd.conf`, but `.4` is
-  still on `eno2` (`ip addr del` not done yet, or not taken): `.4` answers ping from wintermute's MAC and
-  `dig -x 192.168.1.4 @192.168.1.3` still says `pi.hole.` (FTL names its own interface addresses). Next: step 3 of
-  the 9.1 list below, then re-run check 4. **iLO state unverified** (`ipmitool` needs sudo): it is on `.2` or
-  already on `.4`. No cable attached yet. Do not plug it in until `sudo ipmitool lan print 2` shows `.4` **and** `.4`
-  is gone from `eno2`.
+- **9.1 `.4` removed 2026-11-24 (late), checked:** dhcpcd.conf now ends with `interface eno2` + `noipv4` (dhcpcd
+  keeps doing IPv6 on eno2, no IPv4: without it a reboot would make dhcpcd a DHCP client there), then
+  `dhcpcd -n eno2`. **Gotcha:** dhcpcd had replaced the kernel's `192.168.1.0/24` route with its own (src `.4`) and
+  took it along, so wintermute answered LAN TCP/ICMP only via the Speedport (dropped; UDP DNS still worked). Fixed
+  with `ip route add 192.168.1.0/24 dev eno2 proto kernel scope link src 192.168.1.3` (over IPv6 SSH; a reboot
+  restores it too). Checks after: `.4` no ping, `.3` ping/SSH/445/6443/8080 ok, DNS on `.3` UDP+TCP NOERROR and
+  blocks, `.2`/`.1` fine, 4 global IPv6 on eno2, `:67` closed. dhcpcd also gives k3s interfaces `169.254` IPv4LL
+  addresses and a `default dev flannel.1 metric 204` route (below the static default): leave for the reinstall.
+- **Left in 9.1 (user):** (a) `dig -x 192.168.1.4 @192.168.1.3` still says `pi.hole.` (TTL 0, FTL's cached
+  interface list): `kubectl --context wintermute -n pihole rollout restart deploy/pihole-deployment`, then expect
+  empty. (b) iLO: state unverified (`ipmitool` needs sudo); do not plug its cable in until `sudo ipmitool lan print
+  2` shows `.4` (`.4` is now free). (c) `sudo rm -r /etc/pihole` not before ~2026-12-01.
 - **At archive time:** drop the `dumont-pihole-host` memory (it is the resume pointer until then).
 
 - **8.7/8.8 done 2026-11-24:** wintermute runs Pi-hole v6 (`pihole/pihole:2026.11.0`, FTL 6.9) as DNS `.3` and cold
@@ -45,7 +51,7 @@
     `deploy-dumont`, v6 README step 3 (inventory Secret) + `rollout restart` on wintermute.
   - Remaining 9.1 item: `sudo rm -r /etc/pihole` (v5 state, 877 MB, incl. the KSK file), not before ~2026-12-01
     (it is the v5 rollback). Keep `/etc/pihole-v6`, namespace `pihole`, Secret `pihole-web-password`.
-- **Next:** finish 9.1, then archive (`openspec archive`).
+- **Next:** finish 9.1 (a–c above), then archive (`openspec archive`).
 - **Unrelated, done 2026-11-24:** ssh aliases `wintermute`, `wm`, `wintermute_zellij`, `wm_zellij` for `server`
   (`6b050b8`, `a892b2f`); active after a rebuild (`nh os switch .`).
 
