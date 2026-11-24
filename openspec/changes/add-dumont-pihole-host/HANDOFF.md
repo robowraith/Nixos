@@ -11,7 +11,9 @@
 - **9.1 check 2026-11-24 (evening):** the `interface eno2` block is gone from `/etc/dhcpcd.conf`, but `.4` is
   still on `eno2` (`ip addr del` not done yet, or not taken): `.4` answers ping from wintermute's MAC and
   `dig -x 192.168.1.4 @192.168.1.3` still says `pi.hole.` (FTL names its own interface addresses). Next: step 3 of
-  the 9.1 list below, then re-run check 4. iLO not re-addressed/plugged yet (no second cable attached).
+  the 9.1 list below, then re-run check 4. **iLO state unverified** (`ipmitool` needs sudo): it is on `.2` or
+  already on `.4`. No cable attached yet. Do not plug it in until `sudo ipmitool lan print 2` shows `.4` **and** `.4`
+  is gone from `eno2`.
 - **At archive time:** drop the `dumont-pihole-host` memory (it is the resume pointer until then).
 
 - **8.7/8.8 done 2026-11-24:** wintermute runs Pi-hole v6 (`pihole/pihole:2026.11.0`, FTL 6.9) as DNS `.3` and cold
