@@ -8,7 +8,7 @@
   `pihole-ftl` active; `.2` resolves, blocks (`doubleclick.net` → `0.0.0.0`) and answers `.internal` names; also via
   `fe80::1`. `/` 29 %, 1.5 GB RAM free.
 - **8.6 done:** reason `.111/24`, gw `.1`, DNS `.2`/`.3`/`fe80::1`, lease from `.2`.
-- **8.10 done: lease 72 h** (`bb723ef`). **Not deployed yet.** User runs `nix run .#deploy-dumont` (pihole-ftl
+- **8.10 done: lease 72 h** (`bb723ef`), deployed 2026-11-24. User runs `nix run .#deploy-dumont` (pihole-ftl
   restarts, short DNS blip on `.2`); verify a reconnected device shows `dhcp_lease_time = 259200`.
 - **8.7/8.8 prepared, not applied** (`fdc4ab3`, `20639b8`): v6 container `pihole/pihole:2026.11.0` on k3s.
   - `docs/wintermute/pihole/v6.nix` renders a k8s `List` from `nixosConfigurations.dumont.config.services.pihole-ftl`
@@ -30,11 +30,13 @@
      `piholePackage.src.src.tag`, which unstable's pihole no longer has. That made the old setup-script `mkForce`
      redundant (removed, toplevel identical). Closure 1.5 → 1.7 GiB (unstable glibc/systemd/openssl for FTL),
      dumont has 9.5 GB free. Only Pi-hole changes in `pihole.toml`/units are the store paths. Revert at 26.11
-     (comment in `pihole.nix`). **Not deployed yet**; ships together with the 72 h lease.
+     (comment in `pihole.nix`). **Deployed 2026-11-24** with the 72 h lease.
   2. Standby DNS order stays `.2,.3` (as in 8.8; `v6.nix` unchanged).
   3. wintermute `/admin` open to the LAN under v6: confirmed.
-- **Deploy (user):** `nix run .#deploy-dumont` from a clean tree at origin/main. After it: `pihole -v` on dumont
-  shows 6.9/6.6/6.6.1, `.2` resolves and blocks, a reconnected device gets `dhcp_lease_time = 259200`.
+- **Deployed 2026-11-24 15:24** (`c9b02d7`, incl. 72 h lease and sops-nix bump), checked: system `running`, no
+  failed units, FTL runs `pihole-ftl-6.9`, setup `success`, config `leaseTime = "72h"`, `.2` blocks
+  (`doubleclick.net` → `0.0.0.0`), resolves upstream and `.internal` names, `/admin` 302. Same kernel/initrd as
+  booted, no reboot needed. Still to see: a reconnected device with `dhcp_lease_time = 259200`.
 - **Next after 8.7:** tick 8.7/8.8, drop ConfigMap `pihole-php-cve-2026`; phase 4 (9.1 only after 8.7).
 
 ## State 2026-10-29 (deepthought)
